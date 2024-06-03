@@ -263,11 +263,11 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 					this.setNextPosition(this.getIdlePosition());
 				}
 				if (!this.world.isRemote) {
-					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox())) {
+					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(0.8D))) {
 						if (!entity.equals(this.shootingEntity) && !entity.equals(this)) {
 							entity.hurtResistantTime = 10;
 							entity.getEntityData().setBoolean("TempData_disableKnockback", true);
-							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 1.5f);
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2.5f);
 							this.scorchEffects(entity.posX, entity.posY+entity.height/2, entity.posZ, entity.width/2, entity.height/2);
 						}
 					}
@@ -304,7 +304,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 				new net.narutomod.event.EventSphericalExplosion(this.world, this.shootingEntity,
 				 (int)this.posX, (int)this.posY + 5, (int)this.posZ, (int)this.maxScale, 0, 0.3333f);
 				ProcedureAoeCommand.set(this, 0d, this.maxScale)
-				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxScale * 60f);
+				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxScale * 85f);
 				//this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.maxScale * 5f, flag, flag);
 				this.scorchEffects(this.posX, this.posY, this.posZ, 2.5d * this.maxScale, 1d);
 				this.setDead();
