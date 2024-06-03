@@ -197,6 +197,9 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				if (entity instanceof EntityPlayer) {
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, (long) 3600);
+				}
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 						SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:kirigakurenojutsu"))),
 						SoundCategory.PLAYERS, 5, 1f);
@@ -209,7 +212,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 	public static class EntityStream extends EntityBeamBase.Base {
 		private final AirPunch stream = new AirPunch();
 		private final int maxLife = 100;
-		private final float damageModifier = 0.5f;
+		private final float damageModifier = 2.5f;
 		private float power;
 
 		public EntityStream(World a) {
@@ -273,8 +276,14 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
-				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
+				if (player instanceof EntityPlayer) {
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
+							EntityStream.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 40f, 1f, 6f));
+				}
+				else {
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
 						EntityStream.this.power * EntityStream.this.damageModifier);
+				}
 			}
 
 			@Override
@@ -298,6 +307,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
+					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 30));
 					EntityStream entityarrow = new EntityStream(entity, power);
 					entityarrow.shoot();
 					entity.world.spawnEntity(entityarrow);

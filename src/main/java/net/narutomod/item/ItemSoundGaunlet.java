@@ -55,7 +55,7 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 	public static class RangedItem extends Item {
 		public RangedItem() {
 			super();
-			this.setMaxDamage(200);
+			this.setMaxDamage(100);
 			this.setFull3D();
 			this.setUnlocalizedName("sound_gaunlet");
 			this.setRegistryName("sound_gaunlet");
@@ -89,7 +89,7 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 						entity1.addPotionEffect(new PotionEffect(PotionParalysis.potion, (int)d1, 0));
 						entity1.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int)d1 + 5, 0));
 						entity1.hurtResistantTime = 10;
-						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(), (float)d1 * 3f);
+						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(), (float)d1 * 2f);
 					}
 				}
 				if (!(entity instanceof EntityPlayer) || !((EntityPlayer)entity).isCreative()) {

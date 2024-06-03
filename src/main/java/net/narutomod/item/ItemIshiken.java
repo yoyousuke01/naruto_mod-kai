@@ -34,26 +34,32 @@ public class ItemIshiken extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new ItemSword(EnumHelper.addToolMaterial("ISHIKEN", 0, 0, 8.5f, 14f, 0)) {
-			@Override
-			public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
-				Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
-				if (slot == EntityEquipmentSlot.MAINHAND) {
-					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
-					multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
-							new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -3.1, 0));
-				}
-				return multimap;
-			}
-
-			public Set<String> getToolClasses(ItemStack stack) {
-				HashMap<String, Integer> ret = new HashMap<String, Integer>();
-				ret.put("sword", 0);
-				return ret.keySet();
-			}
-		}.setUnlocalizedName("ishiken").setRegistryName("ishiken").setCreativeTab(TabModTab.tab));
+		elements.items.add(() -> new ItemCustom().setUnlocalizedName("ishiken").setRegistryName("ishiken").setCreativeTab(TabModTab.tab));
 	}
+
+	public static class ItemCustom extends ItemSword implements ItemOnBody.Interface {
+		public ItemCustom() {
+			super(EnumHelper.addToolMaterial("ISHIKEN", 0, 0, 8.5f, 14f, 0));
+		}
+
+		@Override
+		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
+			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
+			if (slot == EntityEquipmentSlot.MAINHAND) {
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
+						new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -3.1, 0));
+			}
+			return multimap;
+		}
+	}
+	public Set<String> getToolClasses(ItemStack stack) {
+		HashMap<String, Integer> ret = new HashMap<String, Integer>();
+		ret.put("sword", 1);
+		return ret.keySet();
+	}
+
 
 	@SideOnly(Side.CLIENT)
 	@Override

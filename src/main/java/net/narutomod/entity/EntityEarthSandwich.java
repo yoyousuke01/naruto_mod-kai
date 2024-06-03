@@ -206,7 +206,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 2.0f;
+				return 1.0f;
 			}
 	
 			@Override
@@ -216,7 +216,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getMaxPower() {
-				return 20.0f;
+				return 10.0f;
 			}
 		}
 	}

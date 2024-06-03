@@ -64,8 +64,8 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 
 	public static class Genjutsu implements ItemJutsu.IJutsuCallback {
 		private final double maxRange = 30.0d;
-		private final int duration = 200;
-		private final int cooldown = 1200;
+		private final int duration = 400;
+		private final int cooldown = 12000;
 
 		@Override
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
