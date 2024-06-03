@@ -318,8 +318,10 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (!entity.isRiding()) {
+				if ((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false)
+						|| (NarutomodModVariables.world_tick > entity.getEntityData().getDouble("ice_dome_cd")))) {
 					this.createJutsu(entity, entity.posX, entity.posY - 0.1d, entity.posZ);
+					entity.getEntityData().setDouble("ice_dome_cd", NarutomodModVariables.world_tick + 600);
 					return true;
 				} else if (entity.getRidingEntity() instanceof EC) {
 					((EC)entity.getRidingEntity()).shootSpears();
