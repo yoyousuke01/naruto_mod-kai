@@ -158,6 +158,9 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
 					entity.world.spawnEntity(new EC(entity, ItemMokuton.GOLEM.chakraUsage * 0.05d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
+					 if (entity instanceof EntityPlayer) {
+					 	ItemJutsu.setCurrentJutsuCooldown(stack, entity, 7200);
+					 }
 					return true;
 				}
 				return false;

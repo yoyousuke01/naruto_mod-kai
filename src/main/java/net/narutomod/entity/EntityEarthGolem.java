@@ -213,6 +213,9 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
+					if (entity instanceof EntityPlayer) {
+						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 800));
+					}
 					entity.world.spawnEntity(new EC(entity, power));
 					return true;
 				}

@@ -44,12 +44,12 @@ import javax.annotation.Nullable;
 public abstract class EntitySusanooBase extends EntityCreature implements IRangedAttackMob {
 	private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> FLAME_COLOR = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
-	public static final double BXP_REQUIRED_L0 = 2000.0d;
+	public static final double BXP_REQUIRED_L0 = 3000.0d;
 	public static final double BXP_REQUIRED_L1 = 5000.0d;
 	public static final double BXP_REQUIRED_L2 = 10000.0d;
 	public static final double BXP_REQUIRED_L3 = 20000.0d;
-	public static final double BXP_REQUIRED_L4 = 36000.0d;
-	protected double chakraUsage = 30d; // per second
+	public static final double BXP_REQUIRED_L4 = 60000.0d;
+	protected double chakraUsage = 45d; // per second
 	protected double chakraUsageModifier = 2d;
 	protected double playerXp;
 	//private EntityLivingBase ownerPlayer = null;

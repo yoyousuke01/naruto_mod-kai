@@ -39,7 +39,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends Entity {
 		private final AirStream airStream = new AirStream();
-		private final float damageModifier = 0.5f;
+		private final float damageModifier = 0.6f;
 		private EntityLivingBase user;
 		private float power;
 

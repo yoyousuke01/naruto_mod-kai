@@ -122,6 +122,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			@Override
 			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
 				ProcedureUtils.pushEntity(player, target, this.getRange(0) * 1.6d, 3.0F);
+				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(player, null), 20f);
 			}
 
 			@Override

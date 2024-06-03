@@ -87,7 +87,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(MODELSCALE * 0.8f, MODELSCALE * 2.0f);
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
-			this.chakraUsage = 90d;
+			this.chakraUsage = 280d;
 		}
 
 		public EntityCustom(EntityPlayer player) {

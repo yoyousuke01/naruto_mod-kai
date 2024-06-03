@@ -82,7 +82,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			this.setSize(MODELSCALE * 0.8F, MODELSCALE * (this.hasLegs() ? 2.0F : 1.25F));
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
 			this.lifeSpan = Integer.MAX_VALUE;
-			this.chakraUsage = this.hasLegs() ? 70d : 60d;
+			this.chakraUsage = this.hasLegs() ? 220d : 180d;
 		}
 
 		public EntityCustom(EntityLivingBase entity, boolean fullBody) {

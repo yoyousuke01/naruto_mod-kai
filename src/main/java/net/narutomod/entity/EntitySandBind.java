@@ -73,7 +73,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		private Vec3d capturedVec;
 		private int funeralTime;
 		private final float funeralDamage = 4f; // per tick for 20 ticks
-		private static final int MAXTIME = 600;
+		private static final int MAXTIME = 300;
 
 		public EC(World world) {
 			super(world);

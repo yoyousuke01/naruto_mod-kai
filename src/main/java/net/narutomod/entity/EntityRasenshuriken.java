@@ -262,6 +262,9 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if ((stack.getItem() == ItemFuton.block && power >= 0.1f) || (stack.getItem() == ItemSenjutsu.block && power >= 2.0f)) {
+					if (entity instanceof EntityPlayer) {
+						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 3600));
+					}
 					EC.create(entity, power, stack.getItem() == ItemSenjutsu.block);
 					return true;
 				}

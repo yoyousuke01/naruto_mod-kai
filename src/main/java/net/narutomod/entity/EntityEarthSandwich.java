@@ -187,7 +187,10 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 				if (power >= 2f) {
 					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 32d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
-						if (power >= 8f) {
+						if (entity instanceof EntityPlayer) {
+							ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 1800));
+						}
+						if (power >= 3f) {
 							entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 							 .getObject(new ResourceLocation("narutomod:sando_no_jutsu")), SoundCategory.NEUTRAL, 5, 1f);
 						} else {

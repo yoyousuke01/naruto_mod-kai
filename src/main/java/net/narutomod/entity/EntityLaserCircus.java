@@ -135,6 +135,9 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				if (entity instanceof EntityPlayer) {
+					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 120));
+				}
 				entity.world.spawnEntity(new EC(entity, power, stack));
 				return true;
 			}

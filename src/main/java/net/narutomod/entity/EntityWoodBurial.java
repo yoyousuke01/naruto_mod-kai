@@ -42,7 +42,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends ItemMokuton.WoodSegment {
-		private int lifespan = 300;
+		private int lifespan = 150;
 		private EC prevSegment;
 		private Entity target;
 		private Vec3d targetVec;
@@ -115,7 +115,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
 					if (this.ticksExisted > 50) {
-						this.target.attackEntityFrom(DamageSource.IN_WALL, 10.0f);
+						this.target.attackEntityFrom(DamageSource.IN_WALL, 3.0f);
 					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}
@@ -146,7 +146,9 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				});
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(res.entityHit));
-					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 300);
+					if (entity instanceof EntityPlayer) {
+						((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 3800);
+					}
 					return true;
 				}
 				return false;
