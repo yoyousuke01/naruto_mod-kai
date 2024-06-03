@@ -1,10 +1,6 @@
 {
 	"credit": "Made with Blockbench",
 	"texture_size": [1024, 1024],
-	"textures": {
-		"0": "flowerstaff_1",
-		"particle": "flowerstaff_1"
-	},
 	"elements": [
 		{
 			"from": [3.05174, 29.0351, 8.6014],
@@ -5927,6 +5923,11 @@
 			"rotation": [13, -90, 0],
 			"translation": [0.75, 0.25, 1.75],
 			"scale": [1.15, 1.15, 1.15]
+		},
+		"head": {
+			"rotation": [0, 0, 33],
+			"translation": [0, -13.5, 3.25],
+			"scale": [2, 2, 2]
 		}
 	},
 	"groups": [

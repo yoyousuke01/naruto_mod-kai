@@ -35,7 +35,7 @@ import net.narutomod.ElementsNarutomodMod;
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 	private static final String SUMMONED_SUSANOO = "summonedSusanooID";
-	public static final double BASE_CHAKRA_USAGE = 500d;
+	public static final double BASE_CHAKRA_USAGE = 1000d;
 
 	public ProcedureSusanoo(ElementsNarutomodMod instance) {
 		super(instance, 168);
