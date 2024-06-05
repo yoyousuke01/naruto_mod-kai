@@ -332,20 +332,24 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			}
 		}
 	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
 	}
+
 	public static class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EntityStream.class, renderManager -> new RenderStream(renderManager));
 		}
+
 		@SideOnly(Side.CLIENT)
 		public class RenderStream extends EntityBeamBase.Renderer<EntityStream> {
-			private final ResourceLocation TEXTURE = new ResourceLocation("minecraft:textures/blocks/water_flow.png");
+			private final ResourceLocation texture = new ResourceLocation("minecraft:textures/blocks/water_flow.png");
+
 			public RenderStream(RenderManager renderManager) {
 				super(renderManager);
 			}
@@ -353,14 +357,13 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public EntityBeamBase.Model getMainModel(EntityStream entity) {
 				float f = entity.ticksAlive >= entity.maxLife - 10
-						? Math.max((float) (entity.maxLife - entity.ticksAlive) / 10f, 0f)
-						: Math.min((float) entity.ticksAlive / 10f, 1f);
+						? Math.max((float)(entity.maxLife - entity.ticksAlive) / 10f, 0f) : Math.min((float)entity.ticksAlive / 10f, 1f);
 				return new ModelLongCube(entity.getBeamLength() * f);
 			}
 
 			@Override
 			protected ResourceLocation getEntityTexture(EntityStream entity) {
-				return TEXTURE;
+				return this.texture;
 			}
 		}
 
@@ -371,6 +374,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 		public class ModelLongCube extends EntityBeamBase.Model {
 			private final ModelRenderer bone;
 			protected float scale = 1.0F;
+
 			public ModelLongCube(float length) {
 				this.textureWidth = 32;
 				this.textureHeight = 1024;
@@ -383,7 +387,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(0.0F, (this.scale - 1.0F) * 1.5F + 1F, 0.0F);
-				GlStateManager.scale(this.scale, this.scale, this.scale);
+				GlStateManager.scale(this.scale * 0.6F, this.scale, this.scale * 0.6F);
 				GlStateManager.color(1f, 1f, 1f, 1f);
 				this.bone.render(f5);
 				GlStateManager.popMatrix();
