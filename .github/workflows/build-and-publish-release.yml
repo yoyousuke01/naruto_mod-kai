@@ -1,0 +1,49 @@
+name: Build and Publish Release
+
+on:
+  push:
+    branches:
+      - 0.3.1-beta
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: delete old releases
+      uses: sgpublic/delete-release-action@v1.1
+      with:
+        release-drop: true
+        release-drop-tag: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: checkout code
+      uses: actions/checkout@v2
+
+    - name: make gradlew executable
+      run: chmod +x ./gradlew
+
+    - name: set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+        server-id: ${{ secrets.MAVEN_SETTINGS_SERVER_ID }}
+        
+    - name: build jar
+      run: |
+        ./gradlew build
+
+    - name: Rename JAR file
+      run: |
+          DATE=$(date -u +'%Y-%m-%dT%H-%M-%S')
+          mv build/libs/*.jar build/libs/NarutoMod-1.12.2-0.3.1.beta-${DATE}.jar
+        
+    - name: create release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/libs/*.jar
+        tag_name: v0.3.1-beta
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
