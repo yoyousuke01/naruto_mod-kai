@@ -215,7 +215,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 	public static class EntityStream extends EntityBeamBase.Base {
 		private final AirPunch stream = new AirPunch();
 		private final int maxLife = 100;
-		private final float damageModifier = 1f;
+		private final float damageModifier = 2f;
 		private float power;
 		public EntityStream(World a) {
 			super(a);
@@ -279,7 +279,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
 				if (player instanceof EntityPlayer) {
 					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
-							EntityStream.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 20000f, 0.5f, 2.0f));
+							EntityStream.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 100, 0.5f, 1.5f));
 				} else {
 					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
 							EntityStream.this.power * EntityStream.this.damageModifier);
@@ -307,7 +307,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
-					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 30));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 100));
 					EntityStream entityarrow = new EntityStream(entity, power);
 					entityarrow.shoot();
 					entity.world.spawnEntity(entityarrow);

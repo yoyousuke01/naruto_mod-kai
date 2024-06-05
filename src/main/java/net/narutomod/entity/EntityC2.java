@@ -1,6 +1,11 @@
 
 package net.narutomod.entity;
 
+import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemBakuton;
+import net.narutomod.ElementsNarutomodMod;
+
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -8,43 +13,36 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.EnumHand;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.EnumHand;
 
-import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.item.ItemBakuton;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.ElementsNarutomodMod;
+import javax.swing.Renderer;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityC2 extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 233;
 	public static final int ENTITYID_RANGED = 234;
-
 	public EntityC2(ElementsNarutomodMod instance) {
 		super(instance, 545);
 	}
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "c_2"), ENTITYID).name("c_2").tracker(64, 3, true).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class).id(new ResourceLocation("narutomod", "c_2"), ENTITYID).name("c_2")
+				.tracker(64, 3, true).build());
 	}
-
 	public static class EC extends ItemBakuton.ExplosiveClay {
 		public EC(World world) {
 			super(world);
@@ -65,7 +63,7 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
 		}
 
 		@Override
@@ -88,18 +86,18 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		public double getMountedYOffset() {
 			return this.height - 0.5;
 		}
-	
+
 		@Override
 		public Entity getControllingPassenger() {
 			return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
 		}
-	
+
 		@Override
 		public void updatePassenger(Entity passenger) {
-			Vec3d vec[] = { new Vec3d(0.4d, 0d, 0d), new Vec3d(-0.5, 0d, 0d) };
+			Vec3d vec[] = {new Vec3d(0.4d, 0d, 0d), new Vec3d(-0.5, 0d, 0d)};
 			if (this.isPassenger(passenger)) {
 				int i = this.getPassengers().indexOf(passenger);
-				Vec3d vec2 = vec[i].rotateYaw(-this.rotationYaw * 0.017453292F - ((float)Math.PI / 2F));
+				Vec3d vec2 = vec[i].rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
 				passenger.setPosition(this.posX + vec2.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec2.z);
 			}
 		}
@@ -107,7 +105,7 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void travel(float strafe, float vertical, float forward) {
 			if (this.isBeingRidden() && this.getControllingPassenger() instanceof EntityPlayer) {
-				EntityPlayer entity = (EntityPlayer)this.getControllingPassenger();
+				EntityPlayer entity = (EntityPlayer) this.getControllingPassenger();
 				this.rotationYaw = entity.rotationYaw;
 				this.prevRotationYaw = this.rotationYaw;
 				this.rotationPitch = entity.rotationPitch;
@@ -115,9 +113,10 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 				this.jumpMovementFactor = this.getAIMoveSpeed() * 0.4f;
 				this.renderYawOffset = entity.rotationYaw;
 				this.rotationYawHead = entity.rotationYaw;
-				this.setAIMoveSpeed((float)this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
-				forward = entity.moveForward == 0f ? this.onGround ? forward : forward + 0.4f 
-				 : entity.moveForward < 0f ? forward : entity.moveForward;
+				this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
+				forward = entity.moveForward == 0f
+						? this.onGround ? forward : forward + 0.4f
+						: entity.moveForward < 0f ? forward : entity.moveForward;
 				if ((!this.onGround || entity.rotationPitch < 0.0F) && forward > 0.0F)
 					this.motionY = -entity.rotationPitch * 0.01f;
 				super.travel(0.0F, 0.0F, forward);
@@ -127,71 +126,64 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-	    @Override
-	    public boolean attackEntityAsMob(Entity entityIn) {
-	    	EntityLivingBase owner = this.getOwner();
-	    	if (!this.world.isRemote) {
-		    	this.world.createExplosion(owner, entityIn.posX, entityIn.posY, entityIn.posZ,
-		    	 10f, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
-	    		this.setDead();
-	    	}
-    		entityIn.hurtResistantTime = 10;
-	    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner), 40f + this.rand.nextFloat() * 10f);
-	    }
-
-	    @Override
-	    public void onUpdate() {
-	    	super.onUpdate();
-	    	if (!this.isBeingRidden() && this.getRemainingLife() > 400) {
-	    		this.setRemainingLife(400);
-	    	}
-	    }
-
-	    /*public static class Jutsu implements ItemJutsu.IJutsuCallback {
-			@Override
-			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float powerIn) {
-				EC c2 = new EC(entity);
-				Vec3d vec = entity.getLookVec();
-				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);
-				c2.setPosition(vec.x, vec.y, vec.z);
-				entity.world.spawnEntity(c2);
-				return true;
+		@Override
+		public boolean attackEntityAsMob(Entity entityIn) {
+			EntityLivingBase owner = this.getOwner();
+			if (!this.world.isRemote) {
+				this.world.createExplosion(owner, entityIn.posX, entityIn.posY, entityIn.posZ, 10f,
+						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+				this.setDead();
 			}
-	    }*/
-	}
+			entityIn.hurtResistantTime = 10;
+			return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner), 40f + this.rand.nextFloat() * 10f);
+		}
 
+		@Override
+		public void onUpdate() {
+			super.onUpdate();
+			if (!this.isBeingRidden() && this.getRemainingLife() > 400) {
+				this.setRemainingLife(400);
+			}
+		}
+		/*
+		 * public static class Jutsu implements ItemJutsu.IJutsuCallback {
+		 * 
+		 * @Override public boolean createJutsu(ItemStack stack, EntityLivingBase
+		 * entity, float powerIn) { EC c2 = new EC(entity); Vec3d vec =
+		 * entity.getLookVec(); vec = entity.getPositionVector().addVector(vec.x, 1d,
+		 * vec.z); c2.setPosition(vec.x, vec.y, vec.z); entity.world.spawnEntity(c2);
+		 * return true; } }
+		 */
+	}
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
 	}
-
 	public static class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
-
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends RenderLiving<EC> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/phantom1.png");
-	
 			public RenderCustom(RenderManager renderManagerIn) {
 				super(renderManagerIn, new ModelPhantom(), 0.75F);
 			}
-	
+
 			@Override
 			protected void preRenderCallback(EC entity, float partialTickTime) {
 				GlStateManager.scale(3.0F, 3.0F, 3.0F);
 				GlStateManager.translate(0.0D, 1.3125D, 0.1875D);
 			}
-	
+
 			@Override
 			protected ResourceLocation getEntityTexture(EC entity) {
 				return this.texture;
 			}
 		}
-	
+
 		// Made with Blockbench 3.8.4
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports
@@ -246,23 +238,23 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(tailtip, -0.0873F, 0.0F, 0.0F);
 				tailtip.cubeList.add(new ModelBox(tailtip, 4, 29, -1.0F, 0.0F, 0.0F, 1, 1, 6, 0.0F, false));
 			}
-	
+
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				body.render(f5);
 			}
-	
+
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
 				modelRenderer.rotateAngleX = x;
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-	
+
 			@Override
 			public void setRotationAngles(float f0, float f1, float ageInTicks, float f3, float f4, float f5, Entity entityIn) {
-				float f = ((float)(entityIn.getEntityId() * 3) + ageInTicks) * 0.13F;
+				float f = ((float) (entityIn.getEntityId() * 3) + ageInTicks) * 0.13F;
 				if (ProcedureUtils.getVelocity(entityIn) > 0.1d) {
-					this.leftWingBody.rotateAngleZ = MathHelper.cos(f) * 16.0F * ((float)Math.PI / 180F);
+					this.leftWingBody.rotateAngleZ = MathHelper.cos(f) * 16.0F * ((float) Math.PI / 180F);
 					this.leftWing.rotateAngleZ = this.leftWingBody.rotateAngleZ;
 					this.rightWingBody.rotateAngleZ = -this.leftWingBody.rotateAngleZ;
 					this.rightWing.rotateAngleZ = -this.leftWing.rotateAngleZ;
@@ -272,8 +264,8 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 					this.rightWingBody.rotateAngleZ = 0.5236F;
 					this.rightWing.rotateAngleZ = -1.0472F;
 				}
-				this.tail.rotateAngleX = -(5.0F + MathHelper.cos(f * 2.0F) * 5.0F) * ((float)Math.PI / 180F);
-				this.tailtip.rotateAngleX = -(5.0F + MathHelper.cos(f * 2.0F) * 5.0F) * ((float)Math.PI / 180F);
+				this.tail.rotateAngleX = -(5.0F + MathHelper.cos(f * 2.0F) * 5.0F) * ((float) Math.PI / 180F);
+				this.tailtip.rotateAngleX = -(5.0F + MathHelper.cos(f * 2.0F) * 5.0F) * ((float) Math.PI / 180F);
 			}
 		}
 	}
