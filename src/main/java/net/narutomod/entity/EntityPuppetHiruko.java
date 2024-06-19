@@ -1,64 +1,72 @@
 
 package net.narutomod.entity;
 
+import org.apache.logging.log4j.message.Message;
+
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemScrollHiruko;
-import net.narutomod.item.ItemSenbon;
-import net.narutomod.item.ItemPoisonSenbon;
 import net.narutomod.item.ItemSenbonArm;
+import net.narutomod.item.ItemSenbon;
+import net.narutomod.item.ItemScrollHiruko;
+import net.narutomod.item.ItemPoisonSenbon;
+import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.item.Item;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.DamageSource;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.datasync.DataSerializers;
 
-import java.util.Random;
 import javax.vecmath.Vector3f;
+
+import javax.swing.Renderer;
+
 import javax.annotation.Nullable;
+
+import java.util.logging.Handler;
+import java.util.Random;
+
 import io.netty.buffer.ByteBuf;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 389;
 	public static final int ENTITYID_RANGED = 390;
-
 	public EntityPuppetHiruko(ElementsNarutomodMod instance) {
 		super(instance, 768);
 	}
@@ -68,7 +76,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
 				.id(new ResourceLocation("narutomod", "puppet_hiruko"), ENTITYID).name("puppet_hiruko").tracker(64, 3, true).build());
 	}
-
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
@@ -79,20 +87,18 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new PlayerHook());
 	}
-
 	public static class EntityCustom extends EntityShieldBase {
 		// POSE: 0-idle; 1-attack; 2-defend
 		private static final DataParameter<Integer> POSE = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private static final DataParameter<Boolean> ROBE_OFF = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
 		private static final DataParameter<Boolean> AKATSUKI = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
-		public static final float MAXHEALTH = 160.0f;
+		public static final float MAXHEALTH = 200.0f;
 		private int poseProgressEnd = 14;
 		private int poseProgress = -1;
 		private Object model;
 		private boolean shouldBlock;
 		private boolean maskOff;
 		private boolean raiseLeftArm;
-
 		public EntityCustom(World world) {
 			super(world);
 			this.setSize(1.4f, 1.7f);
@@ -124,29 +130,29 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			this.poseProgress = 0;
 			this.poseProgressEnd = pose == 1 ? 7 : pose == 2 ? 3 : 14;
 			if (pose != 0 && pose != prevPose) {
-				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hiruko_tail")),
-				 1f, this.rand.nextFloat() * 0.4f + 0.7f);
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hiruko_tail")), 1f,
+						this.rand.nextFloat() * 0.4f + 0.7f);
 			}
 		}
-	
+
 		public int getPose() {
-			return ((Integer)this.getDataManager().get(POSE)).intValue();
+			return ((Integer) this.getDataManager().get(POSE)).intValue();
 		}
 
 		private void takeRobeOff(boolean b) {
 			this.dataManager.set(ROBE_OFF, Boolean.valueOf(b));
 		}
-	
+
 		public boolean isRobeOff() {
-			return ((Boolean)this.getDataManager().get(ROBE_OFF)).booleanValue();
+			return ((Boolean) this.getDataManager().get(ROBE_OFF)).booleanValue();
 		}
 
 		public void setAkatsuki(boolean b) {
 			this.dataManager.set(AKATSUKI, Boolean.valueOf(b));
 		}
-	
+
 		public boolean isAkatsuki() {
-			return ((Boolean)this.getDataManager().get(AKATSUKI)).booleanValue();
+			return ((Boolean) this.getDataManager().get(AKATSUKI)).booleanValue();
 		}
 
 		@Override
@@ -164,11 +170,11 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MAXHEALTH);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(14.0D);
-			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(6.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(35.0D);
+			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(8.0D);
 		}
 
 		@Override
@@ -192,6 +198,10 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			super.attackEntityAsMob(entityIn);
+			if (entityIn instanceof EntityLivingBase) {
+				EntityLivingBase entityLiving = (EntityLivingBase) entityIn;
+				entityLiving.addPotionEffect(new PotionEffect(MobEffects.POISON, 200, 2));
+			}
 			return ProcedureUtils.attackEntityAsMob(this, entityIn);
 		}
 
@@ -201,7 +211,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				amount *= 0.4f;
 			}
 			if (this.shouldBlock) {
-				amount *= 0.2f;
+				amount *= 0.8f;
 			}
 			super.damageEntity(source, amount);
 		}
@@ -216,9 +226,9 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 
 		private boolean hasPuppetJutsu(@Nullable Entity controllingRider) {
 			if (controllingRider instanceof EntityPlayer) {
-				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)controllingRider, ItemNinjutsu.block);
-				return stack != null && ((ItemNinjutsu.RangedItem)stack.getItem())
-				 .canActivateJutsu(stack, ItemNinjutsu.PUPPET, (EntityPlayer)controllingRider) == EnumActionResult.SUCCESS;
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer) controllingRider, ItemNinjutsu.block);
+				return stack != null && ((ItemNinjutsu.RangedItem) stack.getItem()).canActivateJutsu(stack, ItemNinjutsu.PUPPET,
+						(EntityPlayer) controllingRider) == EnumActionResult.SUCCESS;
 			} else {
 				return controllingRider instanceof EntitySasori.EntityCustom;
 			}
@@ -228,9 +238,11 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			boolean robeOff = this.isRobeOff();
+			PotionEffect resistanceEffect = new PotionEffect(MobEffects.RESISTANCE, 20, 2);
+			addPotionEffect(resistanceEffect);
 			if (this.isAkatsuki() && !robeOff && this.rand.nextInt(200) == 0) {
-				this.playSound(net.minecraft.util.SoundEvent.REGISTRY
-				 .getObject(new ResourceLocation("narutomod:dingding")), 0.8f, this.rand.nextFloat() * 0.1f + 0.95f);
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dingding")), 0.8f,
+						this.rand.nextFloat() * 0.1f + 0.95f);
 			}
 			this.setOwnerCanSteer(this.hasPuppetJutsu(this.getControllingPassenger()), robeOff ? 1.5f : 0.5f);
 		}
@@ -269,22 +281,19 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 
 		private boolean isRiderHoldingSenbon() {
 			Entity rider = this.getControllingPassenger();
-			return rider instanceof EntityLivingBase
-			 && (((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemSenbon.block
-			  || ((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemPoisonSenbon.block);
+			return rider instanceof EntityLivingBase && (((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemSenbon.block
+					|| ((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemPoisonSenbon.block);
 		}
 
 		private boolean isRiderHoldingSenbonArm() {
 			Entity rider = this.getControllingPassenger();
-			return rider instanceof EntityLivingBase
-			 && (((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemSenbonArm.block
-			  || ((EntityLivingBase)rider).getHeldItemOffhand().getItem() == ItemSenbonArm.block);
+			return rider instanceof EntityLivingBase && (((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemSenbonArm.block
+					|| ((EntityLivingBase) rider).getHeldItemOffhand().getItem() == ItemSenbonArm.block);
 		}
 
 		private boolean hasSenbonArmInRiderInventory() {
 			Entity rider = this.getControllingPassenger();
-			return rider instanceof EntityPlayer
-			 && ProcedureUtils.hasItemInInventory((EntityPlayer)rider, ItemSenbonArm.block);
+			return rider instanceof EntityPlayer && ProcedureUtils.hasItemInInventory((EntityPlayer) rider, ItemSenbonArm.block);
 		}
 
 		public void raiseLeftArm(boolean b) {
@@ -298,30 +307,28 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderCustom(renderManager));
 		}
-
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends RenderLivingBase<EntityCustom> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/hiruko.png");
 			private ModelPuppetHiruko model;
-	
 			public RenderCustom(RenderManager renderManagerIn) {
 				super(renderManagerIn, new ModelPuppetHiruko(), 0.5F);
 			}
-	
-		 	@Override
+
+			@Override
 			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
 				if (entity.model == null) {
 					entity.model = this.mainModel = this.model = new ModelPuppetHiruko();
 				} else {
-					this.mainModel = this.model = (ModelPuppetHiruko)entity.model;
+					this.mainModel = this.model = (ModelPuppetHiruko) entity.model;
 				}
 				if (entity.isBeingRidden() && entity.getControllingPassenger() instanceof EntityLivingBase) {
-					this.copyLimbSwing(entity, (EntityLivingBase)entity.getControllingPassenger());
+					this.copyLimbSwing(entity, (EntityLivingBase) entity.getControllingPassenger());
 				}
 				this.setModelVisibilities(entity);
 				super.doRender(entity, x, y, z, entityYaw, partialTicks);
 			}
-	
+
 			@Override
 			protected void preRenderCallback(EntityCustom entity, float partialTickTime) {
 				if (entity.isRobeOff()) {
@@ -330,7 +337,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 					GlStateManager.scale(1.125F, 1.125F, 1.125F);
 				}
 			}
-	
+
 			protected void copyLimbSwing(EntityCustom entity, EntityLivingBase rider) {
 				entity.swingProgress = rider.swingProgress;
 				entity.swingProgressInt = rider.swingProgressInt;
@@ -338,7 +345,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				entity.isSwingInProgress = rider.isSwingInProgress;
 				entity.swingingHand = rider.swingingHand;
 			}
-	
+
 			protected void setModelVisibilities(EntityCustom entity) {
 				this.model.setVisible(true);
 				this.model.body.showModel = true;
@@ -357,31 +364,30 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 					this.model.robeAkatsuki.showModel = akatsuki;
 				}
 				this.model.torpedo.showModel = entity.hasSenbonArmInRiderInventory();
-				if (this.renderManager.renderViewEntity.equals(entity.getControllingPassenger())
-				 && this.renderManager.options.thirdPersonView == 0) {
+				if (this.renderManager.renderViewEntity.equals(entity.getControllingPassenger()) && this.renderManager.options.thirdPersonView == 0) {
 					this.model.body.showModel = false;
 					this.model.bipedRightLeg.showModel = false;
 					this.model.bipedLeftLeg.showModel = false;
 				}
 			}
-	
+
 			@Override
 			protected ResourceLocation getEntityTexture(EntityCustom entity) {
 				return this.texture;
 			}
 		}
-	
+
 		// Made with Blockbench 4.4.2
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports
 		@SideOnly(Side.CLIENT)
 		public class ModelPuppetHiruko extends ModelBiped {
 			private final ModelRenderer body;
-			//private final ModelRenderer bipedHead;
+			// private final ModelRenderer bipedHead;
 			private final ModelRenderer jaw;
 			private final ModelRenderer jawMid;
 			private final ModelRenderer mask;
-			//private final ModelRenderer bipedHeadwear;
+			// private final ModelRenderer bipedHeadwear;
 			private final ModelRenderer hair;
 			private final ModelRenderer bone16;
 			private final ModelRenderer bone17;
@@ -428,7 +434,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer cube_r15;
 			private final ModelRenderer cube_r16;
 			private final ModelRenderer veil;
-			//private final ModelRenderer bipedBody;
+			// private final ModelRenderer bipedBody;
 			private final ModelRenderer robe;
 			private final ModelRenderer bone21;
 			private final ModelRenderer rightArm;
@@ -452,21 +458,21 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone9;
 			private final ModelRenderer bone7;
 			private final ModelRenderer bone5;
-			//private final ModelRenderer bipedRightArm;
+			// private final ModelRenderer bipedRightArm;
 			private final ModelRenderer bipedRightUpperArm;
 			private final ModelRenderer bipedRightForeArm;
-			//private final ModelRenderer bipedRightUpperArm2;
-			//private final ModelRenderer bipedRightForeArm2;
-			//private final ModelRenderer bipedLeftArm;
+			// private final ModelRenderer bipedRightUpperArm2;
+			// private final ModelRenderer bipedRightForeArm2;
+			// private final ModelRenderer bipedLeftArm;
 			private final ModelRenderer bipedLeftUpperArm;
 			private final ModelRenderer bipedLeftForeArm;
 			private final ModelRenderer torpedo;
-			//private final ModelRenderer bipedLeftUpperArm2;
-			//private final ModelRenderer bipedLeftForeArm2;
-			//private final ModelRenderer bipedRightLeg;
+			// private final ModelRenderer bipedLeftUpperArm2;
+			// private final ModelRenderer bipedLeftForeArm2;
+			// private final ModelRenderer bipedRightLeg;
 			private final ModelRenderer rightThigh;
 			private final ModelRenderer calfRight;
-			//private final ModelRenderer bipedLeftLeg;
+			// private final ModelRenderer bipedLeftLeg;
 			private final ModelRenderer leftThigh;
 			private final ModelRenderer calfLeft;
 			private final ModelRenderer[] tail = new ModelRenderer[24];
@@ -477,67 +483,47 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone15;
 			private final Vector3f[] tailSway = new Vector3f[10];
 			private final Vector3f[][] tailPoseRobeOn = {
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F)
-				},
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
-					new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)
-				},
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, -0.5236F, -0.0873F), new Vector3f(0.2618F, -0.5236F, -0.0873F), new Vector3f(0.2618F, -0.5236F, -0.0873F), 
-					new Vector3f(0.2618F, -0.5236F, -0.1745F), new Vector3f(0.2618F, 0.0F, -0.1745F), new Vector3f(0.2618F, 0.0F, -0.1745F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), 
-					new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F)
-				}
-			};
+					{new Vector3f(), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F)},
+					{new Vector3f(), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)},
+					{new Vector3f(), new Vector3f(0.2618F, -0.5236F, -0.0873F), new Vector3f(0.2618F, -0.5236F, -0.0873F),
+							new Vector3f(0.2618F, -0.5236F, -0.0873F), new Vector3f(0.2618F, -0.5236F, -0.1745F),
+							new Vector3f(0.2618F, 0.0F, -0.1745F), new Vector3f(0.2618F, 0.0F, -0.1745F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.1745F, 0.0F, 0.0F),
+							new Vector3f(0.0873F, 0.0F, 0.0F)}};
 			private final Vector3f[][] tailPoseRobeOff = {
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)
-				},
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
-					new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), 
-					new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)
-				},
-				{
-					new Vector3f(),
-					new Vector3f(0.2618F, -0.5236F, 0.0F), new Vector3f(0.2618F, -0.5236F, 0.0F), new Vector3f(0.2618F, -0.5236F, 0.0F), 
-					new Vector3f(0.2618F, -0.2618F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F), 
-					new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F), 
-					new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), 
-					new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), 
-					new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.1745F, -0.0873F, 0.0F), new Vector3f(0.1745F, -0.0873F, 0.0F), 
-					new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), 
-					new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F)
-				}
-			};
+					{new Vector3f(), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)},
+					{new Vector3f(), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.2618F, 0.0F, 0.0F), new Vector3f(0.1745F, 0.0F, 0.0F), new Vector3f(0.0873F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F),
+							new Vector3f(0.0436F, 0.0F, 0.0F), new Vector3f(0.0436F, 0.0F, 0.0F)},
+					{new Vector3f(), new Vector3f(0.2618F, -0.5236F, 0.0F), new Vector3f(0.2618F, -0.5236F, 0.0F),
+							new Vector3f(0.2618F, -0.5236F, 0.0F), new Vector3f(0.2618F, -0.2618F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F),
+							new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F),
+							new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, 0.0F, 0.0F), new Vector3f(0.3491F, -0.0873F, 0.0F),
+							new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F),
+							new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.1745F, -0.0873F, 0.0F),
+							new Vector3f(0.1745F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F),
+							new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, -0.0873F, 0.0F), new Vector3f(0.2618F, 0.0F, 0.0F)}};
 			private final Random rand = new Random();
-	
 			public ModelPuppetHiruko() {
 				textureWidth = 128;
 				textureHeight = 128;
@@ -811,7 +797,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bone21.cubeList.add(new ModelBox(bone21, 40, 0, -7.0F, 16.0F, -0.75F, 14, 2, 4, 0.05F, false));
 				rightArm = new ModelRenderer(this);
 				rightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
-				robe.addChild(rightArm);	
+				robe.addChild(rightArm);
 				rightUpperArm = new ModelRenderer(this);
 				rightUpperArm.setRotationPoint(0.0F, 0.0F, 0.0F);
 				rightArm.addChild(rightUpperArm);
@@ -824,7 +810,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				rightForeArm.cubeList.add(new ModelBox(rightForeArm, 16, 64, -2.0F, 0.0F, -4.0F, 4, 6, 4, 0.55F, false));
 				leftArm = new ModelRenderer(this);
 				leftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-				robe.addChild(leftArm);		
+				robe.addChild(leftArm);
 				leftUpperArm = new ModelRenderer(this);
 				leftUpperArm.setRotationPoint(0.0F, 0.0F, 0.0F);
 				leftArm.addChild(leftUpperArm);
@@ -999,7 +985,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				tail[9].setRotationPoint(0.0F, 0.0F, 4.0F);
 				tail[8].addChild(tail[9]);
 				tail[9].cubeList.add(new ModelBox(tail[9], 32, 56, -2.0F, -0.5F, 0.0F, 4, 1, 4, 0.0F, false));
-	
 				tail[10] = new ModelRenderer(this);
 				tail[10].setRotationPoint(0.0F, 0.0F, 4.0F);
 				tail[9].addChild(tail[10]);
@@ -1056,10 +1041,9 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				tail[23].setRotationPoint(0.0F, 0.0F, 4.0F);
 				tail[22].addChild(tail[23]);
 				tail[23].cubeList.add(new ModelBox(tail[23], 32, 56, -2.0F, -0.5F, 0.0F, 4, 1, 4, 0.0F, false));
-				
 				tailEnd = new ModelRenderer(this);
 				tailEnd.setRotationPoint(0.0F, 0.0F, 4.0F);
-				//tail[23].addChild(tailEnd);
+				// tail[23].addChild(tailEnd);
 				tail[9].addChild(tailEnd);
 				tail[10].showModel = false;
 				setRotationAngle(tailEnd, 0.2618F, 0.0F, 0.0F);
@@ -1082,13 +1066,12 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bone2.addChild(bone15);
 				setRotationAngle(bone15, 0.0F, 0.7854F, 0.0F);
 				bone15.cubeList.add(new ModelBox(bone15, 60, 54, -1.5F, -1.0F, -1.5F, 3, 1, 3, 0.0F, false));
-	
 				for (int j = 1; j < tailSway.length; j++) {
-					tailSway[j] = new Vector3f((rand.nextFloat() - 0.5f) * 0.2618F,
-					 (rand.nextFloat() - 0.5f) * 0.5236F, (rand.nextFloat() - 0.5f) * 0.0436F);
+					tailSway[j] = new Vector3f((rand.nextFloat() - 0.5f) * 0.2618F, (rand.nextFloat() - 0.5f) * 0.5236F,
+							(rand.nextFloat() - 0.5f) * 0.0436F);
 				}
 			}
-	
+
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				GlStateManager.pushMatrix();
@@ -1099,17 +1082,17 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				tail[0].render(f5);
 				GlStateManager.popMatrix();
 			}
-	
+
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
 				modelRenderer.rotateAngleX = x;
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-	
+
 			@Override
 			public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity e) {
 				super.setRotationAngles(f, f1, f2, f3, f4, f5, e);
-				EntityCustom entity = (EntityCustom)e;
+				EntityCustom entity = (EntityCustom) e;
 				float pt = f2 - entity.ticksExisted;
 				int pose = entity.getPose();
 				Vector3f[][] tailPose = tailPoseRobeOn;
@@ -1137,47 +1120,48 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				}
 				if (entity.poseProgress >= 0) {
 					switch (pose) {
-					case 0:
-						int j = MathHelper.clamp((int)(((float)entity.poseProgressEnd - (float)entity.poseProgress - pt + 1f) / (float)entity.poseProgressEnd * 14.0f), 0, 14);
-						ModelRenderer mr = tail[8 + j];
-						if (mr.childModels == null || !mr.childModels.contains(tailEnd)) {
-							mr.addChild(tailEnd);
-						}
-						tail[9 + j].showModel = false;
-						if (tail[9 + j].childModels != null) {
-							tail[9 + j].childModels.remove(tailEnd);
-						}
-						break;
-					case 1:
-					case 2:
-						j = MathHelper.clamp((int)(((float)entity.poseProgress + pt) / (float)entity.poseProgressEnd * 14.0f), 0, 14);
-						if (tail[8 + j].childModels != null) {
-							tail[8 + j].childModels.remove(tailEnd);
-						}
-						mr = tail[9 + j];
-						if (mr.childModels == null || !mr.childModels.contains(tailEnd)) {
-							mr.addChild(tailEnd);
-						}
-						if (j < 14) {
-							tail[10 + j].showModel = false;
-						}
-						float f9 = (float)(entity.poseProgressEnd - entity.poseProgress + 1);
-						for (int i = 9 + j; i > 0; i--) {
-							float f6 = tail[i-1].rotateAngleX;
-							float f7 = tail[i-1].rotateAngleY;
-							float f8 = tail[i-1].rotateAngleZ;
-							if (i == 1) {
-								f6 = 0.0F;
-								f7 = 0.0F;
-								f8 = 0.0F;
+						case 0 :
+							int j = MathHelper.clamp((int) (((float) entity.poseProgressEnd - (float) entity.poseProgress - pt + 1f)
+									/ (float) entity.poseProgressEnd * 14.0f), 0, 14);
+							ModelRenderer mr = tail[8 + j];
+							if (mr.childModels == null || !mr.childModels.contains(tailEnd)) {
+								mr.addChild(tailEnd);
 							}
-							f6 += (tailPose[pose][i].x - f6) / f9;
-							f7 += (tailPose[pose][i].y - f7) / f9;
-							f8 += (tailPose[pose][i].z - f8) / f9;
-							this.setRotationAngle(tail[i], f6, f7, f8);
-							tail[i].showModel = true;
-						}
-						break;
+							tail[9 + j].showModel = false;
+							if (tail[9 + j].childModels != null) {
+								tail[9 + j].childModels.remove(tailEnd);
+							}
+							break;
+						case 1 :
+						case 2 :
+							j = MathHelper.clamp((int) (((float) entity.poseProgress + pt) / (float) entity.poseProgressEnd * 14.0f), 0, 14);
+							if (tail[8 + j].childModels != null) {
+								tail[8 + j].childModels.remove(tailEnd);
+							}
+							mr = tail[9 + j];
+							if (mr.childModels == null || !mr.childModels.contains(tailEnd)) {
+								mr.addChild(tailEnd);
+							}
+							if (j < 14) {
+								tail[10 + j].showModel = false;
+							}
+							float f9 = (float) (entity.poseProgressEnd - entity.poseProgress + 1);
+							for (int i = 9 + j; i > 0; i--) {
+								float f6 = tail[i - 1].rotateAngleX;
+								float f7 = tail[i - 1].rotateAngleY;
+								float f8 = tail[i - 1].rotateAngleZ;
+								if (i == 1) {
+									f6 = 0.0F;
+									f7 = 0.0F;
+									f8 = 0.0F;
+								}
+								f6 += (tailPose[pose][i].x - f6) / f9;
+								f7 += (tailPose[pose][i].y - f7) / f9;
+								f8 += (tailPose[pose][i].z - f8) / f9;
+								this.setRotationAngle(tail[i], f6, f7, f8);
+								tail[i].showModel = true;
+							}
+							break;
 					}
 				}
 				if (pose == 2 || entity.poseProgress < 0) {
@@ -1212,41 +1196,37 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public void onMouseRightButton(MouseEvent event) {
 			EntityPlayer player = Minecraft.getMinecraft().player;
-			if (Minecraft.getMinecraft().currentScreen == null && player.getRidingEntity() instanceof EntityCustom
-			 && event.getButton() == 1 && !((EntityCustom)player.getRidingEntity()).isRiderHoldingSenbon()
-			 && !((EntityCustom)player.getRidingEntity()).isRiderHoldingSenbonArm()) {
+			if (Minecraft.getMinecraft().currentScreen == null && player.getRidingEntity() instanceof EntityCustom && event.getButton() == 1
+					&& !((EntityCustom) player.getRidingEntity()).isRiderHoldingSenbon()
+					&& !((EntityCustom) player.getRidingEntity()).isRiderHoldingSenbonArm()) {
 				NarutomodMod.PACKET_HANDLER.sendToServer(new Message(event.isButtonstate()));
 			}
 		}
-		
 		public static class Message implements IMessage {
 			boolean pressed;
-	
 			public Message() {
 			}
-	
+
 			public Message(boolean var1) {
 				this.pressed = var1;
 			}
-	
 			public static class Handler implements IMessageHandler<Message, IMessage> {
 				@Override
 				public IMessage onMessage(Message message, MessageContext context) {
 					EntityPlayerMP entity = context.getServerHandler().player;
 					entity.getServerWorld().addScheduledTask(() -> {
 						if (entity.world.isBlockLoaded(new BlockPos(entity.posX, entity.posY, entity.posZ))
-						 && entity.getRidingEntity() instanceof EntityCustom) {
-							((EntityCustom)entity.getRidingEntity()).blockAttack(message.pressed);
+								&& entity.getRidingEntity() instanceof EntityCustom) {
+							((EntityCustom) entity.getRidingEntity()).blockAttack(message.pressed);
 						}
 					});
 					return null;
 				}
 			}
-	
 			public void toBytes(ByteBuf buf) {
 				buf.writeBoolean(this.pressed);
 			}
-	
+
 			public void fromBytes(ByteBuf buf) {
 				this.pressed = buf.readBoolean();
 			}
