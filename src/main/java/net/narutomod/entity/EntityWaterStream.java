@@ -1,8 +1,9 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureAirPunch;
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.PlayerTracker;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -13,45 +14,46 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.item.ItemStack;
+import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
+import net.minecraft.block.BlockLiquid;
+
+import javax.swing.Renderer;
 
 import com.google.common.collect.ImmutableMap;
-
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 439;
 	public static final int ENTITYID_RANGED = 440;
-
 	public EntityWaterStream(ElementsNarutomodMod instance) {
 		super(instance, 869);
 	}
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-				.id(new ResourceLocation("narutomod", "water_stream"), ENTITYID).name("water_stream").tracker(64, 3, true).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class).id(new ResourceLocation("narutomod", "water_stream"), ENTITYID)
+				.name("water_stream").tracker(64, 3, true).build());
 	}
-
 	public static class EC extends EntityBeamBase.Base {
 		private final AirPunch stream = new AirPunch();
-		private final float damageModifier = 0.5f;
+		private final float damageModifier = 2f;
 		private int maxLife = 100;
 		private float power;
-
 		public EC(World a) {
 			super(a);
 		}
@@ -76,18 +78,19 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.shootingEntity != null) {
 				if (this.ticksAlive == 1) {
-					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterblast")), 0.5f, this.power / 30f);
+					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterblast")), 0.5f,
+							this.power / 30f);
 				} else if (this.ticksAlive > 40 && this.ticksAlive % 20 == 1) {
-					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterstream")), 0.4f, this.power / 30f - this.rand.nextFloat() * 0.1f);
+					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterstream")), 0.4f,
+							this.power / 30f - this.rand.nextFloat() * 0.1f);
 				}
 				this.shoot();
-				this.stream.execute2(this.shootingEntity, (double)this.power, 0.5d);
+				this.stream.execute2(this.shootingEntity, (double) this.power, 0.5d);
 			}
 			if (!this.world.isRemote && (this.ticksAlive > this.maxLife || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
 			}
 		}
-
 		public class AirPunch extends ProcedureAirPunch {
 			public AirPunch() {
 				this.blockDropChance = 0.4F;
@@ -102,29 +105,34 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec0 = EC.this.getPositionVector();
 				Vec3d vec1 = player.getLookVec();
 				Particles.Renderer particles = new Particles.Renderer(player.world);
-				for (int i = 1, j = (int)(range * 10d); i < j; i++) {
-					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * 0.2d,
-					 this.rand.nextDouble() * 0.2d, (this.rand.nextDouble()-0.5d) * 0.2d);
+				for (int i = 1, j = (int) (range * 10d); i < j; i++) {
+					Vec3d vec = vec0.addVector((this.rand.nextDouble() - 0.5d) * 0.2d, this.rand.nextDouble() * 0.2d,
+							(this.rand.nextDouble() - 0.5d) * 0.2d);
 					Vec3d vec3d = vec1.scale(range * (this.rand.nextDouble() * 0.5d + 0.5d) * 0.4d);
-					particles.spawnParticles(Particles.Types.WATER_SPLASH, vec.x, vec.y, vec.z,
-					 1, 0, 0, 0, vec3d.x, vec3d.y, vec3d.z, 35 + this.rand.nextInt(15));
+					particles.spawnParticles(Particles.Types.WATER_SPLASH, vec.x, vec.y, vec.z, 1, 0, 0, 0, vec3d.x, vec3d.y, vec3d.z,
+							35 + this.rand.nextInt(15));
 				}
 				particles.send();
 			}
 
 			@Override
-			protected void attackEntityFrom(Entity player, Entity target) {
-				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
-						EC.this.power * EC.this.damageModifier);
+			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+				if (player instanceof EntityPlayer) {
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
+							EntityStream.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 100, 0.5f, 1.5f));
+				} else {
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
+							EntityStream.this.power * EntityStream.this.damageModifier);
+				}
 			}
 
 			@Override
 			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				EntityItem ret = super.processAffectedBlock(player, pos, facing);
 				if (ret != null && player.world.isAirBlock(pos.up())) {
-					new net.narutomod.event.EventSetBlocks(player.world, ImmutableMap.of(pos.up(),
-					 Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))),
-					 0, 10, false, false);
+					new net.narutomod.event.EventSetBlocks(player.world,
+							ImmutableMap.of(pos.up(), Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))), 0,
+							10, false, false);
 				}
 				return ret;
 			}
@@ -140,6 +148,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
 					this.createJutsu(entity, power, 100);
+					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 100));
 					return true;
 				}
 				return false;
@@ -157,37 +166,33 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public float getBasePower() {
 				return 5.0f;
 			}
-	
+
 			@Override
 			public float getPowerupDelay() {
 				return 20.0f;
 			}
-	
+
 			@Override
 			public float getMaxPower() {
 				return 30.0f;
 			}
 		}
 	}
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
 	}
-
 	public static class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderStream(renderManager));
 		}
-
 		@SideOnly(Side.CLIENT)
 		public class RenderStream extends EntityBeamBase.Renderer<EC> {
 			private final ResourceLocation texture = new ResourceLocation("minecraft:textures/blocks/water_flow.png");
 			private final ModelLongCube model = new ModelLongCube(1f);
-
 			public RenderStream(RenderManager renderManager) {
 				super(renderManager);
 			}
@@ -195,11 +200,11 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			public EntityBeamBase.Model getMainModel(EC entity, float pt) {
 				float f = entity.ticksAlive >= entity.maxLife - 10
-						? Math.max(((float)entity.maxLife - (float)entity.ticksAlive - pt) / 10f, 0f)
-						: Math.min(((float)entity.ticksAlive + pt) / 10f, 1f);
+						? Math.max(((float) entity.maxLife - (float) entity.ticksAlive - pt) / 10f, 0f)
+						: Math.min(((float) entity.ticksAlive + pt) / 10f, 1f);
 				this.model.setLength(entity.getBeamLength() * f);
 				return this.model;
-				//return new ModelLongCube(entity.getBeamLength() * f);
+				// return new ModelLongCube(entity.getBeamLength() * f);
 			}
 
 			@Override
@@ -220,7 +225,6 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			private ModelRenderer bone;
 			private float length;
 			protected float scale = 1.0F;
-
 			public ModelLongCube(float lengthIn) {
 				this.textureWidth = 32;
 				this.textureHeight = 1024;
