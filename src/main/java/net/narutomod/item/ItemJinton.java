@@ -200,7 +200,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 					this.shoot(vec3d.x, vec3d.y, vec3d.z);
 				}
 				if (this.ticksAlive >= this.wait + 2) {
-					this.beam.execute2((EntityLivingBase)this.shootingEntity, (double)this.getBeamLength(), (double)this.getScale() / 2);
+					this.beam.execute2(this.shootingEntity, (double)this.getBeamLength(), (double)this.getScale() / 2);
 				}
 			}
 			if (this.ticksAlive > this.wait + 60)
@@ -217,13 +217,13 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			}
 			
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength();
 				attackEntityWithJutsu(EntityBeam.this, player, target, 40 * (float)d);
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				return 1.0F;
 			}
 		}
@@ -246,7 +246,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	private static void attackEntityWithJutsu(Entity projectile, EntityLivingBase attacker, Entity target, float amount) {
+	private static void attackEntityWithJutsu(Entity projectile, Entity attacker, Entity target, float amount) {
 		if (target instanceof EntityLivingBase) {
 			target.hurtResistantTime = 10;
 			target.attackEntityFrom(ItemJutsu.causeJutsuDamage(projectile, attacker)
@@ -387,11 +387,11 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public EntityBeamBase.Model getMainModel(EntityBeam entity) {
-			int i = entity.ticksAlive - entity.wait;
-			if (i > 0) {
-				float length = MathHelper.clamp(entity.getBeamLength() * (float)i / 10f, 1f, entity.getBeamLength());
-				float scale = entity.getScale() * 2 * length / entity.getBeamLength();
+		public EntityBeamBase.Model getMainModel(EntityBeam entity, float pt) {
+			float f = (float)entity.ticksAlive + pt - (float)entity.wait;
+			if (f > 0f) {
+				float length = MathHelper.clamp(entity.getBeamLength() * f / 10f, 1f, entity.getBeamLength());
+				float scale = entity.getScale() * 2f * length / entity.getBeamLength();
 				ModelLongCube model = new ModelLongCube(length / scale);
 				model.scale = scale;
 				return model;

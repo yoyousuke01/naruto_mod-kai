@@ -2,6 +2,7 @@
 package net.narutomod.item;
 
 import net.narutomod.entity.EntityPuppetHiruko;
+import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -28,11 +29,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.EnumAction;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -42,6 +46,8 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.PotionEffect;
+
+import com.google.common.collect.Multimap;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSenbon extends ElementsNarutomodMod.ModElement {
@@ -90,12 +96,24 @@ public class ItemSenbon extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
+			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
+			if (slot == EntityEquipmentSlot.MAINHAND) {
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "RangedItem.modifier", 3.0d, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
+						new AttributeModifier(ATTACK_SPEED_MODIFIER, "RangedItem.modifier", -2.4d, 0));
+			}
+			return multimap;
+		}
+
+		@Override
 		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase, int timeLeft) {
 			if (entityLivingBase instanceof EntityPlayerMP) {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
 				boolean flag = entity.getRidingEntity() instanceof EntityPuppetHiruko.EntityCustom;
 				if (flag) {
-					for (int i = 0; i < 3; i++) {
+					for (int i = 0; i < 5; i++) {
 						spawnArrow((EntityLivingBase)entity.getRidingEntity(), false);
 					}
 				} else {
@@ -107,26 +125,6 @@ public class ItemSenbon extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-
-		/*@Override
-		public void onUsingTick(ItemStack itemstack, EntityLivingBase entityLivingBase, int count) {
-			if (entityLivingBase instanceof EntityPlayerMP) {
-				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
-				boolean flag = entity.getRidingEntity() instanceof EntityPuppetHiruko.EntityCustom;
-				if (flag) {
-					for (int i = 0; i < 3; i++) {
-						spawnArrow((EntityLivingBase)entity.getRidingEntity(), false);
-					}
-				} else {
-					spawnArrow(entity, false);
-				}
-				if (!entity.capabilities.isCreativeMode
-				 && EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, itemstack) <= 0) {
-					entity.inventory.clearMatchingItems(block, -1, flag ? 3 : 1, null);
-				}
-			}
-			entityLivingBase.resetActiveHand();
-		}*/
 
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
@@ -167,7 +165,7 @@ public class ItemSenbon extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.timeInGround > 200) {
+			if (!this.world.isRemote && this.timeInGround > 100) {
 				this.setDead();
 			}
 		}
@@ -190,7 +188,7 @@ public class ItemSenbon extends ElementsNarutomodMod.ModElement {
 			super.arrowHit(entity);
 			entity.setArrowCountInEntity(entity.getArrowCountInEntity() - 1);
 			if (this.poisened) {
-				entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 1200, 1));
+				entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 6000, 5));
 			}
 		}
 
@@ -262,7 +260,7 @@ public class ItemSenbon extends ElementsNarutomodMod.ModElement {
 	        GlStateManager.pushMatrix();
 	        GlStateManager.translate((float)x, (float)y, (float)z);
 	        GlStateManager.enableRescaleNormal();
-	        GlStateManager.rotate(entityYaw - 90.0F, 0.0F, 1.0F, 0.0F);
+	        GlStateManager.rotate(ProcedureUtils.interpolateRotation(entity.prevRotationYaw, entity.rotationYaw, partialTicks) - 90.0F, 0.0F, 1.0F, 0.0F);
 	        GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
 	        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 	        if (this.renderOutlines) {

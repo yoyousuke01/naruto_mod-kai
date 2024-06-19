@@ -73,6 +73,7 @@ import com.google.common.collect.Multimap;
 import java.util.UUID;
 import java.util.Random;
 import java.util.List;
+import net.minecraft.util.EntityDamageSource;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemEightGates extends ElementsNarutomodMod.ModElement {
@@ -548,9 +549,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					}
 					((EntityPlayer) player).sendStatusMessage(new TextComponentString(this.GATE[(int) gateOpened].name), true);
 				}
-				if (gateOpened < 8.0f) {
-					player.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 4d);
-				}
+				//if (gateOpened < 8.0f) {
+				//	player.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 4d);
+				//}
 				this.setGateOpened(stack, player, gateOpened + increments);
 			}
 		}
@@ -697,7 +698,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.ticksAlive == 10 && !this.world.isRemote) {
-				this.airPunch.execute((EntityLivingBase)this.shootingEntity, this.range, 5d);
+				this.airPunch.execute(this.shootingEntity, this.range, 5d);
 			}
 			if (this.ticksAlive > 60) {
 				this.setDead();
@@ -706,13 +707,16 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		
 		protected class AirPunch extends ProcedureAirPunch {
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				super.attackEntityFrom(player, target);
-				target.attackEntityFrom(DamageSource.causeMobDamage(player).setDamageBypassesArmor(), EntitySekizo.this.damage);
+				DamageSource ds = player instanceof EntityPlayer ? DamageSource.causePlayerDamage((EntityPlayer)player)
+				 : player instanceof EntityLivingBase ? DamageSource.causeMobDamage((EntityLivingBase)player)
+				 : new EntityDamageSource(player.getName(), player);
+				target.attackEntityFrom(ds.setDamageBypassesArmor(), EntitySekizo.this.damage);
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				this.blockDropChance = 0.2F;
 				return 1.0F;
 			}
@@ -962,8 +966,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public EntityBeamBase.Model getMainModel(EntitySekizo entity) {
-			float length = MathHelper.clamp(entity.getBeamLength() * (float)entity.ticksAlive / 30f, 1f, entity.getBeamLength());
+		public EntityBeamBase.Model getMainModel(EntitySekizo entity, float pt) {
+			float length = MathHelper.clamp(entity.getBeamLength() * ((float)entity.ticksAlive + pt) / 30f, 1f, entity.getBeamLength());
 			ModelLongCube model = new ModelLongCube(length);
 			model.scale = 1.0F + length * 0.15F;
 			return model;

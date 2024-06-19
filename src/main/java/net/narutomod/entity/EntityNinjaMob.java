@@ -89,10 +89,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> CHAKRA_MAX = EntityDataManager.createKey(Base.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> CHAKRA = EntityDataManager.createKey(Base.class, DataSerializers.FLOAT);
 		private final PathwayNinjaMob chakraPathway;
-		private static final int inventorySize = 2;
+		private final int inventorySize = 2;
 		private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 		public int peacefulTicks;
 		private int standStillTicks;
+		private float haltedYaw;
+		private float haltedYawHead;
+		private float haltedPitch;
 
 		public Base(World worldIn, int level, double chakraAmountIn) {
 			super(worldIn);
@@ -107,7 +110,6 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.setAlwaysRenderNameTag(true);
 			this.chakraPathway = new PathwayNinjaMob(this, chakraAmountIn);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50d + 0.005d * level * level);
-			// .applyModifier(new AttributeModifier(NINJA_HEALTH, "ninja.maxhealth", 0.005d * level * level, 0));
 			this.setHealth(this.getMaxHealth());
 		}
 
@@ -209,15 +211,26 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		public void travel(float strafe, float vertical, float forward) {
 			if (this.standStillTicks > 0) {
 				vertical = forward = strafe = 0.0f;
-				//this.motionX = this.motionZ = 0.0f;
+				this.rotationYaw = this.haltedYaw;
+				this.rotationYawHead = this.haltedYawHead;
+				this.rotationPitch = this.haltedPitch;
 				--this.standStillTicks;
 			}
 			super.travel(strafe, vertical, forward);
 		}
 
-		public void standStillFor(int ticks) {
+		protected void standStillFor(int ticks) {
 			this.standStillTicks = ticks;
-			StandStillMessage.sendToTracking(this);
+			this.haltedYaw = this.rotationYaw;
+			this.haltedYawHead = this.rotationYawHead;
+			this.haltedPitch = this.rotationPitch;
+			if (!this.world.isRemote) {
+				StandStillMessage.sendToTracking(this);
+			}
+		}
+
+		protected boolean isStandingStill() {
+			return this.standStillTicks > 0;
 		}
 
 		@Override
@@ -263,6 +276,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.inventory.set(slotno, this.getItemStackFromSlot(slot));
 			this.setItemStackToSlot(slot, stack);
 			InventoryMessage.sendToTracking(this);
+		}
+
+		public int getInventorySize() {
+			return this.inventorySize;
 		}
 
 	    protected boolean isValidLightLevel() {
@@ -534,10 +551,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	                this.strafingTime = -1;
 	            }
 	            if (this.strafingTime >= 20) {
-	                if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+	                if (this.entity.getRNG().nextFloat() < 0.3F) {
 	                    this.strafingClockwise = !this.strafingClockwise;
 	                }
-	                if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+	                if (this.entity.getRNG().nextFloat() < 0.3F) {
 	                    this.strafingBackwards = !this.strafingBackwards;
 	                }
 	                this.strafingTime = 0;
@@ -548,7 +565,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	                } else if (d0 < (double)(this.maxAttackDistance * 0.25F)) {
 	                    this.strafingBackwards = true;
 	                }
-	                this.entity.getMoveHelper().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
+	                float f = (float)this.moveSpeedAmp;
+	                this.entity.getMoveHelper().strafe(this.strafingBackwards ? -f : f, this.strafingClockwise ? 0.5F : -0.5F);
 	                this.entity.faceEntity(entitylivingbase, 30.0F, 30.0F);
 	            } else {
 	                this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
@@ -565,6 +583,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		            float f = MathHelper.sqrt(d0) / this.attackRadius;
 		            this.attackTime = MathHelper.floor(f * (float)(this.attackCooldown));
 		        }
+	        } else {
+	        	this.entity.getNavigator().clearPath();
 	        }
 	    }
 	}
@@ -755,7 +775,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class MoveHelper extends EntityMoveHelper {
-		public MoveHelper(EntityCreature entityIn) {
+		public MoveHelper(EntityLiving entityIn) {
 			super(entityIn);
 		}
 
@@ -830,6 +850,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 	    private void setPose(T entity) {
 	    	ModelBiped model = (ModelBiped)this.getMainModel();
+	    	model.isSneak = entity.isSneaking();
             ItemStack itemstack = entity.getHeldItemMainhand();
             ItemStack itemstack1 = entity.getHeldItemOffhand();
             ModelBiped.ArmPose mainhandpose = ModelBiped.ArmPose.EMPTY;
@@ -940,14 +961,12 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void setRotationAngles(float f0, float f1, float f2, float f3, float f4, float f5, Entity entityIn) {
-			boolean flag1 = this.isSneak;
 			boolean flag2 = PlayerRender.shouldNarutoRun(entityIn) && this.swingProgress == 0.0f;
 			if (flag2) {
 				this.isSneak = true;
 			}
 			super.setRotationAngles(f0, f1, f2, f3, f4, f5, entityIn);
 			if (flag2) {
-				this.isSneak = flag1;
 				this.bipedRightArm.rotateAngleX = 1.4835F;
 				this.bipedRightArm.rotateAngleY = -0.3927F;
 				this.bipedLeftArm.rotateAngleX = 1.4835F;
@@ -1029,7 +1048,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				mc.addScheduledTask(() -> {
 					Entity entity = mc.world.getEntityByID(message.id);
 					if (entity instanceof Base) {
-						for (int i = 0; i < message.list.size() && i < Base.inventorySize; i++) {
+						for (int i = 0; i < message.list.size() && i < ((Base)entity).getInventorySize(); i++) {
 							((Base)entity).inventory.set(i, message.list.get(i));
 						}
 					}
@@ -1086,7 +1105,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				mc.addScheduledTask(() -> {
 					Entity entity = mc.world.getEntityByID(message.id);
 					if (entity instanceof Base) {
-						((Base)entity).standStillTicks = message.ticks;
+						((Base)entity).standStillFor(message.ticks);
 					}
 				});
 				return null;

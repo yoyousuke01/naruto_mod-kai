@@ -47,11 +47,13 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(2.0f, 1.2f);
+			this.setExplosionSize(10.0f);
 		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(2.0f, 1.2f);
+			this.setExplosionSize(10.0f);
 		}
 
 		@Override
@@ -63,7 +65,7 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(40D);
 		}
 
 		@Override
@@ -126,35 +128,24 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
-		public boolean attackEntityAsMob(Entity entityIn) {
-			EntityLivingBase owner = this.getOwner();
-			if (!this.world.isRemote) {
-				this.world.createExplosion(owner, entityIn.posX, entityIn.posY, entityIn.posZ, 10f,
-						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
-				this.setDead();
-			}
-			entityIn.hurtResistantTime = 10;
-			return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner), 40f + this.rand.nextFloat() * 10f);
-		}
+	    @Override
+	    public boolean attackEntityAsMob(Entity entityIn) {
+	    	if (super.attackEntityAsMob(entityIn)) {
+	    		entityIn.hurtResistantTime = 10;
+		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 40f + this.rand.nextFloat() * 10f);
+	    	}
+	    	return false;
+	    }
 
-		@Override
-		public void onUpdate() {
-			super.onUpdate();
-			if (!this.isBeingRidden() && this.getRemainingLife() > 400) {
-				this.setRemainingLife(400);
-			}
-		}
-		/*
-		 * public static class Jutsu implements ItemJutsu.IJutsuCallback {
-		 * 
-		 * @Override public boolean createJutsu(ItemStack stack, EntityLivingBase
-		 * entity, float powerIn) { EC c2 = new EC(entity); Vec3d vec =
-		 * entity.getLookVec(); vec = entity.getPositionVector().addVector(vec.x, 1d,
-		 * vec.z); c2.setPosition(vec.x, vec.y, vec.z); entity.world.spawnEntity(c2);
-		 * return true; } }
-		 */
+	    @Override
+	    public void onUpdate() {
+	    	super.onUpdate();
+	    	if (!this.isBeingRidden() && this.getRemainingLife() > 400) {
+	    		this.setRemainingLife(400);
+	    	}
+	    }
 	}
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();

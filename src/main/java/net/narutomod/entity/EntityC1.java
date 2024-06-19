@@ -43,11 +43,11 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(0.4F, 0.8F);
-		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(0.4F, 0.8F);
+			this.setExplosionSize(4.0f);
 		}
 
 		@Override
@@ -58,27 +58,17 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
 		}
 
-		@Override
-		public boolean attackEntityAsMob(Entity entityIn) {
-			EntityLivingBase owner = this.getOwner();
-			if (!this.world.isRemote) {
-				this.world.createExplosion(owner, entityIn.posX, entityIn.posY, entityIn.posZ, 4f,
-						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
-				this.setDead();
-			}
-			entityIn.hurtResistantTime = 10;
-			return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner), 8f + this.rand.nextFloat() * 4f);
-		}
-		/*
-		 * public static class Jutsu implements ItemJutsu.IJutsuCallback {
-		 * 
-		 * @Override public boolean createJutsu(ItemStack stack, EntityLivingBase
-		 * entity, float powerIn) { EC c1 = new EC(entity); Vec3d vec =
-		 * entity.getLookVec(); vec = entity.getPositionVector().addVector(vec.x, 1d,
-		 * vec.z); c1.setPosition(vec.x, vec.y, vec.z); entity.world.spawnEntity(c1);
-		 * return true; } }
-		 */
+
+	    @Override
+	    public boolean attackEntityAsMob(Entity entityIn) {
+	    	if (super.attackEntityAsMob(entityIn)) {
+		    	entityIn.hurtResistantTime = 10;
+		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 8f + this.rand.nextFloat() * 4f);
+	    	}
+	    	return false;
+	    }
 	}
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();

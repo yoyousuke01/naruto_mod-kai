@@ -62,11 +62,11 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		MinecraftForge.EVENT_BUS.register(new Base.EquipmentHook());
 	}
 	
-	public static DamageSource causeJutsuDamage(Entity source, @Nullable EntityLivingBase indirectEntityIn) {
+	public static DamageSource causeJutsuDamage(Entity source, @Nullable Entity indirectEntityIn) {
 		return new EntityDamageSourceIndirect(NINJUTSU_TYPE, source, indirectEntityIn);
 	}
 
-	public static DamageSource causeSenjutsuDamage(Entity source, @Nullable EntityLivingBase indirectEntityIn) {
+	public static DamageSource causeSenjutsuDamage(Entity source, @Nullable Entity indirectEntityIn) {
 		return new EntityDamageSourceIndirect(SENJUTSU_TYPE, source, indirectEntityIn).setDamageIsAbsolute();
 	}
 
@@ -425,6 +425,16 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		protected JutsuEnum getCurrentJutsu(ItemStack stack) {
 			return this.jutsuList.get(this.getCurrentJutsuIndex(stack));
 		}
+
+		private void setCurrentJutsu(ItemStack stack, int index) {
+			stack.getTagCompound().setInteger(JUTSU_INDEX_KEY, index);
+		}
+	
+		public void setCurrentJutsu(ItemStack stack, JutsuEnum jutsuIn) {
+			if (this.jutsuList.contains(jutsuIn)) {
+				this.setCurrentJutsu(stack, jutsuIn.index);
+			}
+		}
 	
 		private void setNextJutsu(ItemStack stack, EntityLivingBase entity) {
 			if (!stack.hasTagCompound())
@@ -439,7 +449,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 					break;
 			}
 			if (i < this.jutsuList.size()) {
-				stack.getTagCompound().setInteger(JUTSU_INDEX_KEY, next);
+				this.setCurrentJutsu(stack, next);
 				if (entity instanceof EntityPlayer && !entity.world.isRemote)
 					((EntityPlayer) entity).sendStatusMessage(new TextComponentString(this.jutsuList.get(next).getName()), true);
 			}
