@@ -2,8 +2,8 @@
   "id_map": {
 
     "GUI": 64,
-    "DIMENSION": 13,
-    "ENTITY": 442
+    "ENTITY": 442,
+    "DIMENSION": 13
   },
   "mod_elements": [
     {
@@ -7362,7 +7362,7 @@
       "type": "tool",
       "sortid": 870,
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "ids": {},
       "registry_name": "kunai_blade"
     },
@@ -7926,14 +7926,6 @@
       "subtitle": ""
     },
     {
-      "name": "wood_click",
-      "files": [
-        "wood_click"
-      ],
-      "category": "master",
-      "subtitle": ""
-    },
-    {
       "name": "kairikimuso",
       "files": [
         "kairikimuso"
@@ -8359,6 +8351,14 @@
       "name": "waterstream",
       "files": [
         "waterstream"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "wood_click",
+      "files": [
+        "wood_click"
       ],
       "category": "master",
       "subtitle": ""
