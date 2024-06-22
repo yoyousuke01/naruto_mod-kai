@@ -1,72 +1,64 @@
 
 package net.narutomod.entity;
 
-import org.apache.logging.log4j.message.Message;
-
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.item.ItemSenbonArm;
-import net.narutomod.item.ItemSenbon;
-import net.narutomod.item.ItemScrollHiruko;
-import net.narutomod.item.ItemPoisonSenbon;
 import net.narutomod.item.ItemNinjutsu;
+import net.narutomod.item.ItemScrollHiruko;
+import net.narutomod.item.ItemSenbon;
+import net.narutomod.item.ItemPoisonSenbon;
+import net.narutomod.item.ItemSenbonArm;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.DamageSource;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.datasync.DataSerializers;
 
-import javax.vecmath.Vector3f;
-
-import javax.swing.Renderer;
-
-import javax.annotation.Nullable;
-
-import java.util.logging.Handler;
 import java.util.Random;
-
+import javax.vecmath.Vector3f;
+import javax.annotation.Nullable;
 import io.netty.buffer.ByteBuf;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 389;
 	public static final int ENTITYID_RANGED = 390;
+
 	public EntityPuppetHiruko(ElementsNarutomodMod instance) {
 		super(instance, 768);
 	}
@@ -76,6 +68,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
 				.id(new ResourceLocation("narutomod", "puppet_hiruko"), ENTITYID).name("puppet_hiruko").tracker(64, 3, true).build());
 	}
+
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
@@ -87,12 +80,13 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new PlayerHook());
 	}
+
 	public static class EntityCustom extends EntityShieldBase {
 		// POSE: 0-idle; 1-attack; 2-defend
 		private static final DataParameter<Integer> POSE = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private static final DataParameter<Boolean> ROBE_OFF = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
 		private static final DataParameter<Boolean> AKATSUKI = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
-		public static final float MAXHEALTH = 200.0f;
+		public static final float MAXHEALTH = 160.0f;
 		private int poseProgressEnd = 14;
 		private int poseProgress = -1;
 		private Object model;
@@ -131,29 +125,29 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			this.poseProgress = 0;
 			this.poseProgressEnd = pose == 1 ? 7 : pose == 2 ? 3 : 14;
 			if (pose != 0 && pose != prevPose) {
-				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hiruko_tail")), 1f,
-						this.rand.nextFloat() * 0.4f + 0.7f);
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hiruko_tail")),
+				 1f, this.rand.nextFloat() * 0.4f + 0.7f);
 			}
 		}
-
+	
 		public int getPose() {
-			return ((Integer) this.getDataManager().get(POSE)).intValue();
+			return ((Integer)this.getDataManager().get(POSE)).intValue();
 		}
 
 		protected void takeRobeOff(boolean b) {
 			this.dataManager.set(ROBE_OFF, Boolean.valueOf(b));
 		}
-
+	
 		public boolean isRobeOff() {
-			return ((Boolean) this.getDataManager().get(ROBE_OFF)).booleanValue();
+			return ((Boolean)this.getDataManager().get(ROBE_OFF)).booleanValue();
 		}
 
 		public void setAkatsuki(boolean b) {
 			this.dataManager.set(AKATSUKI, Boolean.valueOf(b));
 		}
-
+	
 		public boolean isAkatsuki() {
-			return ((Boolean) this.getDataManager().get(AKATSUKI)).booleanValue();
+			return ((Boolean)this.getDataManager().get(AKATSUKI)).booleanValue();
 		}
 
 		@Override
@@ -171,11 +165,10 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MAXHEALTH);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(25.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(16.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(6.0D);
 		}
 
@@ -205,17 +198,13 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			super.attackEntityAsMob(entityIn);
-			if (entityIn instanceof EntityLivingBase) {
-				EntityLivingBase entityLiving = (EntityLivingBase) entityIn;
-				entityLiving.addPotionEffect(new PotionEffect(MobEffects.POISON, 200, 2));
-			}
 			return ProcedureUtils.attackEntityAsMob(this, entityIn);
 		}
 
 		@Override
 		protected void damageEntity(DamageSource source, float amount) {
 			if (this.shouldBlock) {
-				amount *= 0.8f;
+				amount *= this.rand.nextFloat() * 0.2f;
 			}
 			super.damageEntity(source, amount);
 		}
@@ -230,9 +219,9 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 
 		private boolean hasPuppetJutsu(@Nullable Entity controllingRider) {
 			if (controllingRider instanceof EntityPlayer) {
-				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer) controllingRider, ItemNinjutsu.block);
-				return stack != null && ((ItemNinjutsu.RangedItem) stack.getItem()).canActivateJutsu(stack, ItemNinjutsu.PUPPET,
-						(EntityPlayer) controllingRider) == EnumActionResult.SUCCESS;
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)controllingRider, ItemNinjutsu.block);
+				return stack != null && ((ItemNinjutsu.RangedItem)stack.getItem())
+				 .canActivateJutsu(stack, ItemNinjutsu.PUPPET, (EntityPlayer)controllingRider) == EnumActionResult.SUCCESS;
 			} else {
 				return controllingRider instanceof EntitySasori.EntityCustom;
 			}
@@ -242,7 +231,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			boolean robeOff = this.isRobeOff();
-
 			if (this.isAkatsuki() && !robeOff && !this.maskOff && this.rand.nextInt(200) == 0) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY
 				 .getObject(new ResourceLocation("narutomod:dingding")), 0.8f, this.rand.nextFloat() * 0.1f + 0.95f);
@@ -284,19 +272,20 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 
 		private boolean isRiderHoldingSenbon() {
 			Entity rider = this.getControllingPassenger();
-			return rider instanceof EntityLivingBase && (((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemSenbon.block
-					|| ((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemPoisonSenbon.block);
+			return rider instanceof EntityLivingBase
+			 && (((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemSenbon.block
+			  || ((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemPoisonSenbon.block);
 		}
 
 		private boolean isRiderHoldingSenbonArm() {
 			Entity rider = this.getControllingPassenger();
-			return rider instanceof EntityLivingBase && (((EntityLivingBase) rider).getHeldItemMainhand().getItem() == ItemSenbonArm.block
-					|| ((EntityLivingBase) rider).getHeldItemOffhand().getItem() == ItemSenbonArm.block);
+			return rider instanceof EntityLivingBase
+			 && (((EntityLivingBase)rider).getHeldItemMainhand().getItem() == ItemSenbonArm.block
+			  || ((EntityLivingBase)rider).getHeldItemOffhand().getItem() == ItemSenbonArm.block);
 		}
 
 		public boolean hasSenbonArmInRiderInventory() {
 			Entity rider = this.getControllingPassenger();
-
 			if (rider instanceof EntityPlayer) {
 				return ProcedureUtils.hasItemInInventory((EntityPlayer)rider, ItemSenbonArm.block);
 			} else if (rider instanceof EntityNinjaMob.Base) {
@@ -321,28 +310,30 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderCustom(renderManager));
 		}
+
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends RenderLivingBase<EntityCustom> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/hiruko.png");
 			private ModelPuppetHiruko model;
+	
 			public RenderCustom(RenderManager renderManagerIn) {
 				super(renderManagerIn, new ModelPuppetHiruko(), 0.5F);
 			}
-
-			@Override
+	
+		 	@Override
 			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
 				if (entity.model == null) {
 					entity.model = this.mainModel = this.model = new ModelPuppetHiruko();
 				} else {
-					this.mainModel = this.model = (ModelPuppetHiruko) entity.model;
+					this.mainModel = this.model = (ModelPuppetHiruko)entity.model;
 				}
 				if (entity.isBeingRidden() && entity.getControllingPassenger() instanceof EntityLivingBase) {
-					this.copyLimbSwing(entity, (EntityLivingBase) entity.getControllingPassenger());
+					this.copyLimbSwing(entity, (EntityLivingBase)entity.getControllingPassenger());
 				}
 				this.setModelVisibilities(entity);
 				super.doRender(entity, x, y, z, entityYaw, partialTicks);
 			}
-
+	
 			@Override
 			protected void preRenderCallback(EntityCustom entity, float partialTickTime) {
 				if (entity.isRobeOff()) {
@@ -351,7 +342,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 					GlStateManager.scale(1.125F, 1.125F, 1.125F);
 				}
 			}
-
+	
 			protected void copyLimbSwing(EntityCustom entity, EntityLivingBase rider) {
 				entity.swingProgress = rider.swingProgress;
 				entity.swingProgressInt = rider.swingProgressInt;
@@ -359,7 +350,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				entity.isSwingInProgress = rider.isSwingInProgress;
 				entity.swingingHand = rider.swingingHand;
 			}
-
+	
 			protected void setModelVisibilities(EntityCustom entity) {
 				this.model.setVisible(true);
 				this.model.body.showModel = true;
@@ -378,19 +369,20 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 					this.model.robeAkatsuki.showModel = akatsuki;
 				}
 				this.model.torpedo.showModel = entity.hasSenbonArmInRiderInventory();
-				if (this.renderManager.renderViewEntity.equals(entity.getControllingPassenger()) && this.renderManager.options.thirdPersonView == 0) {
+				if (this.renderManager.renderViewEntity.equals(entity.getControllingPassenger())
+				 && this.renderManager.options.thirdPersonView == 0) {
 					this.model.body.showModel = false;
 					this.model.bipedRightLeg.showModel = false;
 					this.model.bipedLeftLeg.showModel = false;
 				}
 			}
-
+	
 			@Override
 			protected ResourceLocation getEntityTexture(EntityCustom entity) {
 				return this.texture;
 			}
 		}
-
+	
 		// Made with Blockbench 4.4.2
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports
@@ -450,7 +442,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer cube_r15;
 			private final ModelRenderer cube_r16;
 			private final ModelRenderer veil;
-			// private final ModelRenderer bipedBody;
+			//private final ModelRenderer bipedBody;
 			private final ModelRenderer robe;
 			private final ModelRenderer bone21;
 			private final ModelRenderer rightArm;
@@ -474,12 +466,12 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone9;
 			private final ModelRenderer bone7;
 			private final ModelRenderer bone5;
-			// private final ModelRenderer bipedRightArm;
+			//private final ModelRenderer bipedRightArm;
 			private final ModelRenderer bipedRightUpperArm;
 			private final ModelRenderer bipedRightForeArm;
-			// private final ModelRenderer bipedRightUpperArm2;
-			// private final ModelRenderer bipedRightForeArm2;
-			// private final ModelRenderer bipedLeftArm;
+			//private final ModelRenderer bipedRightUpperArm2;
+			//private final ModelRenderer bipedRightForeArm2;
+			//private final ModelRenderer bipedLeftArm;
 			private final ModelRenderer bipedLeftUpperArm;
 			private final ModelRenderer bipedLeftForeArm;
 			private final ModelRenderer torpedo;
@@ -601,7 +593,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				jaw.cubeList.add(new ModelBox(jaw, 0, 74, -3.0F, 0.0F, -4.0F, 2, 2, 4, 0.0F, true));
 				jawMid = new ModelRenderer(this);
 				jawMid.setRotationPoint(0.0F, 0.0F, 0.0F);
-
 				jaw.addChild(jawMid);
 				setRotationAngle(jawMid, 0.1309F, 0.0F, 0.0F);
 				jawMid.cubeList.add(new ModelBox(jawMid, 12, 74, -1.0F, 0.0F, -4.0F, 2, 2, 4, 0.0F, false));
@@ -610,26 +601,21 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bipedHead.addChild(mask);
 				mask.cubeList.add(new ModelBox(mask, 68, 10, -4.0F, -27.0F, -4.0F, 8, 4, 8, 0.25F, false));
 				bipedHeadwear = new ModelRenderer(this);
-
 				bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
 				head.addChild(bipedHeadwear);
 				hair = new ModelRenderer(this);
 				hair.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHeadwear.addChild(hair);
 				bone16 = new ModelRenderer(this);
-
 				bone16.setRotationPoint(0.0F, -6.0F, 4.25F);
 				hair.addChild(bone16);
 				setRotationAngle(bone16, 1.0472F, 0.0F, 0.0F);
 				bone16.cubeList.add(new ModelBox(bone16, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone17 = new ModelRenderer(this);
 				bone17.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone16.addChild(bone17);
 				setRotationAngle(bone17, 0.5236F, 0.0F, 0.0F);
-
 				bone17.cubeList.add(new ModelBox(bone17, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone18 = new ModelRenderer(this);
 				bone18.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone17.addChild(bone18);
@@ -645,7 +631,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				hair.addChild(bone33);
 				setRotationAngle(bone33, 1.0472F, 0.0F, -0.7854F);
 				bone33.cubeList.add(new ModelBox(bone33, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone34 = new ModelRenderer(this);
 				bone34.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone33.addChild(bone34);
@@ -675,7 +660,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bone31.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone30.addChild(bone31);
 				setRotationAngle(bone31, 0.5236F, 0.0F, 0.0F);
-
 				bone31.cubeList.add(new ModelBox(bone31, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.1F, false));
 				bone32 = new ModelRenderer(this);
 				bone32.setRotationPoint(0.0F, -0.1F, 2.0F);
@@ -683,17 +667,14 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(bone32, 0.2618F, 0.0F, 0.0F);
 				bone32.cubeList.add(new ModelBox(bone32, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.0F, false));
 				bone25 = new ModelRenderer(this);
-
 				bone25.setRotationPoint(-0.75F, -5.75F, 4.25F);
 				hair.addChild(bone25);
 				setRotationAngle(bone25, 1.0472F, 0.0F, -0.4363F);
 				bone25.cubeList.add(new ModelBox(bone25, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone26 = new ModelRenderer(this);
 				bone26.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone25.addChild(bone26);
 				setRotationAngle(bone26, 0.5236F, 0.0F, 0.0F);
-
 				bone26.cubeList.add(new ModelBox(bone26, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
 				bone27 = new ModelRenderer(this);
 				bone27.setRotationPoint(0.0F, 0.0F, 2.0F);
@@ -704,33 +685,26 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bone28.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone27.addChild(bone28);
 				setRotationAngle(bone28, 0.2618F, 0.0F, 0.0F);
-
 				bone28.cubeList.add(new ModelBox(bone28, 74, 0, -0.5F, -0.1F, 0.0F, 1, 0, 2, 0.0F, false));
 				bone20 = new ModelRenderer(this);
 				bone20.setRotationPoint(0.75F, -5.75F, 4.25F);
 				hair.addChild(bone20);
 				setRotationAngle(bone20, 1.0472F, 0.0F, 0.4363F);
 				bone20.cubeList.add(new ModelBox(bone20, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone22 = new ModelRenderer(this);
 				bone22.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone20.addChild(bone22);
 				setRotationAngle(bone22, 0.5236F, 0.0F, 0.0F);
-
 				bone22.cubeList.add(new ModelBox(bone22, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.2F, false));
-
 				bone23 = new ModelRenderer(this);
 				bone23.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone22.addChild(bone23);
 				setRotationAngle(bone23, 0.5236F, 0.0F, 0.0F);
-
 				bone23.cubeList.add(new ModelBox(bone23, 74, 0, -0.5F, 0.0F, 0.0F, 1, 0, 2, 0.1F, false));
-
 				bone24 = new ModelRenderer(this);
 				bone24.setRotationPoint(0.0F, 0.0F, 2.0F);
 				bone23.addChild(bone24);
 				setRotationAngle(bone24, 0.2618F, 0.0F, 0.0F);
-
 				bone24.cubeList.add(new ModelBox(bone24, 74, 0, -0.5F, -0.1F, 0.0F, 1, 0, 2, 0.0F, false));
 				bone8 = new ModelRenderer(this);
 				bone8.setRotationPoint(0.0F, -8.5F, -4.25F);
@@ -871,7 +845,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				bone21.cubeList.add(new ModelBox(bone21, 40, 0, -7.0F, 16.0F, -0.75F, 14, 2, 4, 0.05F, false));
 				rightArm = new ModelRenderer(this);
 				rightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
-				robe.addChild(rightArm);
+				robe.addChild(rightArm);	
 				rightUpperArm = new ModelRenderer(this);
 				rightUpperArm.setRotationPoint(0.0F, 0.0F, 0.0F);
 				rightArm.addChild(rightUpperArm);
@@ -884,7 +858,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				rightForeArm.cubeList.add(new ModelBox(rightForeArm, 16, 64, -2.0F, 0.0F, -4.0F, 4, 6, 4, 0.55F, false));
 				leftArm = new ModelRenderer(this);
 				leftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-				robe.addChild(leftArm);
+				robe.addChild(leftArm);		
 				leftUpperArm = new ModelRenderer(this);
 				leftUpperArm.setRotationPoint(0.0F, 0.0F, 0.0F);
 				leftArm.addChild(leftUpperArm);
@@ -1056,11 +1030,11 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				}
 				tail[10][0].showModel = false;
 				for (int j = 1; j < tailSway.length; j++) {
-					tailSway[j] = new Vector3f((rand.nextFloat() - 0.5f) * 0.2618F, (rand.nextFloat() - 0.5f) * 0.5236F,
-							(rand.nextFloat() - 0.5f) * 0.0436F);
+					tailSway[j] = new Vector3f((rand.nextFloat() - 0.5f) * 0.2618F,
+					 (rand.nextFloat() - 0.5f) * 0.5236F, (rand.nextFloat() - 0.5f) * 0.0436F);
 				}
 			}
-
+	
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				GlStateManager.pushMatrix();
@@ -1071,17 +1045,17 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				tail[0][0].render(f5);
 				GlStateManager.popMatrix();
 			}
-
+	
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
 				modelRenderer.rotateAngleX = x;
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-
+	
 			@Override
 			public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity e) {
 				super.setRotationAngles(f, f1, f2, f3, f4, f5, e);
-				EntityCustom entity = (EntityCustom) e;
+				EntityCustom entity = (EntityCustom)e;
 				float pt = f2 - entity.ticksExisted;
 				int pose = entity.getPose();
 				boolean robeOff = entity.isRobeOff();
@@ -1181,37 +1155,41 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public void onMouseRightButton(MouseEvent event) {
 			EntityPlayer player = Minecraft.getMinecraft().player;
-			if (Minecraft.getMinecraft().currentScreen == null && player.getRidingEntity() instanceof EntityCustom && event.getButton() == 1
-					&& !((EntityCustom) player.getRidingEntity()).isRiderHoldingSenbon()
-					&& !((EntityCustom) player.getRidingEntity()).isRiderHoldingSenbonArm()) {
+			if (Minecraft.getMinecraft().currentScreen == null && player.getRidingEntity() instanceof EntityCustom
+			 && event.getButton() == 1 && !((EntityCustom)player.getRidingEntity()).isRiderHoldingSenbon()
+			 && !((EntityCustom)player.getRidingEntity()).isRiderHoldingSenbonArm()) {
 				NarutomodMod.PACKET_HANDLER.sendToServer(new Message(event.isButtonstate()));
 			}
 		}
+		
 		public static class Message implements IMessage {
 			boolean pressed;
+	
 			public Message() {
 			}
-
+	
 			public Message(boolean var1) {
 				this.pressed = var1;
 			}
+	
 			public static class Handler implements IMessageHandler<Message, IMessage> {
 				@Override
 				public IMessage onMessage(Message message, MessageContext context) {
 					EntityPlayerMP entity = context.getServerHandler().player;
 					entity.getServerWorld().addScheduledTask(() -> {
 						if (entity.world.isBlockLoaded(new BlockPos(entity.posX, entity.posY, entity.posZ))
-								&& entity.getRidingEntity() instanceof EntityCustom) {
-							((EntityCustom) entity.getRidingEntity()).blockAttack(message.pressed);
+						 && entity.getRidingEntity() instanceof EntityCustom) {
+							((EntityCustom)entity.getRidingEntity()).blockAttack(message.pressed);
 						}
 					});
 					return null;
 				}
 			}
+	
 			public void toBytes(ByteBuf buf) {
 				buf.writeBoolean(this.pressed);
 			}
-
+	
 			public void fromBytes(ByteBuf buf) {
 				this.pressed = buf.readBoolean();
 			}

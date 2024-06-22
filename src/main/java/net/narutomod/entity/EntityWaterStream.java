@@ -116,13 +116,12 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				if (player instanceof EntityPlayer) {
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
-							EntityStream.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 100, 0.5f, 1.5f));
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
+							EC.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 100, 0.5f, 1.5f));
 				} else {
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityStream.this, player),
-							EntityStream.this.power * EntityStream.this.damageModifier);
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), EC.this.power * EC.this.damageModifier);
 				}
 			}
 

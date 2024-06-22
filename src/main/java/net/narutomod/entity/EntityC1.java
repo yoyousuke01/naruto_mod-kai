@@ -43,12 +43,15 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(0.4F, 0.8F);
+			this.setExplosionSize(4.0f);
+		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(0.4F, 0.8F);
 			this.setExplosionSize(4.0f);
 		}
+
 
 		@Override
 		protected void applyEntityAttributes() {
