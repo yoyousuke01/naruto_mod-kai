@@ -18,6 +18,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.GlStateManager;
@@ -29,14 +30,15 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
-import net.narutomod.creativetab.TabModTab;
-import net.narutomod.NarutomodModVariables;
-import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.Particles;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityScalableProjectile;
 import net.narutomod.entity.EntityHidingInAsh;
 import net.narutomod.entity.EntityFirestream;
+import net.narutomod.creativetab.TabModTab;
+import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.NarutomodModVariables;
+import net.narutomod.Particles;
+import net.narutomod.ElementsNarutomodMod;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemKaton extends ElementsNarutomodMod.ModElement {
@@ -82,26 +84,38 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		private final int timeToFullscale = 20;
 		private int explosionSize;
 		private float damage;
+		private boolean guided;
+		private Entity target;
 		
 		public EntityBigFireball(World a) {
 			super(a);
 			this.setOGSize(0.8F, 0.8F);
 		}
 
-		public EntityBigFireball(EntityLivingBase shooter, float fullScale) {
+		public EntityBigFireball(EntityLivingBase shooter, float fullScale, boolean isGuided) {
 			super(shooter);
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 1, 0);
 			this.damage = fullScale * 10.0f;
+			this.guided = isGuided;
 			//this.setEntityScale(0.1f);
 			Vec3d vec3d = shooter.getLookVec();
-			this.setPosition(shooter.posX + vec3d.x, shooter.posY + 1.2D + vec3d.y, shooter.posZ + vec3d.z);
+			this.setPosition(shooter.posX + vec3d.x, shooter.posY + shooter.getEyeHeight() - 0.2d * fullScale + vec3d.y, shooter.posZ + vec3d.z);
+		}
+
+		public void setDamage(float amount) {
+			this.damage = amount;
+		}
+
+		@Override
+		public boolean isImmuneToExplosions() {
+			return true;
 		}
 
 		@Override
 		protected void onImpact(RayTraceResult result) {
-			if (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale >= 2.0f && this.ticksInAir <= 15) {
+			if (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale >= 2.0f && this.ticksInAir < 15) {
 				return;
 			}
 			if (!this.world.isRemote) {
@@ -112,7 +126,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					if (result.entityHit.equals(this.shootingEntity) || result.entityHit instanceof EntityBigFireball)
 						return;
 					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage);
-					result.entityHit.setFire(10);
+					result.entityHit.setFire(15);
 				}
 				boolean flag = ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, false);
@@ -134,16 +148,31 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && (this.ticksInAir > 100 || this.isInWater())) {
+			if (!this.world.isRemote && (this.ticksInAir > (this.guided ? 200 : 100) || this.isInWater())) {
 				this.setDead();
 			} else {
 				if (!this.world.isRemote && this.ticksAlive <= this.timeToFullscale) {
 					this.setEntityScale(1f + (this.fullScale - 1f) * this.ticksAlive / this.timeToFullscale);
 				}
+				if (this.guided && this.shootingEntity != null) {
+					Vec3d vec;
+					if (this.target == null) {
+						this.target = this.shootingEntity instanceof EntityLiving ? ((EntityLiving)this.shootingEntity).getAttackTarget()
+						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, EntityBigFireball.class).entityHit;
+						vec = this.target != null ? this.target.getPositionEyes(1f).subtract(this.getPositionVector())
+						 : this.shootingEntity.getLookVec();
+					} else {
+						vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
+					}
+					this.motionX *= 0.9D;
+					this.motionY *= 0.9D;
+					this.motionZ *= 0.9D;
+					this.shoot(vec.x, vec.y, vec.z, 0.99f, 0f);
+				}
 				if (this.rand.nextFloat() <= 0.2f) {
 					//this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1, this.rand.nextFloat() + 0.5f);
-					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:flamethrow"))), 
-					 1.0f, this.rand.nextFloat() * 0.5f + 0.6f);
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:flamethrow")),
+					 this.fullScale >= 10.0f ? 5.0F : 1.0f, this.rand.nextFloat() * 0.5f + 0.6f);
 				}
 			}
 		}
@@ -152,7 +181,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 0.5f) {
-					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power);
+					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
+					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
 					//	ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 80));
 					return true;
@@ -160,9 +190,9 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				return false;
 			}
 
-			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power) {
-				EntityBigFireball entityarrow = new EntityBigFireball(entity, power);
-				entityarrow.shoot(x, y, z, 0.95f, 0);
+			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided) {
+				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided);
+				entityarrow.shoot(x, y, z, 0.99f, 0);
 				entity.world.spawnEntity(entityarrow);
 			}
 
@@ -217,7 +247,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				BufferBuilder bufferbuilder = tessellator.getBuffer();
 				GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(12f * (partialTicks + entity.ticksExisted), 0.0F, 0.0F, 1.0F);
+				GlStateManager.rotate(30F * (partialTicks + entity.ticksExisted), 0.0F, 0.0F, 1.0F);
+				GlStateManager.enableBlend();
 				GlStateManager.disableLighting();
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
@@ -227,6 +258,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				bufferbuilder.pos(-0.375D, 0.375D, 0.0D).tex(0.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
 				tessellator.draw();
 				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
 				GlStateManager.disableRescaleNormal();
 				GlStateManager.popMatrix();
 				super.doRender(entity, x, y, z, entityYaw, partialTicks);

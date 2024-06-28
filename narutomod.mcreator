@@ -2,8 +2,8 @@
   "id_map": {
 
     "GUI": 64,
-    "ENTITY": 442,
-    "DIMENSION": 13
+    "DIMENSION": 13,
+    "ENTITY": 444
   },
   "mod_elements": [
     {
@@ -7386,6 +7386,18 @@
       "locked_code": false,
       "ids": {},
       "registry_name": "kunai_blade_recipe"
+    },
+    {
+      "name": "WaterCanonball",
+      "type": "mob",
+      "sortid": 873,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 443,
+        "1": 444
+      },
+      "registry_name": "water_canonball"
     }
   ],
   "variable_elements": [
@@ -7543,13 +7555,6 @@
       "name": "HakkeKusho",
       "files": [
         "hakkekusho"
-      ],
-      "category": "master"
-    },
-    {
-      "name": "MajiNaguri",
-      "files": [
-        "majinaguri"
       ],
       "category": "master"
     },
@@ -8362,12 +8367,60 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "matatabi_roar1",
+      "files": [
+        "matatabi_roar1"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "matatabi_roar2",
+      "files": [
+        "matatabi_roar2"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "waterfall",
+      "files": [
+        "waterfall"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "shot",
+      "files": [
+        "gal_se_decopin_shot"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "gyuki_roar",
+      "files": [
+        "gyuki_roar"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "gyuki_snort",
+      "files": [
+        "gyuki_snort"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
     "en_us": {
-      "entity.crow.name": "Crow",
       "item.kiba_blades.name": "Kiba Blades",
+      "entity.crow.name": "Crow",
       "chattext.gedomazo.cantspawn": "Can\u0027t summon Gedo Mazo, it\u0027s already in the world",
       "entity.tenten.name": "Tenten",
       "item.futton.name": "Boil Release",
@@ -8607,6 +8660,8 @@
       "item.uchihalegs.name": "Uchiha Leggings",
       "entity.swamp_pit.name": "Swamp of the Underworld",
       "entity.toad.name": "Toad",
+      "subtitles.matatabi_roar1": "",
+      "subtitles.matatabi_roar2": "",
       "entity.enhanced_strength.name": "Enhanced Strength",
       "advancements.mokuton_acquired.descr": "Wood Release is a nature transformation kekkei genkai, a combination of Earth and Water Release. It was famously used by Hashirama Senju, and in fact is not known to have naturally occurred in anyone else, leading to it being regarded as impossible to use without having his cells.",
       "subtitles.ringing": "",
@@ -8688,6 +8743,7 @@
       "tooltip.byakurinnesharingan.jutsu2": "Yomotsu Hirasaka",
       "item.scroll_hiding_in_ash.name": "Fire Release - Hiding In Ash",
       "entity.buddha_1000.name": "Sage Art Wood Release: Shinsu Senju",
+      "subtitles.shot": "",
       "chattext.specialevent.titanjadeniscoming": "Event alert: Titan Jaden is coming!",
       "item.ninja_armor_war_1legs.name": "Ninja Armor War 1 Leggings",
       "tooltip.mokuton.rightclick2": "Four-Pillar House Technique",
@@ -8700,6 +8756,7 @@
       "advancements.ninjaachievement.descr": "You may now begin your ninja training!",
       "item.ninja_armor_soundboots.name": "Ninja Armor Sound Boots",
       "advancements.hyoton_acquired.title": "Ice Release Acquired",
+      "subtitles.gyuki_roar": "",
       "item.yagura_staff.name": "Yagura Staff",
       "item.scythe_hidan.name": "Scythe 3-blade",
       "subtitles.fourtails_idle2": "",
@@ -8709,6 +8766,7 @@
       "item.jutsu.name": "Jutsu",
       "item.ninja_armor_jiraiyabody.name": "Jiraiya Jacket",
       "tile.light_source.name": "Light Source",
+      "entity.water_canonball.name": "Water Cannon Ball",
       "chattext.bijumanager.tooweak": "You are not strong enough to take on %s\u0027s chakra!",
       "item.scroll_big_blow.name": "Wind Release - Great Breakthrough",
       "chattext.eightgates.gate1": "1st Gate: Gate of Opening",
@@ -8802,6 +8860,7 @@
       "entity.firestream.name": "Firestream",
       "chattext.jutsu.enabled": "%s is now enabled!",
       "item.folding_fan.name": "Giant Folding Fan",
+      "subtitles.waterfall": "",
       "splash_potion.effect.feather_falling": "Splash Feather Falling",
       "tooltip.yooton.musthave": "Must have Earth \u0026 Fire release",
       "entity.ice_spike.name": "Shattering Ice Spear",
@@ -9015,6 +9074,7 @@
       "tooltip.eightgates.currentxp": "Current XP: %d",
       "item.ninja_armor_anbuhelmet.name": "Ninja Armor Anbu Helmet",
       "item.ninja_armor_naruto_shelmet.name": "Ninja Armor Naruto S Helmet",
+      "subtitles.gyuki_snort": "",
       "item.ninja_armor_iwalegs.name": "Ninja Pants (Iwagakure)",
       "item.ninja_armor_obito_warlegs.name": "Ninja Armor Obito War Leggings",
       "item.kamuidimension.name": "Kamui Dimension Portal Igniter",

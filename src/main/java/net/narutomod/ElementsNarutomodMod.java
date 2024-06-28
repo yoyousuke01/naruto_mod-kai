@@ -118,8 +118,6 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "HakkeshoKaiten")));
 		sounds.put(new ResourceLocation("narutomod", "HakkeKusho"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "HakkeKusho")));
-		sounds.put(new ResourceLocation("narutomod", "MajiNaguri"),
-				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "MajiNaguri")));
 		sounds.put(new ResourceLocation("narutomod", "hand_shoot"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "hand_shoot")));
 		sounds.put(new ResourceLocation("narutomod", "nagiharai"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "nagiharai")));
@@ -294,6 +292,16 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "waterstream")));
 		sounds.put(new ResourceLocation("narutomod", "wood_click"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "wood_click")));
+		sounds.put(new ResourceLocation("narutomod", "matatabi_roar1"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "matatabi_roar1")));
+		sounds.put(new ResourceLocation("narutomod", "matatabi_roar2"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "matatabi_roar2")));
+		sounds.put(new ResourceLocation("narutomod", "waterfall"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "waterfall")));
+		sounds.put(new ResourceLocation("narutomod", "shot"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "shot")));
+		sounds.put(new ResourceLocation("narutomod", "gyuki_roar"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "gyuki_roar")));
+		sounds.put(new ResourceLocation("narutomod", "gyuki_snort"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "gyuki_snort")));
 	}
 
 	public void preInit(FMLPreInitializationEvent event) {
