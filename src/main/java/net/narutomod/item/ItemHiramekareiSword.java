@@ -6,16 +6,23 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.EnumAction;
@@ -27,17 +34,17 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.potion.PotionReach;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityChakraFlow;
+import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.Chakra;
 import net.narutomod.creativetab.TabModTab;
@@ -71,6 +78,11 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:hiramekarei", "inventory"));
+	}
+
+	@Override
+	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new RangedItem.AttackHook());
 	}
 
 	public static class RangedItem extends Item implements ItemOnBody.Interface {
@@ -173,6 +185,25 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 		public boolean hasEffect(ItemStack itemstack) {
 			return this.effectActive(itemstack);
 		}
+
+		public static class AttackHook {
+			@SubscribeEvent
+			public void onLivingAttack(LivingAttackEvent event) {
+				Entity attacker = event.getSource().getImmediateSource();
+				if (attacker instanceof EntityLivingBase && ((EntityLivingBase)attacker).getHeldItemMainhand().getItem() == block && !event.getEntityLiving().getEntityData().getBoolean("splashDamageFromHiraMekarei")) {
+					double d = ProcedureUtils.getReachDistance((EntityLivingBase)attacker);
+					for (EntityLivingBase entity : attacker.world.getEntitiesWithinAABB(EntityLivingBase.class, attacker.getEntityBoundingBox().grow(d, 0.25D, d))) {
+						if (entity != attacker && entity != event.getEntityLiving() && !attacker.isOnSameTeam(entity) && attacker.getDistanceSq(entity) <= d * d) {
+							entity.getEntityData().setBoolean("splashDamageFromHiraMekarei", true);
+							entity.knockBack(attacker, 0.5F, MathHelper.sin(attacker.rotationYaw * 0.017453292F), -MathHelper.cos(attacker.rotationYaw * 0.017453292F));
+							entity.attackEntityFrom(DamageSource.causeMobDamage((EntityLivingBase)attacker), event.getAmount());
+							entity.getEntityData().removeTag("splashDamageFromHiraMekarei");
+						}
+					}
+					attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, net.minecraft.init.SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, attacker.getSoundCategory(), 1.0F, 1.0F);
+				}
+			}
+		}
 	}
 
 	public static class EntityEffects extends EntityChakraFlow.Base {
@@ -227,7 +258,7 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 				EntityLivingBase user = entity.getUser();
 				int userid = user != null ? user.getEntityId() : -1;
 				for (int i = 0; i < 50; i++) {
-					Vec3d vec1 = vec.scale(entity.getRNG().nextDouble() * 0.4d + 0.6d);
+					Vec3d vec1 = vec.scale(entity.getRNG().nextDouble() * 0.6667d + 1.0d);
 					Particles.spawnParticle(entity.world, Particles.Types.SMOKE, startvec.x, startvec.y, startvec.z, 1,
 					 0.08d, 0.2d, 0.08d, vec1.x, vec1.y, vec1.z, 0x206AD1FF, 40, 5, 0xF0, userid);
 				}

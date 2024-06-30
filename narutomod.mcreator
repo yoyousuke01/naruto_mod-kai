@@ -1,9 +1,9 @@
 {
   "id_map": {
 
-    "GUI": 64,
+    "GUI": 68,
     "DIMENSION": 13,
-    "ENTITY": 444
+    "ENTITY": 448
   },
   "mod_elements": [
     {
@@ -7398,6 +7398,90 @@
         "1": 444
       },
       "registry_name": "water_canonball"
+    },
+    {
+      "name": "ScrollWaterCannonGui",
+      "type": "gui",
+      "sortid": 874,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 65
+      },
+      "registry_name": "scroll_water_cannon_gui"
+    },
+    {
+      "name": "ScrollWaterCannon",
+      "type": "item",
+      "sortid": 875,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "scroll_water_cannon"
+    },
+    {
+      "name": "FlameSlice",
+      "type": "mob",
+      "sortid": 876,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 445,
+        "1": 446
+      },
+      "registry_name": "flame_slice"
+    },
+    {
+      "name": "FlameFormation",
+      "type": "mob",
+      "sortid": 877,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 447,
+        "1": 448
+      },
+      "registry_name": "flame_formation"
+    },
+    {
+      "name": "ScrollFlameSliceGui",
+      "type": "gui",
+      "sortid": 878,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 66
+      },
+      "registry_name": "scroll_flame_slice_gui"
+    },
+    {
+      "name": "ScrollFlameSlice",
+      "type": "item",
+      "sortid": 879,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "scroll_flame_slice"
+    },
+    {
+      "name": "ScrollFlameFormationGui",
+      "type": "gui",
+      "sortid": 880,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 68
+      },
+      "registry_name": "scroll_flame_formation_gui"
+    },
+    {
+      "name": "ScrollFlameFormation",
+      "type": "item",
+      "sortid": 881,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "scroll_flame_formation"
     }
   ],
   "variable_elements": [
@@ -8415,6 +8499,30 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "ting",
+      "files": [
+        "ting"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "shuriken1",
+      "files": [
+        "shuriken1"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "chakraflow",
+      "files": [
+        "chakraflow"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
@@ -8432,6 +8540,7 @@
       "subtitles.sando_no_jutsu": "",
       "subtitles.laser": "",
       "item.ryo_100.name": "100 Ryo",
+      "subtitles.shuriken1": "",
       "tooltip.samehada.general": "Samehada is a sentient sword utilised by the Seven Ninja Swordsmen of the Mist and is regarded as the most terrifying out of all the Seven Swordsmen\u0027s blades.",
       "item.summoning_contract.name": "Summoning Contract",
       "item.ninja_armor_jiraiyaboots.name": "Ninja Armor Jiraiya Boots",
@@ -8731,6 +8840,7 @@
       "item.whitezetsuflesh.name": "White Zetsu Flesh",
       "item.clothes_mizukagehelmet.name": "Mizukage Hat",
       "subtitles.hiruko_tail": "",
+      "entity.flame_slice.name": "Flame Slice",
       "item.mokuton.name": "Wood Release",
       "subtitles.dojutsu": "",
       "item.ninja_armor.name": "Ninja Armor",
@@ -8740,11 +8850,11 @@
       "entity.c_1.name": "Explosive Clay ([Left click] to set target)",
       "item.byakurinnesharinganboots.name": "",
       "item.clothes_kazekageboots.name": "",
+      "subtitles.ting": "",
       "tooltip.byakurinnesharingan.jutsu2": "Yomotsu Hirasaka",
       "item.scroll_hiding_in_ash.name": "Fire Release - Hiding In Ash",
       "entity.buddha_1000.name": "Sage Art Wood Release: Shinsu Senju",
       "subtitles.shot": "",
-      "chattext.specialevent.titanjadeniscoming": "Event alert: Titan Jaden is coming!",
       "item.ninja_armor_war_1legs.name": "Ninja Armor War 1 Leggings",
       "tooltip.mokuton.rightclick2": "Four-Pillar House Technique",
       "subtitles.mindtransfer": "",
@@ -8759,6 +8869,7 @@
       "subtitles.gyuki_roar": "",
       "item.yagura_staff.name": "Yagura Staff",
       "item.scythe_hidan.name": "Scythe 3-blade",
+      "item.scroll_flame_slice.name": "Fire Release: Cloud Style Flame Slice",
       "subtitles.fourtails_idle2": "",
       "entity.rantoncloud.name": "Thunder Cloud Void Wave",
       "subtitles.fourtails_idle1": "",
@@ -8846,6 +8957,7 @@
       "chattext.rinnegan.path5": "Outer Path",
       "death.attack.ninjutsu_damage": "%1$s was killed by %2$s using ninjutsu",
       "item.ninja_armor_kiribody.name": "Flak Jacket (Kirigakure)",
+      "entity.flame_formation.name": "Flame Formation",
       "entity.poison_mist.name": "Poison Mist",
       "entity.spike.name": "Spike",
       "advancements.mokuton_acquired.title": "Wood Release Acquired",
@@ -9056,7 +9168,6 @@
       "item.ninja_armor_otolegs.name": "Ninja Leggings (Otogakure)",
       "subtitles.shukaku_roar": "",
       "tooltip.kusanagi.description": "The Kusanagi sword of Japanese legend.",
-      "tooltip.jadensword.description": "The ultimate weapon wielded by the Mighty Jaden.",
       "entity.c_2.name": "C 2",
       "item.mangekyosharinganhelmet.name": "Mangekyo Sharingan - Amaterasu",
       "key.mcreator.specialjutsu1": "Jutsu 1",
@@ -9108,6 +9219,7 @@
       "tipped_arrow.effect.chakra_enhanced_strength": "Arrow of Chakra Enhanced Strength",
       "item.ninja_armor_konohahelmet.name": "Forehead Protector (Konoha)",
       "item.scroll_enhanced_strength.name": "Medical Ninjutsu - Chakra Enhanced Strength",
+      "subtitles.chakraflow": "",
       "entity.susanooskeleton.name": "Susanoo Skeleton",
       "entity.hiraishin.name": "Flying Thunder God Jutsu",
       "tooltip.jiton.musthave": "Must have Earth \u0026 Wind release",
@@ -9115,6 +9227,7 @@
       "entity.specialeffect.name": "Special Effect",
       "effect.flight": "Flight",
       "item.tenseiganbody.name": "Tenseigan Chakra",
+      "item.scroll_flame_formation.name": "Fire Release: Uchiha Flame Formation",
       "item.rinneganlegs.name": "Rinne Sharingan Leggings",
       "item.dojutsu.name": "Dojutsu",
       "entity.entityjitonshield.name": "Shield of Sand",
@@ -9134,6 +9247,7 @@
       "chattext.cooldown.formatted": "Cooldown: %.1f",
       "key.mcreator.powerincrease": "Switch Jutsu / Increase",
       "entity.gedo_statue.name": "Demonic Statue of the Outer Path",
+      "item.scroll_water_cannon.name": "Water Release - Water Cannon Ball",
       "entity.water_shockwave.name": "Exploding Water Shockwave",
       "entity.puppet_hiruko.name": "Hiruko Puppet",
       "item.ninja_armor_kumolegs.name": "Ninja Pants (Kumogakure)",

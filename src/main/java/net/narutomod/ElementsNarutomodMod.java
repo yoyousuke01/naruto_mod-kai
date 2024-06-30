@@ -12,6 +12,7 @@ import net.narutomod.gui.GuiScrollWaterShockwaveGui;
 import net.narutomod.gui.GuiScrollWaterSharkGui;
 import net.narutomod.gui.GuiScrollWaterPrisonGui;
 import net.narutomod.gui.GuiScrollWaterDragonGui;
+import net.narutomod.gui.GuiScrollWaterCannonGui;
 import net.narutomod.gui.GuiScrollTransformationGui;
 import net.narutomod.gui.GuiScrollSwampPitGui;
 import net.narutomod.gui.GuiScrollShadowImitationGui;
@@ -39,6 +40,8 @@ import net.narutomod.gui.GuiScrollGreatFireballGui;
 import net.narutomod.gui.GuiScrollGenjutsuGui;
 import net.narutomod.gui.GuiScrollFutonVacuumGui;
 import net.narutomod.gui.GuiScrollFutonChakraFlowGui;
+import net.narutomod.gui.GuiScrollFlameSliceGui;
+import net.narutomod.gui.GuiScrollFlameFormationGui;
 import net.narutomod.gui.GuiScrollFireStreamGui;
 import net.narutomod.gui.GuiScrollFireAnnihilationGui;
 import net.narutomod.gui.GuiScrollFalseDarknessGui;
@@ -302,6 +305,10 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "gyuki_roar")));
 		sounds.put(new ResourceLocation("narutomod", "gyuki_snort"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "gyuki_snort")));
+		sounds.put(new ResourceLocation("narutomod", "ting"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "ting")));
+		sounds.put(new ResourceLocation("narutomod", "shuriken1"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "shuriken1")));
+		sounds.put(new ResourceLocation("narutomod", "chakraflow"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "chakraflow")));
 	}
 
 	public void preInit(FMLPreInitializationEvent event) {
@@ -462,6 +469,12 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollSealingChainsGui.GuiContainerMod(world, x, y, z, player);
 			if (id == GuiScrollHiraishinGui.GUIID)
 				return new GuiScrollHiraishinGui.GuiContainerMod(world, x, y, z, player);
+			if (id == GuiScrollWaterCannonGui.GUIID)
+				return new GuiScrollWaterCannonGui.GuiContainerMod(world, x, y, z, player);
+			if (id == GuiScrollFlameSliceGui.GUIID)
+				return new GuiScrollFlameSliceGui.GuiContainerMod(world, x, y, z, player);
+			if (id == GuiScrollFlameFormationGui.GUIID)
+				return new GuiScrollFlameFormationGui.GuiContainerMod(world, x, y, z, player);
 			return null;
 		}
 
@@ -559,6 +572,12 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollSealingChainsGui.GuiWindow(world, x, y, z, player);
 			if (id == GuiScrollHiraishinGui.GUIID)
 				return new GuiScrollHiraishinGui.GuiWindow(world, x, y, z, player);
+			if (id == GuiScrollWaterCannonGui.GUIID)
+				return new GuiScrollWaterCannonGui.GuiWindow(world, x, y, z, player);
+			if (id == GuiScrollFlameSliceGui.GUIID)
+				return new GuiScrollFlameSliceGui.GuiWindow(world, x, y, z, player);
+			if (id == GuiScrollFlameFormationGui.GUIID)
+				return new GuiScrollFlameFormationGui.GuiWindow(world, x, y, z, player);
 			return null;
 		}
 	}

@@ -11,9 +11,10 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +29,7 @@ import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.PlayerTracker;
 import net.narutomod.Particles;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityRasenshuriken;
 import net.narutomod.entity.EntityFutonGreatBreakthrough;
 import net.narutomod.entity.EntityFutonVacuum;
@@ -38,7 +40,6 @@ import net.narutomod.potion.PotionReach;
 
 import java.util.Random;
 import javax.annotation.Nullable;
-import net.minecraft.util.text.TextFormatting;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemFuton extends ElementsNarutomodMod.ModElement {
@@ -67,14 +68,6 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:futon", "inventory"));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(ChakraFlow.class, renderManager -> {
-			return new RenderChakraFlow(renderManager);
-		});
 	}
 
 	public static boolean isJutsuEnabled(@Nullable ItemStack stack, ItemJutsu.JutsuEnum jutsu) {
@@ -114,6 +107,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 
 	public static class ChakraFlow extends EntityChakraFlow.Base {
 		private int strengthModifier = 2;
+		private boolean holdingWeapon;
 
 		public ChakraFlow(World world) {
 			super(world);
@@ -137,7 +131,6 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		protected void addEffects() {
 			if (!this.world.isRemote && this.ticksExisted % 10 == 0) {
 				EntityLivingBase user = this.getUser();
-				//int strAmp =  user instanceof EntityPlayer ? (int)(PlayerTracker.getNinjaLevel((EntityPlayer)user) / 20d * this.strengthModifier) : 3;
 				user.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, this.strengthModifier + this.ogStrength, false, false));
 				user.addPotionEffect(new PotionEffect(PotionReach.potion, 12, 0, false, false));
 			}
@@ -147,11 +140,16 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (!this.world.isRemote) {
-				EntityLivingBase user = this.getUser();
-				if (user != null && this.isUserHoldingWeapon() && this.ticksExisted % 10 == 1 
-				 && !net.narutomod.Chakra.pathway(user).consume(CHAKRAFLOW.chakraUsage * 0.1d)) {
-					this.setDead();
+				boolean flag = this.isUserHoldingWeapon();
+				if (flag) {
+					if (!this.holdingWeapon) {
+						this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:chakraflow")), 0.8f, 1.0f);
+					}
+					if (this.ticksExisted % 10 == 1 && !net.narutomod.Chakra.pathway(this.getUser()).consume(CHAKRAFLOW.chakraUsage * 0.1d)) {
+						this.setDead();
+					}
 				}
+				this.holdingWeapon = flag;
 			}
 		}
 
@@ -173,6 +171,9 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					}
 					if (ItemRaiton.CHIDORI.jutsu.isActivated(entity)) {
 						ItemRaiton.CHIDORI.jutsu.deactivate(entity);
+					}
+					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
+						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
 					}
 					entity1 = new ChakraFlow(entity, stack);
 					entity.world.spawnEntity(entity1);
@@ -213,17 +214,30 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderChakraFlow extends EntityChakraFlow.RenderCustom<ChakraFlow> {
-		public RenderChakraFlow(RenderManager renderManagerIn) {
-			super(renderManagerIn);
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
+
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(ChakraFlow.class, renderManager -> new RenderChakraFlow(renderManager));
 		}
 
-		@Override
-		protected void spawnParticles(ChakraFlow entity, Vec3d startvec, Vec3d endvec) {
-			Vec3d vec = endvec.subtract(startvec).scale(0.2);
-			Particles.spawnParticle(entity.world, Particles.Types.SMOKE, startvec.x, startvec.y, startvec.z, 
-			  10, 0.05d, 0.05d, 0.05d, vec.x, vec.y, vec.z, 0x086AD1FF, 10, 5, 0xF0);
+		@SideOnly(Side.CLIENT)
+		public class RenderChakraFlow extends EntityChakraFlow.RenderCustom<ChakraFlow> {
+			public RenderChakraFlow(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+	
+			@Override
+			protected void spawnParticles(ChakraFlow entity, Vec3d startvec, Vec3d endvec) {
+				Vec3d vec = endvec.subtract(startvec).scale(0.6d);
+				Particles.spawnParticle(entity.world, Particles.Types.SMOKE, startvec.x, startvec.y, startvec.z, 
+				  10, 0.05d, 0.05d, 0.05d, vec.x, vec.y, vec.z, 0x086AD1FF, 10, 5, 0xF0);
+			}
 		}
 	}
 }
