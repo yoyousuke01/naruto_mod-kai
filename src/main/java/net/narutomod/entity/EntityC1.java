@@ -43,22 +43,22 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(0.4F, 0.8F);
-			this.setExplosionSize(4.0f);
+
+			this.setExplosionSize(5.0f);
 		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(0.4F, 0.8F);
-			this.setExplosionSize(4.0f);
+			this.setExplosionSize(5.0f);
 		}
 
 
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			EntityLivingBase owner = this.getOwner();
-			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(1.2D);
 		}
 
 
@@ -66,7 +66,7 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 	    public boolean attackEntityAsMob(Entity entityIn) {
 	    	if (super.attackEntityAsMob(entityIn)) {
 		    	entityIn.hurtResistantTime = 10;
-		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 8f + this.rand.nextFloat() * 4f);
+		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 12f + this.rand.nextFloat() * 4f);
 	    	}
 	    	return false;
 	    }
