@@ -22,7 +22,9 @@ import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.BossInfo;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
@@ -156,9 +158,6 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 			if ((this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemAkatsukiRobe.helmet) != (target == null)) {
 				this.swapWithInventory(EntityEquipmentSlot.HEAD, 1);
 			}
-			if (this.explosiveCloneCD > 0) {
-				--this.explosiveCloneCD;
-			}
 		}
 
 		@Override
@@ -286,6 +285,14 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public boolean getCanSpawnHere() {
+			return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
+			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty();
+			 //&& this.world.getEntitiesWithinAABB(EntityCustom.class, this.getEntityBoundingBox().grow(128.0D)).isEmpty();
+			 //&& this.rand.nextInt(5) == 0;
+		}
+
+		@Override
 		public boolean isNonBoss() {
 			return false;
 		}
@@ -371,7 +378,7 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 
 			public ModelDeidara() {
 				textureWidth = 64;
-				textureHeight = 32;
+				textureHeight = 64;
 				bipedHead = new ModelRenderer(this);
 				bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHead.cubeList.add(new ModelBox(bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F, false));
@@ -391,13 +398,14 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 				cube_r2.cubeList.add(new ModelBox(cube_r2, 32, 0, -4.0F, -4.0F, -4.0F, 8, 8, 8, 0.7F, false));
 				bipedBody = new ModelRenderer(this);
 				bipedBody.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 16, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F, false));		
+				bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 16, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F, false));
+		
 				bipedRightArm = new ModelRenderer(this);
 				bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
 				bipedRightArm.cubeList.add(new ModelBox(bipedRightArm, 40, 16, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
 				bipedLeftArm = new ModelRenderer(this);
 				bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 40, 16, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, true));
+				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 32, 48, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
 				bipedRightLeg = new ModelRenderer(this);
 				bipedRightLeg.setRotationPoint(-1.9F, 12.0F, 0.0F);
 				bipedRightLeg.cubeList.add(new ModelBox(bipedRightLeg, 0, 16, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, false));
@@ -407,7 +415,7 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 				rightBag.cubeList.add(new ModelBox(rightBag, 24, 0, -4.1F, 0.0F, -2.0F, 2, 4, 4, 0.0F, false));
 				bipedLeftLeg = new ModelRenderer(this);
 				bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
-				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 16, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, true));
+				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 16, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, false));
 				leftBag = new ModelRenderer(this);
 				leftBag.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedLeftLeg.addChild(leftBag);
