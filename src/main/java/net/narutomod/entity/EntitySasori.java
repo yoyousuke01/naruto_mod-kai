@@ -518,16 +518,10 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean getCanSpawnHere() {
 			return super.getCanSpawnHere()
-			 && this.world.getEntitiesWithinAABB(EntityCustom.class, this.getEntityBoundingBox().grow(128.0D)).isEmpty();
+			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()
+			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000);
+			 //&& this.world.getEntitiesWithinAABB(EntityCustom.class, this.getEntityBoundingBox().grow(128.0D)).isEmpty();
 			 //&& this.rand.nextInt(5) == 0;
-		}
-
-		@Override
-		public void addTrackingPlayer(EntityPlayerMP player) {
-			super.addTrackingPlayer(player);
-			if (ModConfig.AGGRESSIVE_BOSSES) {
-				this.setAttackTarget(player);
-			}
 		}
 
 		@Override
@@ -540,7 +534,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 
 		private void trackAttackedPlayers() {
 			Entity entity = this.getAttackingEntity();
-			if (entity instanceof EntityPlayerMP || (entity = (ModConfig.AGGRESSIVE_BOSSES ? this.getLastAttackedEntity() : this.getAttackTarget())) instanceof EntityPlayerMP) {
+			if (entity instanceof EntityPlayerMP || (entity = this.getAttackTarget()) instanceof EntityPlayerMP) {
 				this.bossInfo.addPlayer((EntityPlayerMP) entity);
 			}
 		}
