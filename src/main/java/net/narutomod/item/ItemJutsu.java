@@ -85,6 +85,16 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		 && (!(targetIn instanceof EntityPlayer) || !((EntityPlayer)targetIn).isSpectator());
 	}
 
+	@Nullable
+	public static ItemStack getOwnerMatchingItemstack(EntityPlayer entity, Item itemIn) {
+		ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, itemIn);
+		return stack == null || (stack.getItem() instanceof Base && ((Base)stack.getItem()).isOwner(stack, entity)) ? stack : null;
+	}
+
+	public static boolean hasOwnerMatchingItemstack(EntityPlayer entity, Item itemIn) {
+		return getOwnerMatchingItemstack(entity, itemIn) != null;
+	}
+
 	public static void setCurrentJutsuCooldown(ItemStack stack, EntityLivingBase player, long cd) {
 		if (stack.getItem() instanceof Base) {
 			((Base)stack.getItem()).setCurrentJutsuCooldown(stack, (long)((double)cd * ((Base)stack.getItem()).getModifier(stack, player)));
@@ -534,7 +544,8 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			public void onEquipmentChange(LivingEquipmentChangeEvent event) {
 				EntityLivingBase entity = event.getEntityLiving();
 				ItemStack stack = event.getTo();
-				if (entity instanceof EntityPlayer && !entity.world.isRemote && stack.getItem() instanceof Base
+				if (entity instanceof EntityPlayer && !entity.world.isRemote
+ && stack.getItem() instanceof Base
 				 && event.getSlot().getSlotType() == EntityEquipmentSlot.Type.HAND && stack.getItem() != event.getFrom().getItem()) {
 					if (event.getSlot() == EntityEquipmentSlot.MAINHAND || !(entity.getHeldItemMainhand().getItem() instanceof Base)) {
 						((EntityPlayer)entity).sendStatusMessage(new TextComponentString(ItemJutsu.getCurrentJutsu(stack).getName()), true);
