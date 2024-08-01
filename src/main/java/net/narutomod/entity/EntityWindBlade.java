@@ -103,14 +103,16 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
 						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), scale * 20f);
+						this.setDead();
 					}
 				} else {
-					((WorldServer) this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST, result.hitVec.x, result.hitVec.y, result.hitVec.z,
-							(int) (scale * 8f), 0D, 0D, 0D, 0.4D, Block.getIdFromBlock(this.world.getBlockState(result.getBlockPos()).getBlock()));
-					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")), 0.5f,
-							0.4f + this.rand.nextFloat() * 0.6f);
+					((WorldServer)this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST,
+					 result.hitVec.x, result.hitVec.y, result.hitVec.z, (int)(scale * 8f), 0D, 0D, 0D, 0.4D,
+					 Block.getIdFromBlock(this.world.getBlockState(result.getBlockPos()).getBlock()));
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
+				 	 0.5f, 0.4f + this.rand.nextFloat() * 0.6f);
+					this.setDead();
 				}
-				this.setDead();
 			}
 		}
 
@@ -125,10 +127,16 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
-					entity.world.spawnEntity(new EC(entity, power));
+					this.createJutsu(entity, power);
 					return true;
 				}
 				return false;
+			}
+
+			public static EC createJutsu(EntityLivingBase entity, float power) {
+				EC ec = new EC(entity, power);
+				entity.world.spawnEntity(ec);
+				return ec;
 			}
 
 			@Override
