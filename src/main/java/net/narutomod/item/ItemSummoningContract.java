@@ -275,11 +275,6 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 			public float getPowerupDelay() {
 				return 75.0f;
 			}
-
-			@Override
-			public float getMaxPower() {
-				return 18.1f;
-			}
 			
 			@Override
 			public float getMaxPower() {
