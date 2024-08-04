@@ -24,6 +24,10 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.math.Vec3d;
@@ -94,10 +98,8 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			if (!world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 10 == 3) {
 				ItemStack stack1 = ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemNinjutsu.block);
 				boolean rasenshurikenEnabled = this.isJutsuEnabled(itemstack, RASENSHURIKEN);
-				boolean rasenganEnabled = stack1 != null
-						? ((ItemNinjutsu.RangedItem) stack1.getItem()).canUseJutsu(stack1, ItemNinjutsu.RASENGAN, (EntityPlayer) entity)
-								&& ((ItemNinjutsu.RangedItem) stack1.getItem()).getXpRatio(stack1, ItemNinjutsu.RASENGAN) >= 0.5f
-						: false;
+				boolean rasenganEnabled = stack1 != null && ((ItemNinjutsu.RangedItem)stack1.getItem())
+				 .canActivateJutsu(stack1, ItemNinjutsu.RASENGAN, (EntityPlayer)entity) == EnumActionResult.SUCCESS;
 				if (rasenshurikenEnabled && !rasenganEnabled) {
 					this.enableJutsu(itemstack, RASENSHURIKEN, false);
 				} else if (!rasenshurikenEnabled && rasenganEnabled) {
