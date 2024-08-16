@@ -17,7 +17,7 @@ Jutsus:
  - kekkei mora projectiles are now unblockable
  - add Water cannon ball jutsu and scroll
  - great fireball jutsu can be guided if user jutsuXp >= 2x requirement
- - add cloud style flame slice jutsu and scroll (fire chakra flow), does sweep attack
+ - add cloud style flame slice jutsu and scroll (fire chakra flow), attack is AOE, added sweeping effects
  - adjusted wind release chakra flow particles for kunai and chokuto, added sound effect
  - add Uchiha flame formation (barrier jutsu) and scroll
  - rasenshuriken now tilts in the direction its turning
@@ -32,7 +32,7 @@ Jutsus:
  - add wind release: vacuum wave and B-rank scroll
  - add water release: acid scattering jutsu
  - holding chokuto while in susanoo now consumes slightly more chakra
- - adding Sage Mode: Demonic Illusion: Toad Confrontation Chant (WIP-2: prepare time 15s, genjutsu duration 20s, every ninja mob and player within 80 blocks will be affected, caster press jutsu key 2 to enter genjutsu realm, cooldown 3 minutes)
+ - add Sage Mode: Demonic Illusion: Toad Confrontation Chant (AOE genjutsu)
  - Mind Transfer jutsu: cancel the jutsu by pressing Jutsu key 2
  - the number of puppets you can control depends on your jutsuXP in your puppet jutsu, max 10 puppets
  - Kirin is now a stand alone jutsu, learning chidori won't auto give you kirin anymore
@@ -52,6 +52,7 @@ Items:
  - prevents players dropping the duplicate kiba sword
  - Hiramekarei now does sweeping damage
  - Kusanagi sword won't get stuck in blocks
+ - byakugan veins won't appear unless byakugan jutsus are used
 
 Entities:
  - re-textured kisame

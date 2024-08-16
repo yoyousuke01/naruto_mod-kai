@@ -96,7 +96,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 10 == 3) {
-				ItemStack stack1 = ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemNinjutsu.block);
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, ItemNinjutsu.block);
 				boolean rasenshurikenEnabled = this.isJutsuEnabled(itemstack, RASENSHURIKEN);
 				boolean rasenganEnabled = stack1 != null && ((ItemNinjutsu.RangedItem)stack1.getItem())
 				 .canActivateJutsu(stack1, ItemNinjutsu.RASENGAN, (EntityPlayer)entity) == EnumActionResult.SUCCESS;
@@ -104,7 +104,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					this.enableJutsu(itemstack, RASENSHURIKEN, false);
 				} else if (!rasenshurikenEnabled && rasenganEnabled) {
 					this.enableJutsu(itemstack, RASENSHURIKEN, true);
-					((EntityPlayer) entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", RASENSHURIKEN.getName()), false);
+					((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", RASENSHURIKEN.getName()), false);
 				}
 			}
 		}
@@ -233,10 +233,10 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected void spawnParticles(ChakraFlow entity, Vec3d startvec, Vec3d endvec) {
+			protected void spawnParticles(EntityLivingBase user, Vec3d startvec, Vec3d endvec, float partialTicks) {
 				Vec3d vec = endvec.subtract(startvec).scale(0.6d);
-				Particles.spawnParticle(entity.world, Particles.Types.SMOKE, startvec.x, startvec.y, startvec.z, 10, 0.05d, 0.05d, 0.05d, vec.x,
-						vec.y, vec.z, 0x086AD1FF, 10, 5, 0xF0);
+				Particles.spawnParticle(user.world, Particles.Types.SMOKE, startvec.x, startvec.y, startvec.z, 
+				  10, 0.05d, 0.05d, 0.05d, vec.x, vec.y, vec.z, 0x086AD1FF, 10, 5, 0xF0);
 			}
 		}
 	}
