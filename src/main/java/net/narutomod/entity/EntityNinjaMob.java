@@ -50,13 +50,14 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
@@ -227,13 +228,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			EntityLivingBase target = this.getAttackTarget();
-			//if (target != null && (!target.isEntityAlive()
-			// || (target.isInvisible() && !ItemSharingan.wearingAny(this) && !ItemByakugan.wearingAny(this)))) {
-			//	this.setAttackTarget(null);
-			//}
 			if (ProcedureUtils.isWeapon(this.getItemFromInventory(0)) || ProcedureUtils.isWeapon(this.getHeldItemMainhand())) {
-				boolean flag = this.getRevengeTarget() != null || target != null
+				boolean flag = this.getRevengeTarget() != null || this.getAttackTarget() != null
 				 || (this.getLastAttackedEntity() != null && this.ticksExisted <= this.getLastAttackedEntityTime() + 100);
 				if (this.getHeldItemMainhand().isEmpty() == flag) {
 					this.swapWithInventory(EntityEquipmentSlot.MAINHAND, 0);
@@ -971,6 +967,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
                 model.leftArmPose = mainhandpose;
             }
 	    }
+
+		@Override
+		protected void renderLayers(T entity, float f0, float f1, float f2, float f3, float f4, float f5, float f6) {
+			if (!entity.isInvisible()) {
+				super.renderLayers(entity, f0, f1, f2, f3, f4, f5, f6);
+			}
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -1058,6 +1061,12 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				this.bipedLeftArm.rotateAngleX = 1.4835F;
 				this.bipedLeftArm.rotateAngleY = 0.3927F;
 			}
+		}
+		
+		public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+			modelRenderer.rotateAngleX = x;
+			modelRenderer.rotateAngleY = y;
+			modelRenderer.rotateAngleZ = z;
 		}
 	}
 

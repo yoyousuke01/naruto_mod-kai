@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 466,
+    "DIMENSION": 13,
     "GUI": 70,
-    "DIMENSION": 13
+    "ENTITY": 468
   },
   "mod_elements": [
     {
@@ -7654,6 +7654,18 @@
         "1": 466
       },
       "registry_name": "sweep"
+    },
+    {
+      "name": "Hidan",
+      "type": "mob",
+      "sortid": 896,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 467,
+        "1": 468
+      },
+      "registry_name": "hidan"
     }
   ],
   "variable_elements": [
@@ -8711,6 +8723,14 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "hidan",
+      "files": [
+        "hidan"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
@@ -8848,6 +8868,7 @@
       "item.ninja_armor_iwahelmet.name": "Forehead Protector (Iwagakure)",
       "item.byakuganhelmet.name": "Byakugan",
       "tooltip.rinnegan.jutsu2": "Tendo (Chibakutensei / [SHIFT] Tengaishinsei),  Preta (Shield), Animal (Summoning), Naraka (King of Hell),  Outer (Gedomazo NXP:8100)",
+      "subtitles.hidan": "",
       "tooltip.rinnegan.jutsu3": "Universal Pull ([SHIFT] to dislodge blocks)",
       "entity.wood_burial.name": "Wood Burial",
       "entity.hakkeshokeiten.name": "8-Trigrams Revolving Heaven",
@@ -9423,6 +9444,7 @@
       "entity.sand_levitation.name": "Sand Levitation",
       "subtitles.tenseiblastcharge": "",
       "item.clothes_tsuchikagehelmet.name": "Tsuchikage Hat",
+      "entity.hidan.name": "Hidan",
       "tooltip.mrp.goldtip": "Restores 500 chakra. Regenerates 5% chakra every second for 30 seconds.",
       "tipped_arrow.effect.chakra_enhanced_strength": "Arrow of Chakra Enhanced Strength",
       "item.ninja_armor_konohahelmet.name": "Forehead Protector (Konoha)",

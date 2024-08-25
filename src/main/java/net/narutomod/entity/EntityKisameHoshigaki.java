@@ -214,9 +214,16 @@ public class EntityKisameHoshigaki extends ElementsNarutomodMod.ModElement {
 					return 5.3d + attackTarget.width;
 				}
 			});
-			this.tasks.addTask(4, new EntityAIWatchClosest2(this, EntityPlayer.class, 15.0F, 1.0F));
-			this.tasks.addTask(5, new EntityAIWander(this, 0.5));
-			this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityMob.class, 8.0F));
+			this.tasks.addTask(4, new EntityClone.AIFollowSummoner(this, 0.6d, 4f) {
+				@Override @Nullable
+				protected EntityLivingBase getFollowEntity() {
+					Entity itachi = EntityCustom.this.world.findNearestEntityWithinAABB(EntityItachi.EntityCustom.class, EntityCustom.this.getEntityBoundingBox().grow(256d, 16d, 256d), EntityCustom.this);
+					return itachi instanceof EntityLivingBase ? (EntityLivingBase)itachi : null;
+				}
+			});
+			this.tasks.addTask(5, new EntityAIWatchClosest2(this, EntityPlayer.class, 15.0F, 1.0F));
+			this.tasks.addTask(6, new EntityAIWander(this, 0.5));
+			this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityMob.class, 8.0F));
 		}
 
 		public boolean isClone() {
@@ -606,12 +613,6 @@ public class EntityKisameHoshigaki extends ElementsNarutomodMod.ModElement {
 				bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
 				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 16, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, false));
 				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
-			}
-				
-			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-				modelRenderer.rotateAngleX = x;
-				modelRenderer.rotateAngleY = y;
-				modelRenderer.rotateAngleZ = z;
 			}
 		}
 	}
