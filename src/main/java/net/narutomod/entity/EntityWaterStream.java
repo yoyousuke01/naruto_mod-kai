@@ -51,7 +51,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	}
 	public static class EC extends EntityBeamBase.Base {
 		private final AirPunch stream = new AirPunch();
-		private final float damageModifier = 2f;
+		private final float damageModifier = 0.5f;
 		private int maxLife = 100;
 		private float power;
 		public EC(World a) {

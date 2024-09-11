@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
-
+
+
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -78,7 +79,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Lists;
-
 import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -370,7 +370,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL && this.isValidLightLevel() : true);
+			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL : true);
 		}
 
 		@Override
@@ -404,7 +404,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected float getSoundVolume() {
 			return 1.0F;
-		}
+		}
+
 
 		@Override
 		public Vec3d getLookVec() {

@@ -167,7 +167,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 	
 			@Override
 			public float getMaxPower() {
-				return 50.0f;
+				return 10.0f;
 			}
 		}
 	}
