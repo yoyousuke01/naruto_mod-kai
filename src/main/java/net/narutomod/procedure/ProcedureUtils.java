@@ -507,6 +507,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		if (!stack.hasTagCompound()) {
 			stack.setTagCompound(new NBTTagCompound());
 		}
+//System.out.println(">>>>>> before nbt:"+stack.getTagCompound());
 		if (!stack.getTagCompound().hasKey("ench", 9)) {
 			stack.getTagCompound().setTag("ench", new NBTTagList());
 		}
@@ -523,6 +524,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			compound.setBoolean("FAKE", true);
 			nbttaglist.appendTag(compound);
 		}
+//System.out.println("       after nbt:"+stack.getTagCompound());
 	}
 
 	public static void removeFakeEnchantmentEffect(ItemStack stack) {
@@ -531,6 +533,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
 			NBTTagList nbttaglist = stack.getTagCompound().getTagList("ench", 10);
+//System.out.println("====== before_nbt:"+stack.getTagCompound());
 			Iterator<NBTBase> iter = nbttaglist.iterator();
 			while (iter.hasNext()) {
 				NBTTagCompound compound = (NBTTagCompound)iter.next();
@@ -541,6 +544,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			if (nbttaglist.hasNoTags()) {
 				stack.getTagCompound().removeTag("ench");
 			}
+//System.out.println("       after_nbt:"+stack.getTagCompound());
 		}
 	}
 
@@ -861,9 +865,12 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isSpaceOpenToStandOn(EntityLivingBase entity, BlockPos pos) {
-		AxisAlignedBB bb = entity.getEntityBoundingBox();
-		Vec3d vec = new Vec3d(0.5d+pos.getX(), pos.getY(), 0.5d+pos.getZ()).subtract(entity.posX, bb.minY, entity.posZ);
-		return entity.world.getCollisionBoxes(null, bb.contract(0d, -0.1d, 0d).grow(0.5d, 0d, 0.5d).offset(vec)).isEmpty();
+		return isSpaceOpenToStandOn(entity.world, entity.width, entity.height, pos);
+	}
+
+	public static boolean isSpaceOpenToStandOn(World world, float width, float height, BlockPos pos) {
+		AxisAlignedBB bb = new AxisAlignedBB(0.5f + pos.getX() - width * 0.5f, pos.getY(), 0.5f + pos.getZ() - width * 0.5f, 0.5f + pos.getX() + width * 0.5f, height + pos.getY(), 0.5f + pos.getZ() + width * 0.5f);
+		return world.getCollisionBoxes(null, bb.contract(0d, -0.1d, 0d).grow(0.5d, 0d, 0.5d)).isEmpty();
 	}
 
 	public static String animateString(String string, int type, boolean returnToBlack) {

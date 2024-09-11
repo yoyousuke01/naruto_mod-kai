@@ -1,52 +1,51 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.procedure.ProcedureSync;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemHyoton;
-import net.narutomod.NarutomodModVariables;
-import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.Chakra;
-
+import net.minecraft.client.model.ModelBiped;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.DamageSource;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.item.ItemStack;
-import net.minecraft.init.MobEffects;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.item.ItemStack;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 
-import javax.swing.Renderer;
+import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemHyoton;
+import net.narutomod.Chakra;
+import net.narutomod.NarutomodMod;
+import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
 import java.util.Iterator;
-
 import com.google.common.collect.Lists;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -54,25 +53,28 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 224;
 	public static final int ENTITYID_RANGED = 225;
 	private static final float ENTITY_SCALE = 8.0f;
+
 	public EntityIceDome(ElementsNarutomodMod instance) {
 		super(instance, 535);
 	}
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class).id(new ResourceLocation("narutomod", "ice_dome"), ENTITYID)
-				.name("ice_dome").tracker(64, 3, true).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
+		 .id(new ResourceLocation("narutomod", "ice_dome"), ENTITYID).name("ice_dome").tracker(64, 3, true).build());
 	}
 
 	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EC.LivingHook());
 	}
+
 	public static class EC extends EntityShieldBase {
 		private final int talkTime = 26;
 		private int shootSpearsTime;
 		private List<EntityLivingBase> entitiesInside = Lists.newArrayList();
 		private EntityLivingBase excludedEntity;
+
 		public EC(World world) {
 			super(world);
 			this.isImmuneToFire = false;
@@ -97,12 +99,12 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		public void setDead() {
 			super.setDead();
 			if (!this.world.isRemote) {
-				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")), 0.8f,
-						this.rand.nextFloat() * 0.4f + 0.8f);
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
+				 0.8f, this.rand.nextFloat() * 0.4f + 0.8f);
 				for (int i = 0; i < this.rand.nextInt(50) + 100; i++) {
-					EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat() - 0.5f),
-							this.posY + this.height * this.rand.nextFloat(), this.posZ + this.width * (this.rand.nextFloat() - 0.5f),
-							(this.rand.nextDouble() - 0.5d) * 0.05d, 0d, (this.rand.nextDouble() - 0.5d) * 0.05d);
+					EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat()-0.5f), 
+					 this.posY + this.height * this.rand.nextFloat(), this.posZ + this.width * (this.rand.nextFloat()-0.5f),
+					 (this.rand.nextDouble()-0.5d) * 0.05d, 0d, (this.rand.nextDouble()-0.5d) * 0.05d);
 				}
 				EntityLivingBase summoner = this.getSummoner();
 				if (summoner != null && summoner.isPotionActive(MobEffects.INVISIBILITY)) {
@@ -139,20 +141,21 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.ticksExisted < 5) {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox())) {
-					if (entity instanceof EntityLivingBase && !entity.equals(summoner) && !entity.equals(this.excludedEntity)
-							&& !this.entitiesInside.contains(entity)
-							&& this.getEntityBoundingBox().intersect(entity.getEntityBoundingBox()).equals(entity.getEntityBoundingBox())) {
-						this.entitiesInside.add((EntityLivingBase) entity);
+					if (entity instanceof EntityLivingBase && !entity.equals(summoner)
+					 && !entity.equals(this.excludedEntity) && !this.entitiesInside.contains(entity)
+					 && this.getEntityBoundingBox().intersect(entity.getEntityBoundingBox()).equals(entity.getEntityBoundingBox())) {
+						this.entitiesInside.add((EntityLivingBase)entity);
 					}
 				}
 			}
 			if (!this.world.isRemote && this.shootSpearsTime > 0 && summoner != null) {
 				for (EntityLivingBase entity : this.entitiesInside) {
 					if (entity.isEntityAlive() && !summoner.isOnSameTeam(entity)) {
-						double d0 = (this.rand.nextDouble() - 0.5d) * this.width;
-						double d1 = (this.rand.nextDouble() - 0.5d) * this.width;
-						new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d, this.posY + this.height - 1.6d,
-								this.posZ + d1 * 0.8d, entity.posX, entity.posY + entity.height / 2, entity.posZ, 0.95f, 0.25f);
+						double d0 = (this.rand.nextDouble()-0.5d) * this.width;
+						double d1 = (this.rand.nextDouble()-0.5d) * this.width;
+						new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d,
+						 this.posY + this.height - 1.6d, this.posZ + d1 * 0.8d, entity.posX, entity.posY + entity.height/2,
+						 entity.posZ, 0.95f, 0.25f);
 					}
 				}
 				--this.shootSpearsTime;
@@ -167,7 +170,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted % 20 == 0 && summoner != null
-					&& !Chakra.pathway(summoner).consume(ItemHyoton.ICEDOME.chakraUsage * 0.05d)) {
+			 && !Chakra.pathway(summoner).consume(ItemHyoton.ICEDOME.chakraUsage * 0.05d)) {
 				this.setDead();
 			}
 			this.clearActivePotions();
@@ -179,8 +182,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
-			if (source == DamageSource.DROWN || source == DamageSource.FALL || source == DamageSource.IN_WALL || source == DamageSource.STARVE
-					|| source == DamageSource.WITHER) {
+			if (source == DamageSource.DROWN || source == DamageSource.FALL 
+			 || source == DamageSource.IN_WALL || source == DamageSource.STARVE || source == DamageSource.WITHER) {
 				return false;
 			}
 			Entity srcEntity = source.getImmediateSource();
@@ -215,114 +218,111 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void applyEntityCollision(Entity entity) {
 			if (!this.isRidingSameEntity(entity) && !entity.isBeingRidden() && !entity.noClip && ItemJutsu.canTarget(entity)) {
-				// ProcedureSync.MotionPacket.sendToServer(entity);
+				//ProcedureSync.MotionPacket.sendToServer(entity);
 				this.doCollisions(entity);
 			}
 		}
 
 		private List<EnumFacing> doCollisions(Entity entity) {
-			AxisAlignedBB bb1 = this.getEntityBoundingBox();
-			AxisAlignedBB bb2 = entity.getEntityBoundingBox();
-			List<EnumFacing> list = Lists.newArrayList();
-			// System.out.println(">>> inside:"+this.entitiesInside.contains(entity)+",
-			// lastTickPos:"+new Vec3d(entity.lastTickPosX, entity.lastTickPosY,
-			// entity.lastTickPosZ));
-			// System.out.println(" bb1:"+bb1);
-			// System.out.println(" before: bb2:"+bb2);
+        	AxisAlignedBB bb1 = this.getEntityBoundingBox();
+        	AxisAlignedBB bb2 = entity.getEntityBoundingBox();
+            List<EnumFacing> list = Lists.newArrayList();
+//System.out.println(">>> inside:"+this.entitiesInside.contains(entity)+", lastTickPos:"+new Vec3d(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ));
+//System.out.println("            bb1:"+bb1);
+//System.out.println("    before: bb2:"+bb2);
 			if (!this.entitiesInside.contains(entity)) {
-				if (entity.motionX > 0d && bb2.maxX > bb1.minX && entity.lastTickPosX - entity.width / 2 < bb1.minX && bb2.maxY > bb1.minY
-						&& bb2.minY < bb1.maxY && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ) {
+				if (entity.motionX > 0d && bb2.maxX > bb1.minX && entity.lastTickPosX - entity.width/2 < bb1.minX
+				 && bb2.maxY > bb1.minY && bb2.minY < bb1.maxY && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ) {
 					list.add(EnumFacing.WEST);
-					entity.motionX *= -0.1d;
-					entity.posX = bb1.minX - entity.width * 0.5;
+			       	entity.motionX *= -0.1d;
+			       	entity.posX = bb1.minX - entity.width * 0.5;
 				}
-				if (entity.motionX < 0d && bb2.minX < bb1.maxX && entity.lastTickPosX + entity.width / 2 > bb1.maxX && bb2.maxY > bb1.minY
-						&& bb2.minY < bb1.maxY && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ) {
+				if (entity.motionX < 0d && bb2.minX < bb1.maxX && entity.lastTickPosX + entity.width/2 > bb1.maxX
+				 && bb2.maxY > bb1.minY && bb2.minY < bb1.maxY && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ) {
 					list.add(EnumFacing.EAST);
-					entity.motionX *= -0.1d;
-					entity.posX = bb1.maxX + entity.width * 0.5;
+			    	entity.motionX *= -0.1d;
+			    	entity.posX = bb1.maxX + entity.width * 0.5;
 				}
-				if (entity.motionZ > 0d && bb2.maxZ > bb1.minZ && entity.lastTickPosZ - entity.width / 2 < bb1.minZ && bb2.maxY > bb1.minY
-						&& bb2.minY < bb1.maxY && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
+				if (entity.motionZ > 0d && bb2.maxZ > bb1.minZ && entity.lastTickPosZ - entity.width/2 < bb1.minZ
+				 && bb2.maxY > bb1.minY && bb2.minY < bb1.maxY && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
 					list.add(EnumFacing.NORTH);
-					entity.motionZ *= -0.1d;
-					entity.posZ = bb1.minZ - entity.width * 0.5;
+		        	entity.motionZ *= -0.1d;
+		        	entity.posZ = bb1.minZ - entity.width * 0.5;
 				}
-				if (entity.motionZ < 0d && bb2.minZ < bb1.maxZ && entity.lastTickPosZ + entity.width / 2 > bb1.maxZ && bb2.maxY > bb1.minY
-						&& bb2.minY < bb1.maxY && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
+				if (entity.motionZ < 0d && bb2.minZ < bb1.maxZ && entity.lastTickPosZ + entity.width/2 > bb1.maxZ
+				 && bb2.maxY > bb1.minY && bb2.minY < bb1.maxY && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
 					list.add(EnumFacing.SOUTH);
-					entity.motionZ *= -0.1d;
-					entity.posZ = bb1.maxZ + entity.width * 0.5;
+	        		entity.motionZ *= -0.1d;
+	        		entity.posZ = bb1.maxZ + entity.width * 0.5;
 				}
-				if (entity.motionY > 0d && bb2.maxY > bb1.minY && entity.lastTickPosY < bb1.minY && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ
-						&& bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
+				if (entity.motionY > 0d && bb2.maxY > bb1.minY && entity.lastTickPosY < bb1.minY
+				 && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
 					list.add(EnumFacing.DOWN);
-					entity.motionY *= -0.8d;
-					entity.posY = bb1.minY - entity.height;
+	        		entity.motionY *= -0.8d;
+	        		entity.posY = bb1.minY - entity.height;
 				}
-				if (entity.motionY < 0d && bb2.minY < bb1.maxY && entity.lastTickPosY + entity.height > bb1.maxY && bb2.maxZ > bb1.minZ
-						&& bb2.minZ < bb1.maxZ && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
+				if (entity.motionY < 0d && bb2.minY < bb1.maxY && entity.lastTickPosY + entity.height > bb1.maxY
+				 && bb2.maxZ > bb1.minZ && bb2.minZ < bb1.maxZ && bb2.maxX > bb1.minX && bb2.minX < bb1.maxX) {
 					list.add(EnumFacing.UP);
-					entity.motionY = 0.0d;
-					entity.posY = bb1.maxY;
-					entity.onGround = true;
+	        		entity.motionY = 0.0d;
+	        		entity.posY = bb1.maxY;
+	        		entity.onGround = true;
 				}
 			} else {
 				if (bb2.minX < bb1.minX) {
 					list.add(EnumFacing.WEST);
-					entity.motionX *= -0.1d;
-					entity.posX = bb1.minX + entity.width * 0.5;
+			       	entity.motionX *= -0.1d;
+			       	entity.posX = bb1.minX + entity.width * 0.5;
 				}
 				if (bb2.maxX > bb1.maxX) {
 					list.add(EnumFacing.EAST);
-					entity.motionX *= -0.1d;
-					entity.posX = bb1.maxX - entity.width * 0.5;
+			    	entity.motionX *= -0.1d;
+			    	entity.posX = bb1.maxX - entity.width * 0.5;
 				}
 				if (bb2.minZ < bb1.minZ) {
-					list.add(EnumFacing.NORTH);
-					entity.motionZ *= -0.1d;
-					entity.posZ = bb1.minZ + entity.width * 0.5;
+        			list.add(EnumFacing.NORTH);
+		        	entity.motionZ *= -0.1d;
+		        	entity.posZ = bb1.minZ + entity.width * 0.5;
 				}
 				if (bb2.maxZ > bb1.maxZ) {
-					list.add(EnumFacing.SOUTH);
-					entity.motionZ *= -0.1d;
-					entity.posZ = bb1.maxZ - entity.width * 0.5;
+        			list.add(EnumFacing.SOUTH);
+	        		entity.motionZ *= -0.1d;
+	        		entity.posZ = bb1.maxZ - entity.width * 0.5;
 				}
 				if (bb2.minY < bb1.minY) {
-					list.add(EnumFacing.DOWN);
-					entity.motionY = 0.0d;
-					entity.posY = bb1.minY;
-					entity.onGround = true;
+        			list.add(EnumFacing.DOWN);
+	        		entity.motionY = 0.0d;
+	        		entity.posY = bb1.minY;
+	        		entity.onGround = true;
 				}
 				if (bb2.maxY > bb1.maxY) {
-					list.add(EnumFacing.UP);
-					entity.motionY *= -0.8d;
-					entity.posY = bb1.maxY - entity.height;
+        			list.add(EnumFacing.UP);
+	        		entity.motionY *= -0.8d;
+	        		entity.posY = bb1.maxY - entity.height;
 				}
-			}
-			if (!list.isEmpty()) {
-				entity.setPosition(entity.posX, entity.posY, entity.posZ);
-				entity.velocityChanged = true;
-			}
-			// System.out.println(" after: bb2:"+entity.getEntityBoundingBox());
-			// System.out.println(" hitface: "+list);
+        	}
+        	if (!list.isEmpty()) {
+       			entity.setPosition(entity.posX, entity.posY, entity.posZ);
+        		entity.velocityChanged = true;
+        	}
+//System.out.println("    after:  bb2:"+entity.getEntityBoundingBox());
+//System.out.println("    hitface: "+list);
 			return list;
 		}
 
 		@Override
 		public double getMountedYOffset() {
-			return (double) this.height;
+			return (double)this.height;
 		}
+
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if ((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false)
-						|| (NarutomodModVariables.world_tick > entity.getEntityData().getDouble("ice_dome_cd")))) {
+				if (!entity.isRiding()) {
 					this.createJutsu(entity, entity.posX, entity.posY - 0.1d, entity.posZ);
-					entity.getEntityData().setDouble("ice_dome_cd", NarutomodModVariables.world_tick + 600);
 					return true;
 				} else if (entity.getRidingEntity() instanceof EC) {
-					((EC) entity.getRidingEntity()).shootSpears();
+					((EC)entity.getRidingEntity()).shootSpears();
 					return true;
 				}
 				return false;
@@ -330,8 +330,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 
 			public EC createJutsu(EntityLivingBase entity, double x, double y, double z) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")), net.minecraft.util.SoundCategory.NEUTRAL, 1f,
-						0.9f);
+				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")),
+				 net.minecraft.util.SoundCategory.NEUTRAL, 1f, 0.9f);
 				EC entity1 = new EC(entity, x, y, z);
 				entity.world.spawnEntity(entity1);
 				return entity1;
@@ -343,39 +343,42 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			public void onAttackedInsideDome(LivingAttackEvent event) {
 				EntityLivingBase target = event.getEntityLiving();
 				if (!target.world.isRemote && !(target instanceof EC)) {
-					EC dome = (EC) target.world.findNearestEntityWithinAABB(EC.class, target.getEntityBoundingBox().grow(ENTITY_SCALE), target);
+					EC dome = (EC)target.world.findNearestEntityWithinAABB(EC.class, target.getEntityBoundingBox().grow(ENTITY_SCALE), target);
 					if (dome != null) {
 						Entity attacker = event.getSource().getTrueSource();
 						EntityLivingBase summoner = dome.getSummoner();
-						// if (target.equals(summoner)
-						// || (dome.entitiesInside.contains(target) ==
-						// !dome.entitiesInside.contains(attacker)
-						// && !summoner.equals(attacker))) {
-						if (dome.entitiesInside.contains(target) == !dome.entitiesInside.contains(attacker) && !summoner.equals(attacker)
-								&& !target.equals(summoner)) {
+						//if (target.equals(summoner) 
+						// || (dome.entitiesInside.contains(target) == !dome.entitiesInside.contains(attacker)
+					    //  && !summoner.equals(attacker))) {
+						if (dome.entitiesInside.contains(target) == !dome.entitiesInside.contains(attacker)
+						 && !summoner.equals(attacker) && !target.equals(summoner)) {
 							event.setCanceled(true);
 							dome.attackEntityFrom(event.getSource(), event.getAmount());
-						}
+					    }
 					}
 				}
 			}
 		}
 	}
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
 	}
+
 	public static class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new CustomRender(renderManager));
 		}
+
 		@SideOnly(Side.CLIENT)
 		public class CustomRender extends Render<EC> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/dome_ice.png");
 			private final ModelDome model = new ModelDome();
 			private final int growTime = 30;
+
 			public CustomRender(RenderManager renderManagerIn) {
 				super(renderManagerIn);
 				this.shadowSize = 0.0f;
@@ -391,8 +394,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				GlStateManager.pushMatrix();
 				this.bindEntityTexture(entity);
 				GlStateManager.translate(x, y, z);
-				// GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw -
-				// entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				//GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(-180.0F, 1.0F, 0.0F, 0.0F);
 				GlStateManager.enableAlpha();
 				GlStateManager.enableBlend();
@@ -405,7 +407,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				GlStateManager.enableLighting();
 				GlStateManager.enableCull();
 				GlStateManager.disableBlend();
-				// GlStateManager.disableAlpha();
+				//GlStateManager.disableAlpha();
 				GlStateManager.popMatrix();
 			}
 
@@ -440,6 +442,12 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone17;
 			private final ModelRenderer cube_r3;
 			private final ModelRenderer cube_r4;
+			private final ModelRenderer bottom;
+			private final ModelRenderer bone;
+			private final ModelRenderer bone9;
+			private final ModelRenderer bone5;
+			private final ModelRenderer bone11;
+
 			public ModelDome() {
 				textureWidth = 16;
 				textureHeight = 16;
@@ -534,6 +542,29 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				roof.addChild(cube_r4);
 				setRotationAngle(cube_r4, 0.7854F, -0.7854F, 0.0F);
 				cube_r4.cubeList.add(new ModelBox(cube_r4, 0, 8, -3.8609F, -7.9F, -0.0457F, 8, 8, 0, 0.0F, false));
+				bottom = new ModelRenderer(this);
+				bottom.setRotationPoint(0.0F, 0.0F, 0.0F);
+				dome.addChild(bottom);
+				bone = new ModelRenderer(this);
+				bone.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bottom.addChild(bone);
+				setRotationAngle(bone, 0.0F, -0.7854F, 0.0F);
+				bone.cubeList.add(new ModelBox(bone, -8, 0, -4.0F, 0.0F, 1.75F, 8, 0, 8, 0.0F, false));
+				bone9 = new ModelRenderer(this);
+				bone9.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bottom.addChild(bone9);
+				setRotationAngle(bone9, 0.0F, 0.7854F, 0.0F);
+				bone9.cubeList.add(new ModelBox(bone9, -8, 0, -4.0F, 0.0F, 1.75F, 8, 0, 8, 0.0F, false));
+				bone5 = new ModelRenderer(this);
+				bone5.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bottom.addChild(bone5);
+				setRotationAngle(bone5, 0.0F, -2.3562F, 0.0F);
+				bone5.cubeList.add(new ModelBox(bone5, -8, 0, -4.0F, 0.0F, 1.75F, 8, 0, 8, 0.0F, false));
+				bone11 = new ModelRenderer(this);
+				bone11.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bottom.addChild(bone11);
+				setRotationAngle(bone11, 0.0F, 2.3562F, 0.0F);
+				bone11.cubeList.add(new ModelBox(bone11, -8, 0, -4.0F, 0.0F, 1.75F, 8, 0, 8, 0.0F, false));
 			}
 
 			@Override

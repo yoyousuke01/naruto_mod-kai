@@ -117,21 +117,18 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
-				if (player instanceof EntityPlayer) {
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
-							EC.this.power * MathHelper.clamp((float) PlayerTracker.getNinjaLevel((EntityPlayer) player) / 100, 0.5f, 1.5f));
-				} else {
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), EC.this.power * EC.this.damageModifier);
-				}
+				target.extinguish();
+				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
+						EC.this.power * EC.this.damageModifier);
 			}
 
 			@Override
 			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				EntityItem ret = super.processAffectedBlock(player, pos, facing);
-				if (ret != null && player.world.isAirBlock(pos.up())) {
-					new net.narutomod.event.EventSetBlocks(player.world,
-							ImmutableMap.of(pos.up(), Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))), 0,
-							10, false, false);
+				if ((ret != null || this.rand.nextFloat() < 0.025f) && player.world.isAirBlock(pos.up())) {
+					new net.narutomod.event.EventSetBlocks(player.world, ImmutableMap.of(pos.up(),
+					 Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))),
+					 0, 10, false, false);
 				}
 				return ret;
 			}
