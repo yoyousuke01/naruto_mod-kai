@@ -107,6 +107,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends EntityNinjaMob.Base implements IMob, IRangedAttackMob {
 		private static final DataParameter<Integer> ROBE_OFF_TICKS = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> BREAKING_TICKS = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
+		private static final DataParameter<Boolean> NO_CORE = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
 		private final BossInfoServer bossInfo = new BossInfoServer(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.PROGRESS);
 		private final int BLOCKING_CD = 30;
 		private final int SANDGATHERING_CD = 400;
@@ -150,6 +151,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			super.entityInit();
 			this.dataManager.register(ROBE_OFF_TICKS, Integer.valueOf(-1));
 			this.dataManager.register(BREAKING_TICKS, Integer.valueOf(-1));
+			this.dataManager.register(NO_CORE, Boolean.valueOf(false));
 		}
 
 		private void setRobeOffTicks(int ticks) {
@@ -182,6 +184,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 
 		private void setBreaking(boolean b) {
 			if (b) {
+				this.setNoCore(true);
 				this.setBreakingTicks(0);
 				this.breakingDirection = 1;
 				this.setEntityInvulnerable(true);
@@ -215,8 +218,16 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			return this.getBreakingTicks() >= 0;
 		}
 
+		private void setNoCore(boolean b) {
+			this.dataManager.set(NO_CORE, Boolean.valueOf(b));
+		}
+	
+		public boolean hasNoCore() {
+			return ((Boolean)this.getDataManager().get(NO_CORE)).booleanValue();
+		}
+
 		public boolean actionsHalted() {
-			return this.isStandingStill() || this.isBroken();
+			return this.isStandingStill() || this.isBroken() || this.hasNoCore();
 		}
 
 		@Override
@@ -245,7 +256,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 		protected void initEntityAI() {
 			super.initEntityAI();
 			this.tasks.addTask(0, new EntityAISwimming(this));
-			this.tasks.addTask(1, new EntityNinjaMob.AIAttackRangedTactical(this, 0.4d, 30, 12.0F) {
+			this.tasks.addTask(1, new EntityNinjaMob.AIAttackRangedTactical(this, 0.4d, 60, 12.0F) {
 				@Override
 				public boolean shouldExecute() {
 					return super.shouldExecute() && EntityCustom.this.isRidingHiruko() && !EntityCustom.this.actionsHalted();
@@ -598,6 +609,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void setFullHealthAndEnableHundred() {
+			this.setNoCore(false);
 			this.standStillFor(0);
 			this.setHealth(this.getMaxHealth());
 			if (this.isRobeOff() && this.hundredStage == EnumStage.CANNOT_USE) {
@@ -705,9 +717,9 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
+			EntityCustom owner = this.getOwner();
 			if (this.returnToOwner && this.ticksExisted % 4 == 1) {
 				this.setNoGravity(true);
-				EntityCustom owner = this.getOwner();
 				if (owner != null) {
 					this.inGround = false;
 					Vec3d vec = owner.getPositionVector().addVector(0d, 1.5d, 0d).subtract(this.getPositionVector()).normalize().scale(0.3d);
@@ -720,6 +732,9 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.hurtTime > 0) {
 				--this.hurtTime;
+			}
+			if (!this.world.isRemote && owner == null) {
+				this.setDead();
 			}
 		}
 
@@ -1093,6 +1108,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 					float partialTicks = ageInTicks - entityIn.ticksExisted;
 					float robeOffTicks = (float)entity.getRobeOffTicks() + partialTicks;
 					int bt = entity.getBreakingTicks();
+					boolean nocore = entity.hasNoCore();
 					if (robeOffTicks >= 0) {
 						if (robeOffTicks <= entity.bladesOpenTime) {
 							float f = Math.min(robeOffTicks / entity.bladesOpenTime, 1.0F);
@@ -1105,7 +1121,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 							for (int i = 0; i < this.blade.length; i++) {
 								this.blade[i].rotateAngleZ = this.bladePresetZ[i][0] + (this.bladePresetZ[i][1] - this.bladePresetZ[i][0]) * f;
 							}
-						} else if (bt < 0) {
+						} else if (!nocore) {
 							for (int i = 0; i < this.blade.length; i++) {
 								this.blade[i].rotateAngleZ = this.bladePresetZ[i][1] + ageInTicks * 2.5132F;
 							}
@@ -1120,6 +1136,8 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 						this.bodyPartAngles(this.bipedRightLeg, this.bipedRightLegPreset, f);
 						this.bodyPartAngles(this.bipedLeftLeg, this.bipedLeftLegPreset, f);
 						this.setRobeOff(true);
+					}
+					if (nocore) {
 						this.core.showModel = false;
 						this.eyesPiercing.showModel = false;
 					} else {

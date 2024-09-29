@@ -51,6 +51,7 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.init.Items;
 
+import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.PlayerTracker;
 import net.narutomod.PlayerRender;
@@ -239,6 +240,28 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	@Nullable
+	public static ItemStack getMatchingItemStack(EntityLivingBase entity, ItemStack stackIn) {
+		if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+			return getMatchingItemStack((EntityPlayer)entity, stackIn);
+		}
+		if (entity instanceof EntityNinjaMob.Base) {
+			for (int i = 0; i < ((EntityNinjaMob.Base)entity).getInventorySize(); i++) {
+		 		ItemStack stack = ((EntityNinjaMob.Base)entity).getItemFromInventory(i);
+		 		if (!stack.isEmpty() && ItemStack.areItemStacksEqual(stack, stackIn)) {
+		 			return stack;
+		 		}
+		 	}
+		}
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			ItemStack stack = entity.getItemStackFromSlot(slot);
+			if (!stack.isEmpty() && ItemStack.areItemStacksEqual(stack, stackIn)) {
+				return stack;
+			}
+		}
+		return null;
+	}
+
+	@Nullable
 	public static ItemStack getMatchingItemstackIgnoreDurability(EntityPlayer player, ItemStack stackIn) {
 		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory,
 		 player.inventory.armorInventory, player.inventory.offHandInventory);
@@ -396,6 +419,11 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	public static void addVelocity(Entity target, Vec3d vec) {
 		setVelocity(target, target.motionX + vec.x, target.motionY + vec.y, target.motionZ + vec.z);
+		target.isAirBorne = true;
+	}
+
+	public static void addVelocity(Entity target, double x, double y, double z) {
+		setVelocity(target, target.motionX + x, target.motionY + y, target.motionZ + z);
 		target.isAirBorne = true;
 	}
 
@@ -610,6 +638,10 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		return objectEntityLookingAt(entity, range, trackall, false, (Predicate)null);
 	}
 
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, @Nullable Entity excludeEntity) {
+		return objectEntityLookingAt(entity, range, 0.0d, trackall, false, excludeEntity);
+	}
+
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid) {
 		return objectEntityLookingAt(entity, range, trackall, stopOnLiquid, (Predicate)null);
 	}
@@ -689,6 +721,12 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		if (entityTrace != null && (d2 < d1 || objectMouseOver == null)) {
+			if (!BB.touches(entityTrace.entityHit.getEntityBoundingBox(), entityTrace.hitVec)) {
+				RayTraceResult res = entityTrace.entityHit.getEntityBoundingBox().calculateIntercept(entityTrace.hitVec, BB.getCenter(entityTrace.entityHit.getEntityBoundingBox()));
+				if (res != null) {
+					entityTrace.hitVec = res.hitVec;
+				}
+			}
 			objectMouseOver = entityTrace;
 		}
 		return objectMouseOver;
@@ -1331,6 +1369,14 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	    public static double getVolume(AxisAlignedBB aabb) {
 	    	return (aabb.maxX - aabb.minX) * (aabb.maxY - aabb.minY) * (aabb.maxZ - aabb.minZ);
+	    }
+
+	    public static boolean touches(AxisAlignedBB aabb, Vec3d vec) {
+	    	return vec.x >= aabb.minX && vec.x <= aabb.maxX && vec.y >= aabb.minY && vec.y <= aabb.maxY && vec.z >= aabb.minZ && vec.z <= aabb.maxZ;
+	    }
+
+	    public static boolean touches(AxisAlignedBB aabb1, AxisAlignedBB aabb2) {
+	    	return aabb1.minX <= aabb2.maxX && aabb1.maxX >= aabb2.minX && aabb1.minY <= aabb2.maxY && aabb1.maxY >= aabb2.minY && aabb1.minZ <= aabb2.maxZ && aabb1.maxZ >= aabb2.minZ;
 	    }
     }
 

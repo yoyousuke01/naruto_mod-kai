@@ -254,7 +254,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		    		if (!this.isAIDisabled()) {
 		    			this.setNoAI(true);
 		    		}
-		    	} else if (this.isAIDisabled()) {
+		    	} else if (this.isAIDisabled() && !this.getEntityData().getBoolean("temporaryDisableAI")) {
 		    		this.setNoAI(false);
 		    	}
 				if (this.ticksExisted % 200 == 1) {
@@ -322,12 +322,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 				ItemStack stack = this.getItemStackFromSlot(slot);
 				if (!stack.isEmpty()) {
-					stack.updateAnimation(this.world, this, 0, slot == EntityEquipmentSlot.MAINHAND);
+					stack.updateAnimation(this.world, this, -slot.getSlotIndex(), slot == EntityEquipmentSlot.MAINHAND);
 				}
 			}
-			for (ItemStack stack : this.inventory) {
+			for (int i = 0; i < this.inventory.size(); i++) {
+				ItemStack stack = this.inventory.get(i);
 				if (!stack.isEmpty())
-					stack.updateAnimation(this.world, this, 0, false);
+					stack.updateAnimation(this.world, this, i, false);
 			}
 		}
 
@@ -993,11 +994,12 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				ItemStack stack = entityIn.inventory.get(i);
 				if (stack.getItem() instanceof ItemOnBody.Interface) {
 					ItemOnBody.Interface item = (ItemOnBody.Interface)stack.getItem();
-					if (item.showOnBody() != ItemOnBody.BodyPart.NONE) {
+					ItemOnBody.BodyPart bodypart = item.showOnBody(stack);
+					if (bodypart != ItemOnBody.BodyPart.NONE) {
 						Vec3d offset = item.getOffset();
 						GlStateManager.pushMatrix();
 						ModelBiped model = (ModelBiped)this.renderer.getMainModel();
-						switch (item.showOnBody()) {
+						switch (bodypart) {
 							case HEAD:
 								model.bipedHead.postRender(0.0625F);
 								break;

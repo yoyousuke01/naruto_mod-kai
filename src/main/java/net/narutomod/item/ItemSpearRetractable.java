@@ -1,7 +1,6 @@
 
 package net.narutomod.item;
 
-import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -33,6 +32,7 @@ import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.HashMap;
 import javax.annotation.Nullable;
@@ -70,11 +70,11 @@ public class ItemSpearRetractable extends ElementsNarutomodMod.ModElement {
 					stack.setTagCompound(new NBTTagCompound());
 				}
 				if (isSelected) {
-					if (worldIn.isRemote && entityIn.ticksExisted % 5 == 0) {
+					if (!worldIn.isRemote && entityIn.ticksExisted % 5 == 0) {
 						int customModel = stack.getTagCompound().hasKey(CUSTOM_MODEL_KEY) ? stack.getTagCompound().getInteger(CUSTOM_MODEL_KEY) : -1;
 						if (customModel < 6) {
 							stack.getTagCompound().setInteger(CUSTOM_MODEL_KEY, ++customModel);
-							ProcedureSync.SoundEffectMessage.sendToServer(entityIn.posX, entityIn.posY, entityIn.posZ,
+							worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
 							 SoundEvents.ITEM_ARMOR_EQUIP_IRON, SoundCategory.PLAYERS, 0.4f, 0.4f + (float)customModel * 0.1f);
 						}
 					}
@@ -122,26 +122,29 @@ public class ItemSpearRetractable extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
-   	    ModelBakery.registerItemVariants(block,
-   	     new ModelResourceLocation("narutomod:spear_retractable_0", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_1", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_2", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_3", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_4", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_5", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_6", "inventory"),
-   	     new ModelResourceLocation("narutomod:spear_retractable_7", "inventory"));
+		final ModelResourceLocation[] resources = {
+	   	    new ModelResourceLocation("narutomod:spear_retractable_0", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_1", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_2", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_3", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_4", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_5", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_6", "inventory"),
+	   	    new ModelResourceLocation("narutomod:spear_retractable_7", "inventory")
+		};
+   	    ModelBakery.registerItemVariants(block, resources);
 
 	    ModelLoader.setCustomMeshDefinition(block, new ItemMeshDefinition() {
+	    	private final ModelResourceLocation[] res = Arrays.copyOf(resources, resources.length);
 	        @Override
 	        public ModelResourceLocation getModelLocation(ItemStack stack) {
 	            if (stack.hasTagCompound() && stack.getTagCompound().hasKey(CUSTOM_MODEL_KEY)) {
 	                int customModel = stack.getTagCompound().getInteger(CUSTOM_MODEL_KEY);
 	                if (customModel >= 0 && customModel <= 7) {
-	                	return new ModelResourceLocation("narutomod:spear_retractable_" + customModel, "inventory");
+	                	return this.res[customModel];
 	                }
 	            }
-	            return new ModelResourceLocation("narutomod:spear_retractable_0", "inventory");
+	            return this.res[0];
 	        }
 	    });
 	}

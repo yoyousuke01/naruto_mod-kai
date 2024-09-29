@@ -546,8 +546,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			public void onEquipmentChange(LivingEquipmentChangeEvent event) {
 				EntityLivingBase entity = event.getEntityLiving();
 				ItemStack stack = event.getTo();
-				if (entity instanceof EntityPlayer && !entity.world.isRemote
- && stack.getItem() instanceof Base
+				if (entity instanceof EntityPlayer && !entity.world.isRemote && stack.getItem() instanceof Base
 				 && event.getSlot().getSlotType() == EntityEquipmentSlot.Type.HAND && stack.getItem() != event.getFrom().getItem()) {
 					if (event.getSlot() == EntityEquipmentSlot.MAINHAND || !(entity.getHeldItemMainhand().getItem() instanceof Base)) {
 						((EntityPlayer)entity).sendStatusMessage(new TextComponentString(ItemJutsu.getCurrentJutsu(stack).getName()), true);
@@ -555,7 +554,6 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-
 		public static void switchNextJutsu(ItemStack stack, EntityLivingBase entity) {
 			if (stack.getItem() instanceof Base) {
 				((Base)stack.getItem()).setNextJutsu(stack, entity);

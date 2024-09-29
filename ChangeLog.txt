@@ -30,7 +30,7 @@ Jutsus:
  - truth seeker balls are actually balls now
  - fixed rasenshurken sometimes breaking blocks when mobGriefing=false
  - add wind release: vacuum wave and B-rank scroll
- - add water release: acid scattering jutsu
+ - add water release: acid scattering jutsu (6-tail jinchuriki exclusive)
  - add Sage Mode: Demonic Illusion: Toad Confrontation Chant (AOE genjutsu)
  - Mind Transfer jutsu: cancel the jutsu by pressing Jutsu key 2
  - the number of puppets you can control depends on your jutsuXP in your puppet jutsu, max 10 puppets
@@ -38,6 +38,8 @@ Jutsus:
  - add chakra effects on player's arm when Chakra enhanced strength active
  - Lightning chakra mode: slightly more reach, hunger & resistance scaled to jutsuXP and max chakra, shuts down if food < 1
  - updated dust release cube, charges slower, smaller max, updated effects
+ - fixed fuzzy targeting system sometimes not hitting the target correctly when the projectile is huge (such as rasenshuirken)
+ - change sharingan chance to evade attacks to 60%, can't evade unblockable attacks
 
 Items:
  - added Sakura shippuden clothing and leggings (for slim player models only)
@@ -52,11 +54,15 @@ Items:
  - added kunai sword and recipe, can block attacks
  - fix remaining server crashes due to "NoClassDefFoundError"
  - prevents players dropping the duplicate kiba sword
- - Hiramekarei now does sweeping damage
+ - Hiramekarei now does sweeping damage, added sound and sweeping effects
  - Kusanagi sword won't get stuck in blocks
  - byakugan veins won't appear unless byakugan jutsus are used
  - add retractable spear and recipe
  - folding fan opens when in main hand, closes when worn on back
+ - gunbai: updated model, can be thrown like a flail/mace, will accumulate & deflect enemy jutsu when blocking
+ - Madara's scythe can now be thrown like a flail/mace
+ - slightly buffed damage for kiba blade, nuibari, samehada
+ - increased paralizing effect duration for sound gauntlet
 
 Entities:
  - re-textured Kisame, Sakura, Zabuza
@@ -73,7 +79,7 @@ Entities:
  - added Sasori mob, naturally spawns, spawn weight configurable
  - Karasu puppet shoots poison bombs as well as senbons, better AI
  - added sasori's 100 puppet, puppet size and appearance is random
- - slightly buffed puppets health, increased speed slightly, auto covers for summoner and takes damage if within range
+ - slightly buffed puppets health, increased speed slightly, auto covers for summoner and takes damage if within range, susceptible only to amaterasu and corrosion potion effects
  - buffed tailed beast melee damage slightly, better AI
  - added melee animation for Matatabi(paw swipe) and Kokuo(head butt)
  - Shukaku shoots air bullets, Matatabi shoots fire balls, Isobu shoots water balls, Son Goku shoots green fire,
@@ -88,6 +94,8 @@ Entities:
  - hitting your own Explosion release: explosive clone despawns it
  - added Hidan, jashin mode only works on players or ninja mobs, unblockable, naturally spawns
  - fixed naturally spawned tailed beast only spawning in the +X, +Z direction relative to world spawn point
+ - Itachi no longer does close range melee, better kunai targeting, can block attacks with kunai
+ - added Might Guy blocking animation
  
 General:
  - fixed alpha transparency bug when using certain jutsus
