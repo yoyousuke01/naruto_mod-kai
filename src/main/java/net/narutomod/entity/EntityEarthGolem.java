@@ -53,7 +53,8 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class).id(new ResourceLocation("narutomod", "earth_golem"), ENTITYID)
 				.name("earth_golem").tracker(64, 3, true).build());
 	}
-	public static class EC extends EntitySummonAnimal.Base {
+
+	public static class EC extends EntitySummonAnimal.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 40;
 		private int attackTimer;
 		private int nextStepDistance;
@@ -75,6 +76,11 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.DOTON;
+		}
+
+		@Override
 		protected void postScaleFixup() {
 			float f = this.getScale();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D * f);
@@ -84,10 +90,6 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.1D);
 			super.postScaleFixup();
 			this.experienceValue = (int) (f * 10);
-		}
-
-		@Override
-		protected void dontWander(boolean set) {
 		}
 
 		@Override

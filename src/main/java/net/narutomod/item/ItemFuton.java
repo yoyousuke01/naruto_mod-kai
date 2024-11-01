@@ -110,7 +110,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class ChakraFlow extends EntityChakraFlow.Base {
+	public static class ChakraFlow extends EntityChakraFlow.Base implements ItemJutsu.IJutsu {
 		private boolean holdingWeapon;
 		public ChakraFlow(World world) {
 			super(world);
@@ -128,6 +128,11 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					this.damageModifier = f * 3;
 				}
 			}
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.FUTON;
 		}
 
 		@Override

@@ -36,20 +36,17 @@ import javax.swing.Renderer;
 
 import com.google.common.collect.ImmutableMap;
 
-@ElementsNarutomodMod.ModElement.Tag
-public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
-	public static final int ENTITYID = 439;
-	public static final int ENTITYID_RANGED = 440;
 	public EntityWaterStream(ElementsNarutomodMod instance) {
 		super(instance, 869);
 	}
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class).id(new ResourceLocation("narutomod", "water_stream"), ENTITYID)
-				.name("water_stream").tracker(64, 3, true).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
+				.id(new ResourceLocation("narutomod", "water_stream"), ENTITYID).name("water_stream").tracker(64, 3, true).build());
 	}
-	public static class EC extends EntityBeamBase.Base {
+
+	public static class EC extends EntityBeamBase.Base implements ItemJutsu.IJutsu {
 		private final AirPunch stream = new AirPunch();
 		private final float damageModifier = 0.5f;
 		private int maxLife = 100;
@@ -91,6 +88,12 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SUITON;
+		}
+
 		public class AirPunch extends ProcedureAirPunch {
 			public AirPunch() {
 				this.blockDropChance = 0.4F;

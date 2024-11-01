@@ -222,12 +222,6 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public boolean attackEntityAsMob(Entity entityIn) {
-			super.attackEntityAsMob(entityIn);
-			return ProcedureUtils.attackEntityAsMob(this, entityIn);
-		}
-
-		@Override
 		protected void damageEntity(DamageSource source, float amount) {
 			if (this.shouldBlock) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ting")), 0.6f, this.rand.nextFloat() * 0.6f + 0.8f);

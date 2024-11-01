@@ -73,7 +73,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase targetEntity;
 		private ItemJiton.SwarmTarget sandTarget;
@@ -97,6 +97,11 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 			this.setPosition(vec.x, vec.y, vec.z);
 			this.sandTarget = new ItemJiton.SwarmTarget(this.world, 100, vec, 
 			 this.getTargetVector(), new Vec3d(0.1d, 0.4d, 0.1d), 0.95f, 0.03f, false, 3f, sandType.getColor());
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.JITON;
 		}
 
 		@Override
@@ -180,22 +185,25 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null && this.user.isEntityAlive() 
 			 && this.sandTarget != null && !this.sandTarget.shouldRemove() && this.targetEntity != null) {
+				Vec3d gourdVec = this.getGourdMouthPos();
 				if (this.targetEntity.isEntityAlive() && this.funeralTime != 0 && this.ticksExisted < MAXTIME) {
+					AxisAlignedBB targetBB = this.getTargetVector();
 					if (this.isTargetCaptured()) {
 						if (this.funeralTime > 0) {
-							this.sandTarget.setTarget(this.getTargetVector(), 0.95f, 0.03f, false);
+							this.sandTarget.setTarget(targetBB, 0.95f, 0.03f, false);
 							this.attackTargetEntity(this.funeralDamage);
 							--this.funeralTime;
 						} else {
-							this.sandTarget.setTarget(this.getTargetVector(), this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);
+							this.sandTarget.setTarget(targetBB, this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);
 						}
 						this.holdTarget();
 					} else {
-						this.sandTarget.setTarget(this.getTargetVector(), 2.5f, 0.03f, false);
+						this.sandTarget.setTarget(targetBB, 2.5f, 0.03f, false);
 					}
 				} else {
-					this.sandTarget.setTarget(this.getGourdMouthPos(), 0.8f, 0.02f, true);
+					this.sandTarget.setTarget(gourdVec, 0.8f, 0.02f, true);
 				}
+				this.sandTarget.setStartVec(gourdVec);
 				this.sandTarget.onUpdate();
 				this.setEntityBoundingBox(this.sandTarget.getBorders());
 				this.resetPositionToBB();
@@ -230,7 +238,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 2d, true);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 3d, true);
 				if (result != null) {
 					if (result.entityHit instanceof EC) {
 						result.entityHit.ticksExisted = EC.MAXTIME;

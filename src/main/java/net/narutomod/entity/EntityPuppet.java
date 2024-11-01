@@ -57,6 +57,7 @@ import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Iterator;
@@ -126,7 +127,7 @@ public class EntityPuppet extends ElementsNarutomodMod.ModElement {
 	public abstract static class Base extends EntityCreature {
 		private static final DataParameter<Integer> OWNERID = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> REAL_AGE = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
-		private int haltAITicks;
+		//private int haltAITicks;
 
 		public Base(World worldIn) {
 			super(worldIn);
@@ -297,6 +298,12 @@ public class EntityPuppet extends ElementsNarutomodMod.ModElement {
 			return super.attackEntityFrom(source, amount);
 		}
 
+		@Override
+		public boolean attackEntityAsMob(Entity entityIn) {
+			EntityLivingBase owner = this.getOwner();
+			return owner != null ? ProcedureUtils.attackEntityAsMob(this, entityIn, DamageSource.causeIndirectDamage(this, owner)) : false;
+		}
+
 		/*@Override
 		protected boolean processInteract(EntityPlayer player, EnumHand hand) {
 			ItemStack stack = player.getHeldItem(hand);
@@ -320,7 +327,7 @@ public class EntityPuppet extends ElementsNarutomodMod.ModElement {
 		}
 
 		protected void haltAIfor(int ticks) {
-			this.haltAITicks = ticks;
+			ProcedureOnLivingUpdate.disableAIfor(this, ticks);
 		}
 
 	    @Override
@@ -330,16 +337,7 @@ public class EntityPuppet extends ElementsNarutomodMod.ModElement {
 	    	this.clearMostPotions(PotionCorrosion.potion, PotionAmaterasuFlame.potion);
 	    	super.onUpdate();
 	    	
-	    	if (!this.world.isRemote) {
-		    	if (this.haltAITicks > 0) {
-		    		--this.haltAITicks;
-		    		if (!this.isAIDisabled()) {
-		    			this.setNoAI(true);
-		    		}
-		    	} else if (this.isAIDisabled()) {
-		    		this.setNoAI(false);
-		    	}
-	    	} else if (this.isAIDisabled()) {
+	    	if (this.world.isRemote && this.isAIDisabled()) {
 	    		this.motionX *= 0.1d;
 	    		this.motionY *= 0.1d;
 	    		this.motionZ *= 0.1d;
