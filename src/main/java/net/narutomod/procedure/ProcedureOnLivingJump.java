@@ -1,5 +1,8 @@
 package net.narutomod.procedure;
 
+import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.Chakra;
+
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -10,8 +13,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
 
-import net.narutomod.ElementsNarutomodMod;
-
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 	public ProcedureOnLivingJump(ElementsNarutomodMod instance) {
@@ -20,8 +21,9 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 
 	public static void lunge(EntityPlayer entity) {
 		double speed = ProcedureUtils.getModifiedSpeed(entity);
-		if (entity.isPotionActive(MobEffects.JUMP_BOOST) && speed >= 0.14d
-		 && entity.isSneaking() && entity.getFoodStats().getFoodLevel() > 8.0f) {
+		Chakra.Pathway p = Chakra.pathway(entity);
+		double percent = p.getMax() * 0.003d;
+		if (entity.isPotionActive(MobEffects.JUMP_BOOST) && speed >= 0.14d && entity.isSneaking() && Chakra.pathway(entity).consume(percent)) {
 			double motionY = 0.42d + (double) (entity.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1d;
 			if (speed > 0.4d && motionY > 0.8d) {
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 50d, 1.0d);
@@ -43,14 +45,13 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 				entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
 				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.42d);
 			}
-			entity.addExhaustion(1.0f);
 		}
 	}
 
 	@SubscribeEvent
 	public void lunge(LivingEvent.LivingJumpEvent event) {
 		if (event != null && event.getEntityLiving() instanceof EntityPlayer) {
-			lunge((EntityPlayer)event.getEntityLiving());
+			lunge((EntityPlayer) event.getEntityLiving());
 		}
 	}
 

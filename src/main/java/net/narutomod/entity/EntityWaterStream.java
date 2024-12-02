@@ -36,6 +36,11 @@ import javax.swing.Renderer;
 
 import com.google.common.collect.ImmutableMap;
 
+@ElementsNarutomodMod.ModElement.Tag
+public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
+	public static final int ENTITYID = 439;
+	public static final int ENTITYID_RANGED = 440;
+
 	public EntityWaterStream(ElementsNarutomodMod instance) {
 		super(instance, 869);
 	}
