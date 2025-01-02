@@ -224,8 +224,9 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void damageEntity(DamageSource source, float amount) {
 			if (this.shouldBlock) {
-				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ting")), 0.6f, this.rand.nextFloat() * 0.6f + 0.8f);
-				amount *= this.rand.nextFloat() * 0.2f;
+				this.playSound(SoundEvent.REGISTRY
+				 .getObject(new ResourceLocation("narutomod:ting")), 0.6f, this.rand.nextFloat() * 0.6f + 0.8f);
+				amount *= source.isExplosion() ? 0.9f - this.rand.nextFloat() * 0.2f : (this.rand.nextFloat() * 0.2f);
 			}
 			super.damageEntity(source, amount);
 		}
