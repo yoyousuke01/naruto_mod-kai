@@ -532,14 +532,16 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 									|| (ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemKaton.block)
 											|| ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemSuiton.block)))
 									|| ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemRaiton.block))))) {
-						{
-							Map<String, Object> $_dependencies = new HashMap<>();
-							$_dependencies.put("entity", entity);
-							$_dependencies.put("x", x);
-							$_dependencies.put("y", y);
-							$_dependencies.put("z", z);
-							$_dependencies.put("world", world);
-							ProcedureKGDistribution.executeProcedure($_dependencies);
+						if (giveKG) {
+							{
+								Map<String, Object> $_dependencies = new HashMap<>();
+								$_dependencies.put("entity", entity);
+								$_dependencies.put("x", x);
+								$_dependencies.put("y", y);
+								$_dependencies.put("z", z);
+								$_dependencies.put("world", world);
+								ProcedureKGDistribution.executeProcedure($_dependencies);
+							}
 						}
 					}
 				}

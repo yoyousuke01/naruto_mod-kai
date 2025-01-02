@@ -172,7 +172,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 	
 			@Override
 			public float getMaxPower() {
-				return 10.0f;
+				return EC.MAX_RANGE;
 			}
 		}
 	}
@@ -235,7 +235,6 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			if (res != null && shooter != null) {
 				if (res.entityHit != null) {
 					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 3.0F);
-					res.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(shooter, null), 20f);
 				} else if (this.world.isRemote) {
 					IBlockState blockstate = this.world.getBlockState(res.getBlockPos());
 					if (this.canRaiseDustList.contains(blockstate.getMaterial())) {

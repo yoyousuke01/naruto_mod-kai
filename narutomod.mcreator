@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 470,
+    "GUI": 70,
     "DIMENSION": 13,
-    "GUI": 70
+    "ENTITY": 470
   },
   "mod_elements": [
     {
@@ -687,7 +687,7 @@
       "type": "procedure",
       "sortid": 154,
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "ids": {},
       "metadata": {
         "dependencies": [
