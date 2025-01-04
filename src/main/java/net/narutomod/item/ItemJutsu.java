@@ -110,12 +110,6 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static void setJutsuCooldown(ItemStack stack, EntityLivingBase entity, JutsuEnum jutsuIn, long cd) {
-		if (stack.getItem() instanceof Base) {
-			((Base)stack.getItem()).setJutsuCooldown(stack, jutsuIn, (long)((double)cd * ((Base)stack.getItem()).getModifier(stack, entity)));
-		}
-	}
-
 	public static void logBattleXP(EntityPlayer player) {
 		ItemStack stack = player.getHeldItemMainhand();
 		if (!(stack.getItem() instanceof Base)) {
@@ -139,7 +133,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static JutsuEnum getCurrentJutsu(ItemStack stack) {
+	public static ItemJutsu.JutsuEnum getCurrentJutsu(ItemStack stack) {
 		return stack.getItem() instanceof Base ? ((Base)stack.getItem()).getCurrentJutsu(stack) : null;
 	}
 
