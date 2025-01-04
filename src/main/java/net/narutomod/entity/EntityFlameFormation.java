@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -81,7 +80,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.JutsuEnum.Type.KATON;
+			return ItemJutsu.JutsuEnum.Type.RAITON;
 		}
 
 		@Override
@@ -110,11 +109,6 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			if (SCALE.equals(key) && this.world.isRemote) {
 				this.setScale(this.getScale());
 			}
-		}
-
-		@Override
-		public boolean canBeCollidedWith() {
-			return true;
 		}
 
 		@Override
@@ -193,11 +187,8 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (entity.onGround) {
-					entity.world.spawnEntity(new EC(entity, power));
-					return true;
-				}
-				return false;
+				entity.world.spawnEntity(new EC(entity, power));
+				return true;
 			}
 
 			@Override
@@ -241,18 +232,6 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 							}
 						}
 					}
-				}
-			}
-
-			@SubscribeEvent
-			public void onImpact(ProjectileImpactEvent event) {
-				if (event.getRayTraceResult().entityHit instanceof EC) {
-					event.setCanceled(true);
-					event.getEntity().motionX *= -0.1d;
-					event.getEntity().motionY *= -0.1d;
-					event.getEntity().motionZ *= -0.1d;
-					event.getEntity().rotationYaw += 180.0F;
-					event.getEntity().prevRotationYaw += 180.0F;
 				}
 			}
 		}

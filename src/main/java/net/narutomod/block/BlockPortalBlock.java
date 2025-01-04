@@ -1,5 +1,8 @@
 package net.narutomod.block;
 
+import net.narutomod.event.EventDelayedCallback;
+import net.narutomod.ElementsNarutomodMod;
+
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -15,8 +18,11 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.tileentity.TileEntityEndPortal;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.Item;
+import net.minecraft.init.MobEffects;
+import net.minecraft.init.Items;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -28,20 +34,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockEndPortal;
 import net.minecraft.block.Block;
-import net.minecraft.init.Items;
 
-import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.event.EventDelayedCallback;
-import net.narutomod.ElementsNarutomodMod;
+import javax.annotation.Nullable;
 
 import java.util.Random;
-import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class BlockPortalBlock extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:portalblock")
 	public static final Block block = null;
-
 	public BlockPortalBlock(ElementsNarutomodMod instance) {
 		super(instance, 276);
 	}
@@ -60,17 +61,14 @@ public class BlockPortalBlock extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0,
-				new ModelResourceLocation("narutomod:portalblock", "inventory"));
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation("narutomod:portalblock", "inventory"));
 	}
-
 	public static class BlockCustom extends BlockEndPortal {
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
 		protected static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.3D);
 		protected static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.7D, 1.0D, 1.0D, 1.0D);
 		protected static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.3D, 1.0D, 1.0D);
 		protected static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0.7D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
-
 		public BlockCustom() {
 			super(Material.PORTAL);
 			this.setRegistryName("portalblock");
@@ -153,14 +151,12 @@ public class BlockPortalBlock extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-
 	public static class TileEntityCustom extends TileEntityEndPortal {
 		private static final EventCallback CB = new EventCallback();
 		private EnumFacing facing;
 		private BlockPos pairPos;
 		private int ticksExisted;
 		private int cooldown = 10;
-
 		public TileEntityCustom(EnumFacing side) {
 			this.facing = side;
 		}
@@ -189,36 +185,28 @@ public class BlockPortalBlock extends ElementsNarutomodMod.ModElement {
 					this.cooldown = 20;
 					if (!this.world.isRemote) {
 						entity.rotationYaw = te.facing.getHorizontalAngle();
-						/*if (entity instanceof EntityPlayerMP) {
-							ProcedureUtils.setInvulnerableDimensionChange((EntityPlayerMP)entity);
+						if (entity instanceof EntityPlayerMP) {
+							EntityPlayerMP player = (EntityPlayerMP) entity;
+							player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 60, 6, false, true));
+							player.extinguish();
 							new EventDelayedCallback(this.world, 0, 0, 0, entity, this.world.getTotalWorldTime() + 3, CB);
 						}
 						entity.setPositionAndUpdate(this.pairPos.getX() + 0.5D + te.facing.getFrontOffsetX(),
 								this.pairPos.getY() - ((this.world.getBlockState(this.pairPos.down()).getBlock() == block) ? 1.0D : 0.0D),
-								this.pairPos.getZ() + 0.5D + te.facing.getFrontOffsetZ());*/
-						if (entity instanceof EntityPlayerMP) {
-							((EntityPlayerMP)entity).connection.setPlayerLocation(this.pairPos.getX() + 0.5D + te.facing.getFrontOffsetX(),
-								this.pairPos.getY() - ((this.world.getBlockState(this.pairPos.down()).getBlock() == block) ? 1.0D : 0.0D),
-								this.pairPos.getZ() + 0.5D + te.facing.getFrontOffsetZ(), entity.rotationYaw, entity.rotationPitch);
-						} else {
-							entity.setPositionAndUpdate(this.pairPos.getX() + 0.5D + te.facing.getFrontOffsetX(),
-							 this.pairPos.getY() - ((this.world.getBlockState(this.pairPos.down()).getBlock() == block) ? 1.0D : 0.0D),
-							 this.pairPos.getZ() + 0.5D + te.facing.getFrontOffsetZ());
-						}
+								this.pairPos.getZ() + 0.5D + te.facing.getFrontOffsetZ());
 					}
 				}
 			}
 		}
-
 		public static class EventCallback extends EventDelayedCallback.Callback {
 			public EventCallback() {
 				super(276);
 			}
-	
+
 			@Override
 			public void execute(World world, int x, int y, int z, @Nullable Entity entity) {
-				if (entity instanceof EntityPlayerMP && ((EntityPlayerMP)entity).isInvulnerableDimensionChange()) {
-					((EntityPlayerMP)entity).clearInvulnerableDimensionChange();
+				if (entity instanceof EntityPlayerMP && ((EntityPlayerMP) entity).isInvulnerableDimensionChange()) {
+					((EntityPlayerMP) entity).clearInvulnerableDimensionChange();
 				}
 			}
 		}

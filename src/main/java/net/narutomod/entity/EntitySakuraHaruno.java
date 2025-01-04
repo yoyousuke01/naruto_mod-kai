@@ -168,11 +168,6 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected double meleeReach() {
-			return 1.5d;
-		}
-
-		@Override
 		public boolean isOnSameTeam(Entity entityIn) {
 			return EntityNinjaMob.TeamKonoha.contains(entityIn.getClass()) || this.healableEntities.contains(entityIn);
 		}

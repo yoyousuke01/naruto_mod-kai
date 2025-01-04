@@ -376,18 +376,14 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class PositionRotationPacket {
-		public double posX;
-		public double posY;
-		public double posZ;
-		public float rotationYaw;
-		public float rotationPitch;
+		double posX;
+		double posY;
+		double posZ;
+		float rotationYaw;
+		float rotationPitch;
 
 		PositionRotationPacket() { }
 		
-		public PositionRotationPacket(Entity entity) {
-			this(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
-		}
-
 		PositionRotationPacket(double x, double y, double z, float yaw, float pitch) {
 			this.posX = x;
 			this.posY = y;
@@ -421,7 +417,7 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 
 		public EntityPositionAndRotation(Entity entity) {
 			this.id = entity.getEntityId();
-			this.prp = new PositionRotationPacket(entity);
+			this.prp = new PositionRotationPacket(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
 		}
 
 		public static void sendToTracking(Entity entity) {
@@ -1042,7 +1038,8 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 				this.parts = partentity.length;
 				this.pr = new PositionRotationPacket[this.parts];
 				for (int i = 0; i < this.parts; i++) {
-					this.pr[i] = new PositionRotationPacket(partentity[i]);
+					this.pr[i] = new PositionRotationPacket(partentity[i].posX, partentity[i].posY, partentity[i].posZ,
+					 partentity[i].rotationYaw, partentity[i].rotationPitch);
 				}
 			}
 		}

@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 479,
+    "GUI": 70,
     "DIMENSION": 13,
-    "GUI": 70
+    "ENTITY": 470
   },
   "mod_elements": [
     {
@@ -687,7 +687,7 @@
       "type": "procedure",
       "sortid": 154,
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "ids": {},
       "metadata": {
         "dependencies": [
@@ -810,6 +810,14 @@
       "metadata": {
         "dependencies": []
       }
+    },
+    {
+      "name": "ExtendedReachMouseEvent",
+      "type": "keybind",
+      "sortid": 171,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {}
     },
     {
       "name": "MangekyoSharinganOpened",
@@ -7667,77 +7675,6 @@
         "1": 470
       },
       "registry_name": "kakuzu"
-    },
-    {
-      "name": "Shoton",
-      "type": "gun",
-      "sortid": 900,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {
-        "0": 471
-      },
-      "registry_name": "shoton"
-    },
-    {
-      "name": "CrystalPrison",
-      "type": "mob",
-      "sortid": 901,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {
-        "0": 472,
-        "1": 473
-      },
-      "registry_name": "crystal_prison"
-    },
-    {
-      "name": "CrystalArmor",
-      "type": "mob",
-      "sortid": 902,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {
-        "0": 474,
-        "1": 475
-      },
-      "registry_name": "crystal_armor"
-    },
-    {
-      "name": "CrystalThorns",
-      "type": "mob",
-      "sortid": 903,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {
-        "0": 476,
-        "1": 477
-      },
-      "registry_name": "crystal_thorns"
-    },
-    {
-      "name": "OnMouseEvent",
-      "type": "procedure",
-      "sortid": 904,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {},
-      "registry_name": "on_mouse_event",
-      "metadata": {
-        "dependencies": []
-      }
-    },
-    {
-      "name": "CrystalRay",
-      "type": "mob",
-      "sortid": 905,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {
-        "0": 478,
-        "1": 479
-      },
-      "registry_name": "crystal_ray"
     }
   ],
   "variable_elements": [
@@ -8833,14 +8770,6 @@
       ],
       "category": "master",
       "subtitle": ""
-    },
-    {
-      "name": "ray",
-      "files": [
-        "ray"
-      ],
-      "category": "master",
-      "subtitle": ""
     }
   ],
   "language_map": {
@@ -8865,7 +8794,6 @@
       "item.byakurinnesharinganhelmet.name": "Fake Rinne Sharingan",
       "subtitles.gunbai_deflect": "",
       "entity.tensei_baku_silver.name": "Silver Wheel Rebirth Blast",
-      "entity.crystal_armor.name": "Crystal Armor",
       "item.rinneganboots.name": "",
       "item.ninja_armor_naruto_sbody.name": "Naruto Jacket",
       "chattext.outerpath.alreadyhere": "Unable to summon Ten Tails, it is already here.",
@@ -8960,7 +8888,6 @@
       "item.ashbones.name": "All-Killing Ash Bones",
       "entity.snake_8_heads.name": "8-branch Jutsu",
       "entity.transformation_jutsu.name": "Transformation Jutsu",
-      "entity.crystal_ray.name": "Ray of Light",
       "tooltip.byakurinnesharingan.pulse": "Chakra pulse",
       "subtitles.daibakusuishoha": "",
       "advancements.kekkei_tota_awakened.title": "Kekkei Tota Acquired",
@@ -9172,7 +9099,6 @@
       "subtitles.hirudora": "",
       "item.ninja_armor_otolegs.name": "Ninja Leggings (Otogakure)",
       "subtitles.shukaku_roar": "",
-      "tooltip.shoton.musthave": "Must have Earth release",
       "entity.c_2.name": "C-2",
       "subtitles.hiding_in_ash": "",
       "item.ninja_armor_fishnetslegs.name": "Ninja Fishnets Shirt and Pants",
@@ -9303,7 +9229,6 @@
       "item.zzz.name": "Zzz",
       "tooltip.sagestaff.descr": "Six Path Shakujo: This is the staff created by the truth seeking orb - Originally being held by the sage of the six paths",
       "death.attack.senjutsu": "%1$s was killed by %2$s using senjutsu",
-      "subtitles.ray": "",
       "entity.laser_circus.name": "Laser Circus",
       "tooltip.phantom9sealing.name": "Sealing Jutsu: Nine Phantom Dragons",
       "item.biju_cloakbody.name": "Biju Cloak Body",
@@ -9314,7 +9239,6 @@
       "tooltip.katon.annihilation": "Great Annihilation",
       "splash_potion.effect.heaviness": "Splash Heaviness",
       "subtitles.dragon_roar": "",
-      "entity.crystal_thorns.name": "Divine Path",
       "entity.chidori.name": "Chidori/Spear/Current",
       "advancements.shikotsumyaku_acquired.title": "Shikotsumyaku Acquired",
       "item.scroll_multi_size.name": "Yang Release - Multi-Size jutsu",
@@ -9383,7 +9307,6 @@
       "potion.effect.instant_damage": "Instant Damage",
       "splash_potion.effect.reach": "Splash Reach",
       "item.nuibari_thrown.name": "Nuibari Sword",
-      "item.shoton.name": "Crystal Release",
       "chattext.amaterasu": "Amaterasu!",
       "item.ninja_armor_anbuboots.name": "Ninja Boots (Anbu)",
       "item.whitezetsuflesh.name": "White Zetsu Flesh",
@@ -9611,7 +9534,6 @@
       "item.ninja_armor_sunalegs.name": "Ninja Pants (Sunagakure)",
       "item.scroll_great_fireball.name": "Fire Release - Great Fireball jutsu",
       "item.spear_retractable.name": "Retractable Spear",
-      "entity.crystal_prison.name": "Crystal Prison",
       "key.mcreator.powerincrease": "Switch Jutsu / Increase",
       "entity.gedo_statue.name": "Demonic Statue of the Outer Path",
       "item.scroll_water_cannon.name": "Water Release - Water Cannon Ball",
@@ -9632,10 +9554,10 @@
   "workspaceSettings": {
     "modid": "narutomod",
     "modName": "NarutoMod",
-    "version": "0.3.2-beta",
+    "version": "0.3.1-beta",
     "author": "AHZNB",
     "websiteURL": "https://www.youtube.com/c/AHZNB",
-    "license": "All Rights Reserved",
+    "license": "GNU General Public License version 3 (GPLv3)",
     "disableForgeVersionCheck": true,
     "serverSideOnly": false,
     "modPicture": "shinobi_craft-min",
@@ -9644,7 +9566,7 @@
     "dependants": [],
     "mcreatorDependencies": [],
     "currentGenerator": "forge-1.12.2",
-    "credits": "credits",
+    "credits": "Created using mod maker MCreator - https://mcreator.net/about",
     "modElementsPackage": "net.narutomod",
     "lockBaseModFiles": false
   },

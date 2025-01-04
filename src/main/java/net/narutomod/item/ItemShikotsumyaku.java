@@ -210,19 +210,16 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityBrackenDance extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 8;
-		private final float maxScale;
+		private final float maxScale = 2.0f;
 		private final float damage = 20.0f;
-		private EntityLivingBase user;
 
 		public EntityBrackenDance(World worldIn) {
 			super(worldIn);
 			this.setColor(0xFFFFFFFF);
-			this.maxScale = this.rand.nextFloat() * 2.0f + 1.5f;
 		}
 
 		public EntityBrackenDance(EntityLivingBase userIn, float damageIn) {
-			this(userIn.world);
-			this.user = userIn;
+			super(userIn, 0xFFFFFFFF);
 			//this.damage = damageIn;
 		}
 
@@ -234,14 +231,13 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
+			if (this.ticksAlive <= this.growTime) {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
-					if (!entity.equals(this.user)) {
+					if (!entity.equals(this.shootingEntity)) {
 						entity.hurtResistantTime = 10;
-						entity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
 					}
 				}

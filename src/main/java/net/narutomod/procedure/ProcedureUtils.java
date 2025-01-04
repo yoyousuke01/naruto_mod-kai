@@ -1,84 +1,97 @@
 package net.narutomod.procedure;
 
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.ai.attributes.RangedAttribute;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.Entity;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.Block;
-import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.init.Items;
-
-import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.PlayerTracker;
 import net.narutomod.PlayerRender;
 import net.narutomod.Particles;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.World;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.DamageSource;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.init.Items;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.ai.attributes.RangedAttribute;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.Block;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.advancements.Advancement;
+
 import javax.annotation.Nullable;
-import java.util.*;
-import java.lang.reflect.Field;
+
+import java.util.UUID;
+import java.util.Set;
+import java.util.Random;
+import java.util.Map;
+import java.util.List;
+import java.util.Iterator;
+import java.util.Comparator;
+import java.util.Collection;
+import java.util.Arrays;
+
 import java.lang.reflect.Method;
-import com.google.common.collect.Lists;
+import java.lang.reflect.Field;
+
 import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.base.Predicates;
 import com.google.common.base.Predicate;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
-	//public static final net.minecraft.entity.ai.attributes.IAttribute REACH_DISTANCE = 
-	//  new RangedAttribute(null, "modded.reachDistance", 7.0, 0.0, 128.0).setShouldWatch(true);
-	public static final IAttribute MAXHEALTH = (new RangedAttribute(null, "modded.maxHealth", 20.0D, Float.MIN_VALUE, 1048576.0D)).setDescription("Max Modded Health").setShouldWatch(true);
+	// public static final net.minecraft.entity.ai.attributes.IAttribute
+	// REACH_DISTANCE =
+	// new RangedAttribute(null, "modded.reachDistance", 7.0, 0.0,
+	// 128.0).setShouldWatch(true);
+	public static final IAttribute MAXHEALTH = (new RangedAttribute(null, "modded.maxHealth", 20.0D, Float.MIN_VALUE, 1048576.0D))
+			.setDescription("Max Modded Health").setShouldWatch(true);
 	private static final Random RNG = new Random();
 	public static final DamageSource AMATERASU = new DamageSource(ItemJutsu.NINJUTSU_TYPE).setFireDamage();
 	public static final DamageSource SPECIAL_DAMAGE = new DamageSource("wither").setDamageBypassesArmor().setDamageIsAbsolute();
-	public static final float DEG2RAD = (float)Math.PI / 180.0F;
-	public static final float RAD2DEG = 180.0F / (float)Math.PI;
-	
+	public static final float DEG2RAD = (float) Math.PI / 180.0F;
+	public static final float RAD2DEG = 180.0F / (float) Math.PI;
 	public ProcedureUtils(ElementsNarutomodMod instance) {
 		super(instance, 177);
 	}
@@ -109,20 +122,20 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	@Nullable
 	public static EntityLivingBase searchLivingMatchingId(UUID id) {
-		/*MinecraftServer mcserv = FMLCommonHandler.instance().getMinecraftServerInstance();
-		if (mcserv != null) {
-			for (int i = 0; i < mcserv.getPlayerList().getPlayers().size(); ++i) {
-				EntityPlayerMP player = (EntityPlayerMP) mcserv.getPlayerList().getPlayers().get(i);
-				if (name2Id(player.getDisplayName().getFormattedText()) != id)
-					continue;
-				return player;
-			}
-		}*/
+		/*
+		 * MinecraftServer mcserv =
+		 * FMLCommonHandler.instance().getMinecraftServerInstance(); if (mcserv != null)
+		 * { for (int i = 0; i < mcserv.getPlayerList().getPlayers().size(); ++i) {
+		 * EntityPlayerMP player = (EntityPlayerMP)
+		 * mcserv.getPlayerList().getPlayers().get(i); if
+		 * (name2Id(player.getDisplayName().getFormattedText()) != id) continue; return
+		 * player; } }
+		 */
 		MinecraftServer mcserv = FMLCommonHandler.instance().getMinecraftServerInstance();
 		if (mcserv != null) {
 			Entity entity = mcserv.getEntityFromUuid(id);
 			if (entity instanceof EntityLivingBase) {
-				return (EntityLivingBase)entity;
+				return (EntityLivingBase) entity;
 			}
 		}
 		return null;
@@ -137,14 +150,14 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	@Nullable
 	public static Entity getEntityFromUUID(World world, UUID uuid) {
 		if (world instanceof WorldServer) {
-			return ((WorldServer)world).getEntityFromUuid(uuid);
+			return ((WorldServer) world).getEntityFromUuid(uuid);
 		}
-        for (Entity entity : world.loadedEntityList) {
-            if (uuid.equals(entity.getUniqueID())) {
-                return entity;
-            }
-        }
-        return null;
+		for (Entity entity : world.loadedEntityList) {
+			if (uuid.equals(entity.getUniqueID())) {
+				return entity;
+			}
+		}
+		return null;
 	}
 
 	@Nullable
@@ -168,12 +181,12 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static UUID getOwnerId(ItemStack stack) {
-		return stack.hasTagCompound() && stack.getTagCompound().hasUniqueId("player_id") 
-		 ? stack.getTagCompound().getUniqueId("player_id") : null;
+		return stack.hasTagCompound() && stack.getTagCompound().hasUniqueId("player_id") ? stack.getTagCompound().getUniqueId("player_id") : null;
 	}
 
 	public static boolean isOriginalOwner(EntityLivingBase entity, ItemStack stack) {
-		//return getOwnerId(stack) == name2Id(entity.getDisplayName().getFormattedText());
+		// return getOwnerId(stack) ==
+		// name2Id(entity.getDisplayName().getFormattedText());
 		return entity.getUniqueID().equals(getOwnerId(stack));
 	}
 
@@ -185,15 +198,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	@Nullable
 	public static ItemStack getMatchingItemStack(EntityLivingBase entity, Item item) {
 		if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-			return getMatchingItemStack((EntityPlayer)entity, item);
+			return getMatchingItemStack((EntityPlayer) entity, item);
 		}
 		if (entity instanceof EntityNinjaMob.Base) {
-			for (int i = 0; i < ((EntityNinjaMob.Base)entity).getInventorySize(); i++) {
-		 		ItemStack stack = ((EntityNinjaMob.Base)entity).getItemFromInventory(i);
-		 		if (!stack.isEmpty() && stack.getItem() == item) {
-		 			return stack;
-		 		}
-		 	}
+			for (int i = 0; i < ((EntityNinjaMob.Base) entity).getInventorySize(); i++) {
+				ItemStack stack = ((EntityNinjaMob.Base) entity).getItemFromInventory(i);
+				if (!stack.isEmpty() && stack.getItem() == item) {
+					return stack;
+				}
+			}
 		}
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			ItemStack stack = entity.getItemStackFromSlot(slot);
@@ -213,7 +226,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	public static boolean hasOwnerMatchingItemstack(EntityPlayer entity, Item itemIn) {
 		return getOwnerMatchingItemstack(entity, itemIn) != null;
 	}
-	
+
 	@Nullable
 	public static ItemStack getItemStackIgnoreDurability(InventoryPlayer inventory, ItemStack itemStackIn) {
 		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(inventory.mainInventory, inventory.armorInventory,
@@ -222,7 +235,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
 				ItemStack itemstack = (ItemStack) iterator.next();
-				//if (!itemstack.isEmpty() && itemstack.isItemEqualIgnoreDurability(itemStackIn))
+				// if (!itemstack.isEmpty() &&
+				// itemstack.isItemEqualIgnoreDurability(itemStackIn))
 				if (!itemstack.isEmpty() && itemstack.getItem() == itemStackIn.getItem()) {
 					return itemstack;
 				}
@@ -247,8 +261,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	@Nullable
 	public static ItemStack getMatchingItemStack(EntityPlayer player, ItemStack itemStackIn) {
-		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory,
-		 player.inventory.armorInventory, player.inventory.offHandInventory);
+		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, player.inventory.armorInventory,
+				player.inventory.offHandInventory);
 		for (List<ItemStack> list : allInv) {
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
@@ -264,15 +278,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	@Nullable
 	public static ItemStack getMatchingItemStack(EntityLivingBase entity, ItemStack stackIn) {
 		if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-			return getMatchingItemStack((EntityPlayer)entity, stackIn);
+			return getMatchingItemStack((EntityPlayer) entity, stackIn);
 		}
 		if (entity instanceof EntityNinjaMob.Base) {
-			for (int i = 0; i < ((EntityNinjaMob.Base)entity).getInventorySize(); i++) {
-		 		ItemStack stack = ((EntityNinjaMob.Base)entity).getItemFromInventory(i);
-		 		if (!stack.isEmpty() && ItemStack.areItemStacksEqual(stack, stackIn)) {
-		 			return stack;
-		 		}
-		 	}
+			for (int i = 0; i < ((EntityNinjaMob.Base) entity).getInventorySize(); i++) {
+				ItemStack stack = ((EntityNinjaMob.Base) entity).getItemFromInventory(i);
+				if (!stack.isEmpty() && ItemStack.areItemStacksEqual(stack, stackIn)) {
+					return stack;
+				}
+			}
 		}
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			ItemStack stack = entity.getItemStackFromSlot(slot);
@@ -285,15 +299,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	@Nullable
 	public static ItemStack getMatchingItemstackIgnoreDurability(EntityPlayer player, ItemStack stackIn) {
-		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory,
-		 player.inventory.armorInventory, player.inventory.offHandInventory);
+		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, player.inventory.armorInventory,
+				player.inventory.offHandInventory);
 		for (List<ItemStack> list : allInv) {
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
 				ItemStack itemstack = (ItemStack) iterator.next();
 				if (!itemstack.isEmpty() && itemstack.getCount() == stackIn.getCount() && itemstack.getItem() == stackIn.getItem()
-				 && itemstack.hasTagCompound() == stackIn.hasTagCompound() && itemstack.areCapsCompatible(stackIn)
-				 && (!itemstack.hasTagCompound() || itemstack.getTagCompound().equals(stackIn.getTagCompound()))) {
+						&& itemstack.hasTagCompound() == stackIn.hasTagCompound() && itemstack.areCapsCompatible(stackIn)
+						&& (!itemstack.hasTagCompound() || itemstack.getTagCompound().equals(stackIn.getTagCompound()))) {
 					return itemstack;
 				}
 			}
@@ -302,8 +316,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean hasAnyItemOfSubtype(EntityPlayer player, Class<? extends Item> itemType) {
-		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, 
-		 player.inventory.armorInventory, player.inventory.offHandInventory);
+		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, player.inventory.armorInventory,
+				player.inventory.offHandInventory);
 		for (List<ItemStack> list : allInv) {
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
@@ -317,8 +331,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static List<ItemStack> getAllItemsOfSubType(EntityPlayer player, Class<? extends Item> itemType) {
-		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, 
-		 player.inventory.armorInventory, player.inventory.offHandInventory);
+		List<NonNullList<ItemStack>> allInv = Arrays.<NonNullList<ItemStack>>asList(player.inventory.mainInventory, player.inventory.armorInventory,
+				player.inventory.offHandInventory);
 		List<ItemStack> itemlist = Lists.newArrayList();
 		for (List<ItemStack> list : allInv) {
 			Iterator iterator = list.iterator();
@@ -341,9 +355,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
-		return stack1.getItem() == stack2.getItem() 
-		 && (!stack1.getHasSubtypes() || stack1.getMetadata() == stack2.getMetadata()) 
-		 && ItemStack.areItemStackTagsEqual(stack1, stack2);
+		return stack1.getItem() == stack2.getItem() && (!stack1.getHasSubtypes() || stack1.getMetadata() == stack2.getMetadata())
+				&& ItemStack.areItemStackTagsEqual(stack1, stack2);
 	}
 
 	public static int getSlotFor(ItemStack stack, EntityPlayer player) {
@@ -418,7 +431,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			if (entityIn instanceof EntityLivingBase) {
 				ItemStack itemstack1 = attacker.getHeldItemMainhand();
 				if (!itemstack1.isEmpty()) {
-					itemstack1.getItem().hitEntity(itemstack1, (EntityLivingBase)entityIn, attacker);
+					itemstack1.getItem().hitEntity(itemstack1, (EntityLivingBase) entityIn, attacker);
 				}
 				EnchantmentHelper.applyThornEnchantments((EntityLivingBase) entityIn, attacker);
 			}
@@ -474,7 +487,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		if (vec3d.lengthVector() > range) {
 			return Vec3d.ZERO;
 		}
-		multiplier *= (float)(range - vec3d.lengthVector()) * 0.1f;
+		multiplier *= (float) (range - vec3d.lengthVector()) * 0.1f;
 		double d = Math.sqrt(2d / (target instanceof EntityLivingBase ? target.height : target.getEntityBoundingBox().getAverageEdgeLength()));
 		vec3d = vec3d.normalize().scale(d);
 		if (target.onGround && vec3d.y < d * 0.6d)
@@ -485,7 +498,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void pullEntity(Vec3d src, Entity target, float multiplier) {
-		//Vec3d vec3d = new Vec3d(target.posX - src.x, target.posY - src.y, target.posZ - src.z);
+		// Vec3d vec3d = new Vec3d(target.posX - src.x, target.posY - src.y, target.posZ
+		// - src.z);
 		Vec3d vec3d = src.subtract(target.getPositionVector());
 		multiplier *= (float) vec3d.lengthVector() * 0.1f;
 		vec3d = vec3d.normalize().scale(multiplier);
@@ -534,14 +548,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	public static void swapItemToSlot(EntityPlayer entity, EntityEquipmentSlot slot, ItemStack itemstack) {
 		ItemStack itemstack1 = entity.getItemStackFromSlot(slot);
-		//ItemStack itemstack2 = getItemStackIgnoreDurability(entity.inventory, itemstack);
+		// ItemStack itemstack2 = getItemStackIgnoreDurability(entity.inventory,
+		// itemstack);
 		ItemStack itemstack2 = getMatchingItemStack(entity, itemstack);
 		if (itemstack2 != null && !itemstack2.isEmpty()) {
 			itemstack = itemstack2.copy();
 			itemstack2.shrink(1);
 		}
 		if (!itemstack1.isEmpty()) {
-			//if (itemstack1.getItem() == itemstack.getItem()) return;
+			// if (itemstack1.getItem() == itemstack.getItem()) return;
 			if (ItemStack.areItemStacksEqual(itemstack, itemstack1))
 				return;
 			if (itemstack1.getMaxStackSize() > 1) {
@@ -561,7 +576,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		if (!stack.hasTagCompound()) {
 			stack.setTagCompound(new NBTTagCompound());
 		}
-//System.out.println(">>>>>> before nbt:"+stack.getTagCompound());
+		// System.out.println(">>>>>> before nbt:"+stack.getTagCompound());
 		if (!stack.getTagCompound().hasKey("ench", 9)) {
 			stack.getTagCompound().setTag("ench", new NBTTagList());
 		}
@@ -574,11 +589,11 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 		if (!flag) {
 			NBTTagCompound compound = new NBTTagCompound();
-			compound.setShort("id", (short)100);
+			compound.setShort("id", (short) 100);
 			compound.setBoolean("FAKE", true);
 			nbttaglist.appendTag(compound);
 		}
-//System.out.println("       after nbt:"+stack.getTagCompound());
+		// System.out.println(" after nbt:"+stack.getTagCompound());
 	}
 
 	public static void removeFakeEnchantmentEffect(ItemStack stack) {
@@ -587,10 +602,10 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
 			NBTTagList nbttaglist = stack.getTagCompound().getTagList("ench", 10);
-//System.out.println("====== before_nbt:"+stack.getTagCompound());
+			// System.out.println("====== before_nbt:"+stack.getTagCompound());
 			Iterator<NBTBase> iter = nbttaglist.iterator();
 			while (iter.hasNext()) {
-				NBTTagCompound compound = (NBTTagCompound)iter.next();
+				NBTTagCompound compound = (NBTTagCompound) iter.next();
 				if (compound.getBoolean("FAKE")) {
 					iter.remove();
 				}
@@ -598,7 +613,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			if (nbttaglist.hasNoTags()) {
 				stack.getTagCompound().removeTag("ench");
 			}
-//System.out.println("       after_nbt:"+stack.getTagCompound());
+			// System.out.println(" after_nbt:"+stack.getTagCompound());
 		}
 	}
 
@@ -610,8 +625,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			NBTTagList nbttaglist = stack.getTagCompound().getTagList("ench", 10);
 			Iterator<NBTBase> iter = nbttaglist.iterator();
 			while (iter.hasNext()) {
-				NBTTagCompound compound = (NBTTagCompound)iter.next();
-				if (compound.getShort("id") == Enchantment.getEnchantmentID(enchantment) && (int)compound.getShort("lvl") == levels) {
+				NBTTagCompound compound = (NBTTagCompound) iter.next();
+				if (compound.getShort("id") == Enchantment.getEnchantmentID(enchantment) && (int) compound.getShort("lvl") == levels) {
 					iter.remove();
 				}
 			}
@@ -625,7 +640,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		double yaw = -MathHelper.atan2(entityIn.posX - looker.posX, entityIn.posZ - looker.posZ) * (180d / Math.PI);
 		return Math.abs(MathHelper.wrapDegrees(yaw - looker.rotationYawHead)) < 85d && looker.canEntityBeSeen(entityIn);
 	}
-	
+
 	public static RayTraceResult raytraceBlocks(Entity entity, double distance) {
 		Vec3d vec1 = entity.getPositionEyes(1f);
 		Vec3d vec2 = vec1.add(entity.getLookVec().scale(distance));
@@ -633,15 +648,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range) {
-		return objectEntityLookingAt(entity, range, false, false, (Predicate)null);
+		return objectEntityLookingAt(entity, range, false, false, (Predicate) null);
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbGrow) {
-		return objectEntityLookingAt(entity, range, bbGrow, false, false, (Predicate)null);
+		return objectEntityLookingAt(entity, range, bbGrow, false, false, (Predicate) null);
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbGrow, boolean trackall) {
-		return objectEntityLookingAt(entity, range, bbGrow, trackall, false, (Predicate)null);
+		return objectEntityLookingAt(entity, range, bbGrow, trackall, false, (Predicate) null);
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, @Nullable Entity excludeEntity) {
@@ -652,16 +667,16 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		return objectEntityLookingAt(entity, range, bbgrow, false, false, excludeEntity);
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, Class <? extends Entity> excludeClazz) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, Class<? extends Entity> excludeClazz) {
 		return objectEntityLookingAt(entity, range, 0.0d, false, false, excludeClazz);
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, Class <? extends Entity> excludeClazz) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, Class<? extends Entity> excludeClazz) {
 		return objectEntityLookingAt(entity, range, bbgrow, false, false, excludeClazz);
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall) {
-		return objectEntityLookingAt(entity, range, trackall, false, (Predicate)null);
+		return objectEntityLookingAt(entity, range, trackall, false, (Predicate) null);
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, @Nullable Entity excludeEntity) {
@@ -669,14 +684,16 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid) {
-		return objectEntityLookingAt(entity, range, trackall, stopOnLiquid, (Predicate)null);
+		return objectEntityLookingAt(entity, range, trackall, stopOnLiquid, (Predicate) null);
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid, @Nullable Entity excludeEntity) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid,
+			@Nullable Entity excludeEntity) {
 		return objectEntityLookingAt(entity, range, 0.0d, trackall, stopOnLiquid, excludeEntity);
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, boolean trackall, boolean stopOnLiquid, @Nullable Entity excludeEntity) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, boolean trackall, boolean stopOnLiquid,
+			@Nullable Entity excludeEntity) {
 		return objectEntityLookingAt(entity, range, bbgrow, trackall, stopOnLiquid, new Predicate<Entity>() {
 			public boolean apply(@Nullable Entity p_apply_1_) {
 				return p_apply_1_ != null && !p_apply_1_.equals(excludeEntity);
@@ -684,7 +701,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		});
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, boolean trackall, boolean stopOnLiquid, Class <? extends Entity> excludeClazz) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbgrow, boolean trackall, boolean stopOnLiquid,
+			Class<? extends Entity> excludeClazz) {
 		return objectEntityLookingAt(entity, range, bbgrow, trackall, stopOnLiquid, new Predicate<Entity>() {
 			public boolean apply(@Nullable Entity p_apply_1_) {
 				return p_apply_1_ != null && !excludeClazz.isAssignableFrom(p_apply_1_.getClass());
@@ -692,17 +710,20 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		});
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid, @Nullable Predicate<Entity> filter) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, boolean trackall, boolean stopOnLiquid,
+			@Nullable Predicate<Entity> filter) {
 		return objectEntityLookingAt(entity, range, 0.0d, trackall, stopOnLiquid, filter);
 	}
 
-	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbGrow, boolean trackall, boolean stopOnLiquid, @Nullable Predicate<Entity> filter) {
+	public static RayTraceResult objectEntityLookingAt(Entity entity, double range, double bbGrow, boolean trackall, boolean stopOnLiquid,
+			@Nullable Predicate<Entity> filter) {
 		Vec3d vec3d = entity.getPositionEyes(1f);
 		Vec3d vec3d1 = entity.getLookVec().scale(range).add(vec3d);
 		return rayTrace(entity, vec3d, vec3d1, bbGrow, trackall, stopOnLiquid, filter);
 	}
 
-	public static RayTraceResult rayTrace(Entity entity, Vec3d fromVec, Vec3d toVec, double bbGrow, boolean trackall, boolean stopOnLiquid, @Nullable Predicate<Entity> filter) {
+	public static RayTraceResult rayTrace(Entity entity, Vec3d fromVec, Vec3d toVec, double bbGrow, boolean trackall, boolean stopOnLiquid,
+			@Nullable Predicate<Entity> filter) {
 		Vec3d vec3d1 = toVec.subtract(fromVec);
 		double d0 = vec3d1.lengthVector();
 		double d1 = d0;
@@ -716,9 +737,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 				entity.getEntityBoundingBox().expand(vec3d1.x, vec3d1.y, vec3d1.z).grow(1.0D),
 				Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
 					public boolean apply(@Nullable Entity p_apply_1_) {
-						return p_apply_1_ != null 
-						 && (trackall || (p_apply_1_.canBeCollidedWith() && !p_apply_1_.noClip)) 
-						 && (filter == null || filter.apply(p_apply_1_));
+						return p_apply_1_ != null && (trackall || (p_apply_1_.canBeCollidedWith() && !p_apply_1_.noClip))
+								&& (filter == null || filter.apply(p_apply_1_));
 					}
 				}));
 		double d2 = d1;
@@ -748,7 +768,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 		if (entityTrace != null && (d2 < d1 || objectMouseOver == null)) {
 			if (!BB.touches(entityTrace.entityHit.getEntityBoundingBox(), entityTrace.hitVec)) {
-				RayTraceResult res = entityTrace.entityHit.getEntityBoundingBox().calculateIntercept(entityTrace.hitVec, BB.getCenter(entityTrace.entityHit.getEntityBoundingBox()));
+				RayTraceResult res = entityTrace.entityHit.getEntityBoundingBox().calculateIntercept(entityTrace.hitVec,
+						BB.getCenter(entityTrace.entityHit.getEntityBoundingBox()));
 				if (res != null) {
 					entityTrace.hitVec = res.hitVec;
 				}
@@ -763,7 +784,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	@Nullable
-	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance, boolean sound) {
+	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance,
+			boolean sound) {
 		EntityItem entityToSpawn = null;
 		IBlockState blockstate = world.getBlockState(pos);
 		float blockHardness = blockstate.getBlockHardness(world, pos);
@@ -785,8 +807,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (world instanceof WorldServer) {
-				((WorldServer)world).spawnParticle(EnumParticleTypes.BLOCK_DUST, 0.5D+pos.getX(), 0.5D+pos.getY(), 0.5D+pos.getZ(),
-				 8, 0.2d, 0.2d, 0.2d, 0.15d, Block.getIdFromBlock(blockstate.getBlock()));
+				((WorldServer) world).spawnParticle(EnumParticleTypes.BLOCK_DUST, 0.5D + pos.getX(), 0.5D + pos.getY(), 0.5D + pos.getZ(), 8, 0.2d,
+						0.2d, 0.2d, 0.15d, Block.getIdFromBlock(blockstate.getBlock()));
 			}
 		}
 		return entityToSpawn;
@@ -794,16 +816,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	public static <T extends Entity> T findNearestSensibleEntityWithinAABB(World world, Class<? extends T> entityType, AxisAlignedBB aabb,
 			EntityLivingBase closestTo) {
-		return findNearestEntityWithinAABB(world, entityType, aabb, closestTo, 
-		 Predicates.and(EntitySelectors.CAN_AI_TARGET, new Predicate<Entity>() {
+		return findNearestEntityWithinAABB(world, entityType, aabb, closestTo, Predicates.and(EntitySelectors.CAN_AI_TARGET, new Predicate<Entity>() {
 			public boolean apply(@Nullable Entity p_apply_1_) {
 				return p_apply_1_ != null && p_apply_1_.isEntityAlive() && p_apply_1_.canBeCollidedWith() && closestTo.canEntityBeSeen(p_apply_1_);
 			}
 		}));
 	}
 
-	public static <T extends Entity> T findNearestEntityWithinAABB(World world, Class<? extends T> entityType, AxisAlignedBB aabb,
-			Entity closestTo, @Nullable Predicate<? super T> filter) {
+	public static <T extends Entity> T findNearestEntityWithinAABB(World world, Class<? extends T> entityType, AxisAlignedBB aabb, Entity closestTo,
+			@Nullable Predicate<? super T> filter) {
 		List<T> list = world.<T>getEntitiesWithinAABB(entityType, aabb, filter);
 		T t = null;
 		double d0 = Double.MAX_VALUE;
@@ -822,50 +843,49 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	public static List<BlockPos> getBlocksOfType(World world, AxisAlignedBB bb, Block block) {
 		List<BlockPos> list = Lists.<BlockPos>newArrayList();
-        int j2 = MathHelper.floor(bb.minX);
-        int k2 = MathHelper.ceil(bb.maxX);
-        int l2 = MathHelper.floor(bb.minY);
-        int i3 = MathHelper.ceil(bb.maxY);
-        int j3 = MathHelper.floor(bb.minZ);
-        int k3 = MathHelper.ceil(bb.maxZ);
-        BlockPos.PooledMutableBlockPos mutableblockpos = BlockPos.PooledMutableBlockPos.retain();
-        for (int l3 = j2; l3 < k2; ++l3) {
-            for (int i4 = l2; i4 < i3; ++i4) {
-                for (int j4 = j3; j4 < k3; ++j4) {
+		int j2 = MathHelper.floor(bb.minX);
+		int k2 = MathHelper.ceil(bb.maxX);
+		int l2 = MathHelper.floor(bb.minY);
+		int i3 = MathHelper.ceil(bb.maxY);
+		int j3 = MathHelper.floor(bb.minZ);
+		int k3 = MathHelper.ceil(bb.maxZ);
+		BlockPos.PooledMutableBlockPos mutableblockpos = BlockPos.PooledMutableBlockPos.retain();
+		for (int l3 = j2; l3 < k2; ++l3) {
+			for (int i4 = l2; i4 < i3; ++i4) {
+				for (int j4 = j3; j4 < k3; ++j4) {
 					if (world.getBlockState(mutableblockpos.setPos(l3, i4, j4)).getBlock() == block) {
 						list.add(mutableblockpos.toImmutable());
 					}
-                }
-            }
-        }
-        mutableblockpos.release();
-        return list;
+				}
+			}
+		}
+		mutableblockpos.release();
+		return list;
 	}
 
 	public static List<BlockPos> getNonAirBlocks(World world, AxisAlignedBB bb, float hardnessLimit, boolean hasCollisionbox) {
 		List<BlockPos> list = Lists.<BlockPos>newArrayList();
-        int j2 = MathHelper.floor(bb.minX);
-        int k2 = MathHelper.ceil(bb.maxX);
-        int l2 = MathHelper.floor(bb.minY);
-        int i3 = MathHelper.ceil(bb.maxY);
-        int j3 = MathHelper.floor(bb.minZ);
-        int k3 = MathHelper.ceil(bb.maxZ);
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
-        for (int l3 = j2; l3 < k2; ++l3) {
-            for (int i4 = l2; i4 < i3; ++i4) {
-                for (int j4 = j3; j4 < k3; ++j4) {
+		int j2 = MathHelper.floor(bb.minX);
+		int k2 = MathHelper.ceil(bb.maxX);
+		int l2 = MathHelper.floor(bb.minY);
+		int i3 = MathHelper.ceil(bb.maxY);
+		int j3 = MathHelper.floor(bb.minZ);
+		int k3 = MathHelper.ceil(bb.maxZ);
+		BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
+		for (int l3 = j2; l3 < k2; ++l3) {
+			for (int i4 = l2; i4 < i3; ++i4) {
+				for (int j4 = j3; j4 < k3; ++j4) {
 					IBlockState blockstate = world.getBlockState(pos.setPos(l3, i4, j4));
 					float hardness = blockstate.getBlockHardness(world, pos);
-					if (!world.isAirBlock(pos) 
-					 && (hardnessLimit < 0f || (hardness >= 0f && hardness <= hardnessLimit))
-					 && (!hasCollisionbox || blockstate.getCollisionBoundingBox(world, pos) != Block.NULL_AABB)) {
+					if (!world.isAirBlock(pos) && (hardnessLimit < 0f || (hardness >= 0f && hardness <= hardnessLimit))
+							&& (!hasCollisionbox || blockstate.getCollisionBoundingBox(world, pos) != Block.NULL_AABB)) {
 						list.add(pos.toImmutable());
 					}
-                }
-            }
-        }
-        pos.release();
-        return list;
+				}
+			}
+		}
+		pos.release();
+		return list;
 	}
 
 	public static List<BlockPos> getNonAirBlocks(World world, AxisAlignedBB bb, boolean hasCollisionbox) {
@@ -879,33 +899,33 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	// gets all block bounding boxes excpet air, including liquids
 	public static List<AxisAlignedBB> getBoundingBoxes(World world, AxisAlignedBB bb) {
 		List<AxisAlignedBB> list = Lists.<AxisAlignedBB>newArrayList();
-        for (BlockPos pos : getNonAirBlocks(world, bb)) {
-        	list.add(world.getBlockState(pos).getBoundingBox(world, pos).offset(pos));
-        }
-        return list;
+		for (BlockPos pos : getNonAirBlocks(world, bb)) {
+			list.add(world.getBlockState(pos).getBoundingBox(world, pos).offset(pos));
+		}
+		return list;
 	}
 
 	public static List<BlockPos> getAllAirBlocks(World world, AxisAlignedBB bb) {
 		List<BlockPos> list = Lists.<BlockPos>newArrayList();
-        int j2 = MathHelper.floor(bb.minX);
-        int k2 = MathHelper.ceil(bb.maxX);
-        int l2 = MathHelper.floor(bb.minY);
-        int i3 = MathHelper.ceil(bb.maxY);
-        int j3 = MathHelper.floor(bb.minZ);
-        int k3 = MathHelper.ceil(bb.maxZ);
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
-        for (int l3 = j2; l3 < k2; ++l3) {
-            for (int i4 = l2; i4 < i3; ++i4) {
-                for (int j4 = j3; j4 < k3; ++j4) {
+		int j2 = MathHelper.floor(bb.minX);
+		int k2 = MathHelper.ceil(bb.maxX);
+		int l2 = MathHelper.floor(bb.minY);
+		int i3 = MathHelper.ceil(bb.maxY);
+		int j3 = MathHelper.floor(bb.minZ);
+		int k3 = MathHelper.ceil(bb.maxZ);
+		BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
+		for (int l3 = j2; l3 < k2; ++l3) {
+			for (int i4 = l2; i4 < i3; ++i4) {
+				for (int j4 = j3; j4 < k3; ++j4) {
 					if (world.isAirBlock(pos.setPos(l3, i4, j4))) {
 						list.add(pos.toImmutable());
-						//list.add(new BlockPos.MutableBlockPos(pos));
+						// list.add(new BlockPos.MutableBlockPos(pos));
 					}
-                }
-            }
-        }
-        pos.release();
-        return list;
+				}
+			}
+		}
+		pos.release();
+		return list;
 	}
 
 	@Nullable
@@ -933,13 +953,14 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isSpaceOpenToStandOn(World world, float width, float height, BlockPos pos) {
-		AxisAlignedBB bb = new AxisAlignedBB(0.5f + pos.getX() - width * 0.5f, pos.getY(), 0.5f + pos.getZ() - width * 0.5f, 0.5f + pos.getX() + width * 0.5f, height + pos.getY(), 0.5f + pos.getZ() + width * 0.5f);
+		AxisAlignedBB bb = new AxisAlignedBB(0.5f + pos.getX() - width * 0.5f, pos.getY(), 0.5f + pos.getZ() - width * 0.5f,
+				0.5f + pos.getX() + width * 0.5f, height + pos.getY(), 0.5f + pos.getZ() + width * 0.5f);
 		return world.getCollisionBoxes(null, bb.contract(0d, -0.1d, 0d).grow(0.5d, 0d, 0.5d)).isEmpty();
 	}
 
 	public static int getTopSolidBlockY(World world, BlockPos pos) {
-		for ( ; pos.getY() < 256 && world.getBlockState(pos).getCollisionBoundingBox(world, pos) != null; pos = pos.up()) ;
-		for ( ; pos.getY() > 0 && world.getBlockState(pos).getCollisionBoundingBox(world, pos) == null; pos = pos.down()) ;
+		for (; pos.getY() < 256 && world.getBlockState(pos).getCollisionBoundingBox(world, pos) != null; pos = pos.up());
+		for (; pos.getY() > 0 && world.getBlockState(pos).getCollisionBoundingBox(world, pos) == null; pos = pos.down());
 		if (pos.getY() > 0) {
 			return pos.up().getY();
 		}
@@ -955,13 +976,13 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		if (type == 0) {
 			long l = Minecraft.getSystemTime();
 			for (int i = 0; i < stringLength; ++i)
-				outputString = ((long) i + l / 10L) % 188L == 0L 
-				 ? outputString + TextFormatting.WHITE + string.substring(i, i + 1)
-				 : ((long) i + l / 10L) % 188L == 1L
-				 	? outputString + TextFormatting.YELLOW + string.substring(i, i + 1)
-				 	: ((long) i + l / 10L) % 188L == 187L
-				 		? outputString + TextFormatting.YELLOW + string.substring(i, i + 1)
-				 		: outputString + TextFormatting.GOLD + string.substring(i, i + 1);
+				outputString = ((long) i + l / 10L) % 188L == 0L
+						? outputString + TextFormatting.WHITE + string.substring(i, i + 1)
+						: ((long) i + l / 10L) % 188L == 1L
+								? outputString + TextFormatting.YELLOW + string.substring(i, i + 1)
+								: ((long) i + l / 10L) % 188L == 187L
+										? outputString + TextFormatting.YELLOW + string.substring(i, i + 1)
+										: outputString + TextFormatting.GOLD + string.substring(i, i + 1);
 		} else if (type == 1)
 			outputString = TextFormatting.fromColorIndex((int) (Minecraft.getSystemTime() / 80L % 15L) + (returnToBlack ? 0 : 1)) + string;
 		if (returnToBlack)
@@ -970,13 +991,12 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean advancementAchieved(EntityPlayerMP player, String advancementName) {
-		Advancement adv = ((WorldServer)player.world).getAdvancementManager().getAdvancement(new ResourceLocation(advancementName));
+		Advancement adv = ((WorldServer) player.world).getAdvancementManager().getAdvancement(new ResourceLocation(advancementName));
 		return adv != null ? player.getAdvancements().getProgress(adv).isDone() : false;
 	}
 
 	public static void grantAdvancement(EntityPlayerMP player, String advancementName, boolean playToast) {
-		Advancement _adv = ((MinecraftServer) player.mcServer).getAdvancementManager()
-				.getAdvancement(new ResourceLocation(advancementName));
+		Advancement _adv = ((MinecraftServer) player.mcServer).getAdvancementManager().getAdvancement(new ResourceLocation(advancementName));
 		AdvancementProgress _ap = player.getAdvancements().getProgress(_adv);
 		if (!_ap.isDone()) {
 			Iterator _iterator = _ap.getRemaningCriteria().iterator();
@@ -985,16 +1005,16 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 				player.getAdvancements().grantCriterion(_adv, _criterion);
 			}
 			if (playToast) {
-				player.world.playSound(null, player.posX, player.posY, player.posZ, (SoundEvent) 
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("ui.toast.challenge_complete")), 
-				 SoundCategory.NEUTRAL, (float) 1, (float) 1);
+				player.world.playSound(null, player.posX, player.posY, player.posZ,
+						(SoundEvent) SoundEvent.REGISTRY.getObject(new ResourceLocation("ui.toast.challenge_complete")), SoundCategory.NEUTRAL,
+						(float) 1, (float) 1);
 			}
 		}
 	}
 
 	public static boolean isWeapon(ItemStack stack) {
-		return !stack.isEmpty() && stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND)
-		 .containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());
+		return !stack.isEmpty()
+				&& stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());
 	}
 
 	public static double getFollowRange(EntityLivingBase entity) {
@@ -1024,10 +1044,10 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			ItemStack stack = entity.getHeldItemMainhand();
 			if (isWeapon(stack)) {
 				Collection<AttributeModifier> modifiers = stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND)
-			 	 .get(SharedMonsterAttributes.ATTACK_DAMAGE.getName());
-			 	for (AttributeModifier modifier : modifiers) {
+						.get(SharedMonsterAttributes.ATTACK_DAMAGE.getName());
+				for (AttributeModifier modifier : modifiers) {
 					attribute.removeModifier(modifier);
-			 	}
+				}
 				d = attribute.getAttributeValue();
 				for (AttributeModifier modifier : modifiers) {
 					attribute.applyModifier(modifier);
@@ -1041,7 +1061,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	public static double getMainhandItemDamage(EntityLivingBase entity) {
 		return getModifiedAttackDamage(entity) - getPunchDamage(entity);
 	}
-	
+
 	public static double getArmorValue(EntityLivingBase entity) {
 		IAttributeInstance attribute = entity.getEntityAttribute(SharedMonsterAttributes.ARMOR);
 		return attribute != null ? attribute.getAttributeValue() : 0f;
@@ -1065,39 +1085,39 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			entity.getEntityData().setDouble("deathAnimationType", (double) type);
 			entity.getEntityData().setDouble(NarutomodModVariables.DeathAnimationTime, (double) duration);
 			if (type == 2 && entity instanceof EntityPlayer) {
-				PlayerRender.setColorMultiplier((EntityPlayer)entity, 0x30000000);
+				PlayerRender.setColorMultiplier((EntityPlayer) entity, 0x30000000);
 			}
 		}
 	}
 
 	public static void clearDeathAnimations(EntityLivingBase entity) {
-		if ((int)entity.getEntityData().getDouble("deathAnimationType") == 2 && entity instanceof EntityPlayer) {
-			PlayerRender.setColorMultiplier((EntityPlayer)entity, 0);
+		if ((int) entity.getEntityData().getDouble("deathAnimationType") == 2 && entity instanceof EntityPlayer) {
+			PlayerRender.setColorMultiplier((EntityPlayer) entity, 0);
 		}
 		entity.getEntityData().removeTag("deathAnimationType");
 		entity.getEntityData().removeTag(NarutomodModVariables.DeathAnimationTime);
 	}
 
 	public static Field getFieldByIndex(Class clazz, Class matchClazz, int fieldIndex) {
-			//throws IndexOutOfBoundsException, NoSuchFieldException {
+		// throws IndexOutOfBoundsException, NoSuchFieldException {
 		if (clazz == matchClazz) {
 			try {
 				Field[] fields = clazz.getDeclaredFields();
 				if (fields.length > fieldIndex) {
-		            fields[fieldIndex].setAccessible(true);
+					fields[fieldIndex].setAccessible(true);
 					return fields[fieldIndex];
 				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			throw new IndexOutOfBoundsException(matchClazz + " does not have " + (fieldIndex+1) + " declared fields");
+			throw new IndexOutOfBoundsException(matchClazz + " does not have " + (fieldIndex + 1) + " declared fields");
 		} else {
-            Class superClass = clazz.getSuperclass();
-            if (superClass == null) {
-                throw new RuntimeException("no matching class " + matchClazz);
-            } else {
-                return getFieldByIndex(superClass, matchClazz, fieldIndex);
-            }
+			Class superClass = clazz.getSuperclass();
+			if (superClass == null) {
+				throw new RuntimeException("no matching class " + matchClazz);
+			} else {
+				return getFieldByIndex(superClass, matchClazz, fieldIndex);
+			}
 		}
 	}
 
@@ -1107,19 +1127,22 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 				for (Method method : cls.getDeclaredMethods()) {
 					boolean match = true;
 					Class[] clazz1 = method.getParameterTypes();
-					if ((method.getReturnType().isPrimitive() ? !isPrimitiveEqual(method.getReturnType(), returnType)
-					 : !method.getReturnType().equals(returnType)) || clazz1.length != params.length) {
+					if ((method.getReturnType().isPrimitive()
+							? !isPrimitiveEqual(method.getReturnType(), returnType)
+							: !method.getReturnType().equals(returnType)) || clazz1.length != params.length) {
 						match = false;
 					} else {
 						for (int i = 0; i < clazz1.length; i++) {
-							if (clazz1[i].isPrimitive() ? !isPrimitiveEqual(clazz1[i], params[i].getClass()) : !clazz1[i].isAssignableFrom(params[i].getClass())) {
+							if (clazz1[i].isPrimitive()
+									? !isPrimitiveEqual(clazz1[i], params[i].getClass())
+									: !clazz1[i].isAssignableFrom(params[i].getClass())) {
 								match = false;
 							}
 						}
 					}
 					if (match) {
-		            	method.setAccessible(true);
-						return (T)method.invoke(parent, params);
+						method.setAccessible(true);
+						return (T) method.invoke(parent, params);
 					}
 				}
 			} catch (Exception e) {
@@ -1127,7 +1150,8 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		String s = parent + " does not have methods matching parameters: ";
-		for (Object obj : params) s += ", " + obj.getClass();
+		for (Object obj : params)
+			s += ", " + obj.getClass();
 		throw new IllegalArgumentException(s + ", returns: " + returnType.getName());
 	}
 
@@ -1141,13 +1165,15 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 						match = false;
 					} else {
 						for (int i = 0; i < clazz1.length; i++) {
-							if (clazz1[i].isPrimitive() ? !isPrimitiveEqual(clazz1[i], params[i].getClass()) : !clazz1[i].isAssignableFrom(params[i].getClass())) {
+							if (clazz1[i].isPrimitive()
+									? !isPrimitiveEqual(clazz1[i], params[i].getClass())
+									: !clazz1[i].isAssignableFrom(params[i].getClass())) {
 								match = false;
 							}
 						}
 					}
 					if (match) {
-		            	method.setAccessible(true);
+						method.setAccessible(true);
 						method.invoke(parent, params);
 						return;
 					}
@@ -1157,17 +1183,18 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		String s = parent + " does not have methods matching parameters: ";
-		for (Object obj : params) s += ", " + obj.getClass();
+		for (Object obj : params)
+			s += ", " + obj.getClass();
 		throw new IllegalArgumentException(s);
 	}
 
 	private static boolean isPrimitiveEqual(Class<?> clazz1, Class<?> clazz2) {
 		String clazz1name = clazz1.getName();
-		return (clazz1name.equals("float") && clazz2.equals(Float.class))
-		 || (clazz1name.equals("int") && clazz2.equals(Integer.class)) || (clazz1name.equals("double") && clazz2.equals(Double.class))
-		 || (clazz1name.equals("boolean") && clazz2.equals(Boolean.class)) || (clazz1name.equals("long") && clazz2.equals(Long.class))
-		 || (clazz1name.equals("short") && clazz2.equals(Short.class)) || (clazz1name.equals("byte") && clazz2.equals(Byte.class))
-		 || (clazz1name.equals("char") && clazz2.equals(Character.class)) || (clazz1name.equals("void") && clazz2.equals(Void.class));
+		return (clazz1name.equals("float") && clazz2.equals(Float.class)) || (clazz1name.equals("int") && clazz2.equals(Integer.class))
+				|| (clazz1name.equals("double") && clazz2.equals(Double.class)) || (clazz1name.equals("boolean") && clazz2.equals(Boolean.class))
+				|| (clazz1name.equals("long") && clazz2.equals(Long.class)) || (clazz1name.equals("short") && clazz2.equals(Short.class))
+				|| (clazz1name.equals("byte") && clazz2.equals(Byte.class)) || (clazz1name.equals("char") && clazz2.equals(Character.class))
+				|| (clazz1name.equals("void") && clazz2.equals(Void.class));
 	}
 
 	public static void setInvulnerableDimensionChange(EntityPlayerMP player) {
@@ -1186,10 +1213,9 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void poofWithSmoke(World world, double x, double y, double z, float width, float height) {
-		world.playSound(null, x, y, z,
-		 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), SoundCategory.NEUTRAL, 1f, 1f);
-		Particles.spawnParticle(world, Particles.Types.SMOKE, x, y + height * 0.5, z,
-		 300, 0.5d * width, 0.3d * height, 0.5d * width, 0d, 0d, 0d, 0xD0FFFFFF, (int)(width * 30f));
+		world.playSound(null, x, y, z, SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), SoundCategory.NEUTRAL, 1f, 1f);
+		Particles.spawnParticle(world, Particles.Types.SMOKE, x, y + height * 0.5, z, 300, 0.5d * width, 0.3d * height, 0.5d * width, 0d, 0d, 0d,
+				0xD0FFFFFF, (int) (width * 30f));
 	}
 
 	public static float subtractDegreesWrap(float cur, float prev) {
@@ -1213,14 +1239,14 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		return prev + f * pt;
 	}
 
-    public static Vec3d rotateRoll(Vec3d vec3d, float roll) {
-        float f = MathHelper.cos(roll);
-        float f1 = MathHelper.sin(roll);
-        double d0 = vec3d.x * (double)f - vec3d.y * (double)f1;
-        double d1 = vec3d.y * (double)f + vec3d.x * (double)f1;
-        double d2 = vec3d.z;
-        return new Vec3d(d0, d1, d2);
-    }
+	public static Vec3d rotateRoll(Vec3d vec3d, float roll) {
+		float f = MathHelper.cos(roll);
+		float f1 = MathHelper.sin(roll);
+		double d0 = vec3d.x * (double) f - vec3d.y * (double) f1;
+		double d1 = vec3d.y * (double) f + vec3d.x * (double) f1;
+		double d2 = vec3d.z;
+		return new Vec3d(d0, d1, d2);
+	}
 
 	public static float getYawFromVec(double x, double z) {
 		return (float) (-MathHelper.atan2(x, z) * (180d / Math.PI));
@@ -1246,7 +1272,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	public static double getCDModifier(double modifier) {
 		return 1.0d / (0.5d + 0.02d * modifier);
 	}
-	
+
 	public static double getCooldownModifier(EntityPlayer player) {
 		return getCDModifier(PlayerTracker.getNinjaLevel(player));
 	}
@@ -1256,7 +1282,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isPlayerDisconnected(Entity entity) {
-		return entity instanceof EntityPlayerMP && ((EntityPlayerMP)entity).hasDisconnected();
+		return entity instanceof EntityPlayerMP && ((EntityPlayerMP) entity).hasDisconnected();
 	}
 
 	public static void sendChatAll(String string) {
@@ -1273,190 +1299,186 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	public static void sendMessageToAllNear(String string, double x, double y, double z, double radius, int dimension) {
 		MinecraftServer mcserv = FMLCommonHandler.instance().getMinecraftServerInstance();
 		if (mcserv != null) {
-	        for (int i = 0; i < mcserv.getPlayerList().getCurrentPlayerCount(); ++i) {
-	            EntityPlayerMP entityplayermp = mcserv.getPlayerList().getPlayers().get(i);
-	            if (entityplayermp.dimension == dimension) {
-	                double d0 = x - entityplayermp.posX;
-	                double d1 = y - entityplayermp.posY;
-	                double d2 = z - entityplayermp.posZ;
-	                if (d0 * d0 + d1 * d1 + d2 * d2 < radius * radius) {
-	                    entityplayermp.sendMessage(new TextComponentString(string));
-	                }
-	            }
-	        }
+			for (int i = 0; i < mcserv.getPlayerList().getCurrentPlayerCount(); ++i) {
+				EntityPlayerMP entityplayermp = mcserv.getPlayerList().getPlayers().get(i);
+				if (entityplayermp.dimension == dimension) {
+					double d0 = x - entityplayermp.posX;
+					double d1 = y - entityplayermp.posY;
+					double d2 = z - entityplayermp.posZ;
+					if (d0 * d0 + d1 * d1 + d2 * d2 < radius * radius) {
+						entityplayermp.sendMessage(new TextComponentString(string));
+					}
+				}
+			}
+		}
+	}
+	public static class BlockposSorter implements Comparator<BlockPos> {
+		private final BlockPos pos;
+		public BlockposSorter(BlockPos posIn) {
+			this.pos = posIn;
+		}
+
+		@Override
+		public int compare(BlockPos p_compare_1_, BlockPos p_compare_2_) {
+			double d0 = this.pos.distanceSq(p_compare_1_);
+			double d1 = this.pos.distanceSq(p_compare_2_);
+			if (d0 < d1) {
+				return -1;
+			} else {
+				return d0 > d1 ? 1 : 0;
+			}
 		}
 	}
 
-    public static class BlockposSorter implements Comparator<BlockPos> {
-        private final BlockPos pos;
-	
-        public BlockposSorter(BlockPos posIn) {
-            this.pos = posIn;
-        }
-	
-    	@Override
-        public int compare(BlockPos p_compare_1_, BlockPos p_compare_2_) {
-            double d0 = this.pos.distanceSq(p_compare_1_);
-            double d1 = this.pos.distanceSq(p_compare_2_);
-            if (d0 < d1) {
-                return -1;
-            } else {
-                return d0 > d1 ? 1 : 0;
-            }
-        }
-    }
+	public static class EntitySorter implements Comparator<Entity> {
+		private final double x;
+		private final double y;
+		private final double z;
+		public EntitySorter(Entity entityIn) {
+			this(entityIn.posX, entityIn.posY, entityIn.posZ);
+		}
 
-    public static class EntitySorter implements Comparator<Entity> {
-        private final double x;
-        private final double y;
-        private final double z;
-	
-        public EntitySorter(Entity entityIn) {
-        	this(entityIn.posX, entityIn.posY, entityIn.posZ);
-        }
+		public EntitySorter(double xIn, double yIn, double zIn) {
+			this.x = xIn;
+			this.y = yIn;
+			this.z = zIn;
+		}
 
-        public EntitySorter(double xIn, double yIn, double zIn) {
-        	this.x = xIn;
-        	this.y = yIn;
-        	this.z = zIn;
-        }
-	
-    	@Override
-        public int compare(Entity p_compare_1_, Entity p_compare_2_) {
-            double d0 = p_compare_1_.getDistanceSq(this.x, this.y, this.z); //this.entity.getDistanceSq(p_compare_1_);
-            double d1 = p_compare_2_.getDistanceSq(this.x, this.y, this.z); //this.entity.getDistanceSq(p_compare_2_);
-            if (d0 < d1) {
-                return -1;
-            } else {
-                return d0 > d1 ? 1 : 0;
-            }
-        }
-    }
+		@Override
+		public int compare(Entity p_compare_1_, Entity p_compare_2_) {
+			double d0 = p_compare_1_.getDistanceSq(this.x, this.y, this.z); // this.entity.getDistanceSq(p_compare_1_);
+			double d1 = p_compare_2_.getDistanceSq(this.x, this.y, this.z); // this.entity.getDistanceSq(p_compare_2_);
+			if (d0 < d1) {
+				return -1;
+			} else {
+				return d0 > d1 ? 1 : 0;
+			}
+		}
+	}
 
-    public static class VecSorter implements Comparator<Vec3d> {
-    	private final Vec3d vec;
-    	private final boolean reverse;
+	public static class VecSorter implements Comparator<Vec3d> {
+		private final Vec3d vec;
+		private final boolean reverse;
+		public VecSorter(Vec3d vecIn) {
+			this(vecIn, false);
+		}
 
-    	public VecSorter(Vec3d vecIn) {
-    		this(vecIn, false);
-    	}
+		public VecSorter(Vec3d vecIn, boolean isReversed) {
+			this.vec = vecIn;
+			this.reverse = isReversed;
+		}
 
-    	public VecSorter(Vec3d vecIn, boolean isReversed) {
-    		this.vec = vecIn;
-    		this.reverse = isReversed;
-    	}
+		@Override
+		public int compare(Vec3d vec1, Vec3d vec2) {
+			double d0 = this.vec.squareDistanceTo(vec1);
+			double d1 = this.vec.squareDistanceTo(vec2);
+			if (d0 < d1) {
+				return this.reverse ? 1 : -1;
+			} else {
+				return d0 > d1 ? this.reverse ? -1 : 1 : 0;
+			}
+		}
+	}
 
-    	@Override
-    	public int compare(Vec3d vec1, Vec3d vec2) {
-    		double d0 = this.vec.squareDistanceTo(vec1);
-    		double d1 = this.vec.squareDistanceTo(vec2);
-            if (d0 < d1) {
-                return this.reverse ? 1 : -1;
-            } else {
-                return d0 > d1 ? this.reverse ? -1 : 1 : 0;
-            }
-    	}
-    }
+	public static class RayTraceResultSorter implements Comparator<RayTraceResult> {
+		private final Vec3d vec;
+		public RayTraceResultSorter(Vec3d vecIn) {
+			this.vec = vecIn;
+		}
 
-    public static class RayTraceResultSorter implements Comparator<RayTraceResult> {
-    	private final Vec3d vec;
+		@Override
+		public int compare(RayTraceResult res1, RayTraceResult res2) {
+			double d0 = this.vec.squareDistanceTo(res1.hitVec);
+			double d1 = this.vec.squareDistanceTo(res2.hitVec);
+			if (d0 < d1) {
+				return -1;
+			} else {
+				return d0 > d1 ? 1 : 0;
+			}
+		}
+	}
 
-    	public RayTraceResultSorter(Vec3d vecIn) {
-    		this.vec = vecIn;
-    	}
+	public static class BB {
+		public static double calculateInvXOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetX) {
+			if (other.maxY > main.minY && other.minY < main.maxY && other.maxZ > main.minZ && other.minZ < main.maxZ) {
+				if (offsetX > 0.0D && other.maxX <= main.maxX) {
+					double d1 = main.maxX - other.maxX;
+					if (d1 < offsetX) {
+						offsetX = d1;
+					}
+				} else if (offsetX < 0.0D && other.minX >= main.minX) {
+					double d0 = main.minX - other.minX;
+					if (d0 > offsetX) {
+						offsetX = d0;
+					}
+				}
+			}
+			return offsetX;
+		}
 
-    	@Override
-    	public int compare(RayTraceResult res1, RayTraceResult res2) {
-    		double d0 = this.vec.squareDistanceTo(res1.hitVec);
-    		double d1 = this.vec.squareDistanceTo(res2.hitVec);
-            if (d0 < d1) {
-                return -1;
-            } else {
-                return d0 > d1 ? 1 : 0;
-            }
-    	}
-    }
+		public static double calculateInvYOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetY) {
+			if (other.maxX > main.minX && other.minX < main.maxX && other.maxZ > main.minZ && other.minZ < main.maxZ) {
+				if (offsetY > 0.0D && other.maxY <= main.maxY) {
+					double d1 = main.maxY - other.maxY;
+					if (d1 < offsetY) {
+						offsetY = d1;
+					}
+				} else if (offsetY < 0.0D && other.minY >= main.minY) {
+					double d0 = main.minY - other.minY;
+					if (d0 > offsetY) {
+						offsetY = d0;
+					}
+				}
+			}
+			return offsetY;
+		}
 
-    public static class BB {
-	    public static double calculateInvXOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetX) {
-	        if (other.maxY > main.minY && other.minY < main.maxY && other.maxZ > main.minZ && other.minZ < main.maxZ) {
-	            if (offsetX > 0.0D && other.maxX <= main.maxX) {
-	                double d1 = main.maxX - other.maxX;
-	                if (d1 < offsetX) {
-	                    offsetX = d1;
-	                }
-	            } else if (offsetX < 0.0D && other.minX >= main.minX) {
-	                double d0 = main.minX - other.minX;
-	                if (d0 > offsetX) {
-	                    offsetX = d0;
-	                }
-	            }
-	        }
-            return offsetX;
-	    }
+		public static double calculateInvZOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetZ) {
+			if (other.maxX > main.minX && other.minX < main.maxX && other.maxY > main.minY && other.minY < main.maxY) {
+				if (offsetZ > 0.0D && other.maxZ <= main.maxZ) {
+					double d1 = main.maxZ - other.maxZ;
+					if (d1 < offsetZ) {
+						offsetZ = d1;
+					}
+				} else if (offsetZ < 0.0D && other.minZ >= main.minZ) {
+					double d0 = main.minZ - other.minZ;
+					if (d0 > offsetZ) {
+						offsetZ = d0;
+					}
+				}
+			}
+			return offsetZ;
+		}
 
-	    public static double calculateInvYOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetY) {
-	        if (other.maxX > main.minX && other.minX < main.maxX && other.maxZ > main.minZ && other.minZ < main.maxZ) {
-	            if (offsetY > 0.0D && other.maxY <= main.maxY) {
-	                double d1 = main.maxY - other.maxY;
-	                if (d1 < offsetY) {
-	                    offsetY = d1;
-	                }
-	            } else if (offsetY < 0.0D && other.minY >= main.minY) {
-	                double d0 = main.minY - other.minY;
-	                if (d0 > offsetY) {
-	                    offsetY = d0;
-	                }
-	            }
-	        }
-            return offsetY;
-	    }
-	
-	    public static double calculateInvZOffset(AxisAlignedBB main, AxisAlignedBB other, double offsetZ) {
-	        if (other.maxX > main.minX && other.minX < main.maxX && other.maxY > main.minY && other.minY < main.maxY) {
-	            if (offsetZ > 0.0D && other.maxZ <= main.maxZ) {
-	                double d1 = main.maxZ - other.maxZ;
-	                if (d1 < offsetZ) {
-	                    offsetZ = d1;
-	                }
-	            } else if (offsetZ < 0.0D && other.minZ >= main.minZ) {
-	                double d0 = main.minZ - other.minZ;
-	                if (d0 > offsetZ) {
-	                    offsetZ = d0;
-	                }
-	            }
-	        }
-            return offsetZ;
-	    }
+		public static double getCenterX(AxisAlignedBB aabb) {
+			return aabb.minX + (aabb.maxX - aabb.minX) * 0.5d;
+		}
 
-	    public static double getCenterX(AxisAlignedBB aabb) {
-	    	return aabb.minX + (aabb.maxX - aabb.minX) * 0.5d;
-	    }
+		public static double getCenterY(AxisAlignedBB aabb) {
+			return aabb.minY + (aabb.maxY - aabb.minY) * 0.5d;
+		}
 
-	    public static double getCenterY(AxisAlignedBB aabb) {
-	    	return aabb.minY + (aabb.maxY - aabb.minY) * 0.5d;
-	    }
+		public static double getCenterZ(AxisAlignedBB aabb) {
+			return aabb.minZ + (aabb.maxZ - aabb.minZ) * 0.5d;
+		}
 
-	    public static double getCenterZ(AxisAlignedBB aabb) {
-	    	return aabb.minZ + (aabb.maxZ - aabb.minZ) * 0.5d;
-	    }
+		public static Vec3d getCenter(AxisAlignedBB aabb) {
+			return new Vec3d(getCenterX(aabb), getCenterY(aabb), getCenterZ(aabb));
+		}
 
-	    public static Vec3d getCenter(AxisAlignedBB aabb) {
-	    	return new Vec3d(getCenterX(aabb), getCenterY(aabb), getCenterZ(aabb));
-	    }
+		public static double getVolume(AxisAlignedBB aabb) {
+			return (aabb.maxX - aabb.minX) * (aabb.maxY - aabb.minY) * (aabb.maxZ - aabb.minZ);
+		}
 
-	    public static double getVolume(AxisAlignedBB aabb) {
-	    	return (aabb.maxX - aabb.minX) * (aabb.maxY - aabb.minY) * (aabb.maxZ - aabb.minZ);
-	    }
+		public static boolean touches(AxisAlignedBB aabb, Vec3d vec) {
+			return vec.x >= aabb.minX && vec.x <= aabb.maxX && vec.y >= aabb.minY && vec.y <= aabb.maxY && vec.z >= aabb.minZ && vec.z <= aabb.maxZ;
+		}
 
-	    public static boolean touches(AxisAlignedBB aabb, Vec3d vec) {
-	    	return vec.x >= aabb.minX && vec.x <= aabb.maxX && vec.y >= aabb.minY && vec.y <= aabb.maxY && vec.z >= aabb.minZ && vec.z <= aabb.maxZ;
-	    }
-
-	    public static boolean touches(AxisAlignedBB aabb1, AxisAlignedBB aabb2) {
-	    	return aabb1.minX <= aabb2.maxX && aabb1.maxX >= aabb2.minX && aabb1.minY <= aabb2.maxY && aabb1.maxY >= aabb2.minY && aabb1.minZ <= aabb2.maxZ && aabb1.maxZ >= aabb2.minZ;
-	    }
-    }
+		public static boolean touches(AxisAlignedBB aabb1, AxisAlignedBB aabb2) {
+			return aabb1.minX <= aabb2.maxX && aabb1.maxX >= aabb2.minX && aabb1.minY <= aabb2.maxY && aabb1.maxY >= aabb2.minY
+					&& aabb1.minZ <= aabb2.maxZ && aabb1.maxZ >= aabb2.minZ;
+		}
+	}
 
 	public static class CollisionHelper {
 		private Entity entity;
@@ -1465,7 +1487,6 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		public double dz;
 		private final List<AxisAlignedBB>[] hitsList = new List[6];
 		private final Map<Entity, EnumFacing> entitiesList = Maps.newHashMap();
-
 		public CollisionHelper(Entity entityIn) {
 			this.entity = entityIn;
 			for (int i = 0; i < this.hitsList.length; i++) {
@@ -1480,32 +1501,41 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			for (int i = 0; i < this.hitsList.length; i++) {
 				this.hitsList[i].clear();
 			}
-	       	if (x != 0.0D) for (AxisAlignedBB aabb : list) {
-	       		double d = aabb.calculateXOffset(this.entity.getEntityBoundingBox(), x);
-		    	if (Math.abs(d) < Math.abs(this.dx)) this.dx = d;
-		    	if (d != x) this.hitsList[(x > 0d ? EnumFacing.EAST : EnumFacing.WEST).getIndex()].add(aabb);
-	       	}
-		    if (y != 0.0D) for (AxisAlignedBB aabb : list) {
-	       		double d = aabb.calculateYOffset(this.entity.getEntityBoundingBox(), y);
-		    	if (Math.abs(d) < Math.abs(this.dy)) this.dy = d;
-		    	if (d != y) this.hitsList[(y > 0d ? EnumFacing.UP : EnumFacing.DOWN).getIndex()].add(aabb);
-		    }
-		    if (z != 0.0D) for (AxisAlignedBB aabb : list) {
-	       		double d = aabb.calculateZOffset(this.entity.getEntityBoundingBox(), z);
-		    	if (Math.abs(d) < Math.abs(this.dz)) this.dz = d;
-		    	if (d != z) this.hitsList[(z > 0d ? EnumFacing.SOUTH : EnumFacing.NORTH).getIndex()].add(aabb);
-		    }
+			if (x != 0.0D)
+				for (AxisAlignedBB aabb : list) {
+					double d = aabb.calculateXOffset(this.entity.getEntityBoundingBox(), x);
+					if (Math.abs(d) < Math.abs(this.dx))
+						this.dx = d;
+					if (d != x)
+						this.hitsList[(x > 0d ? EnumFacing.EAST : EnumFacing.WEST).getIndex()].add(aabb);
+				}
+			if (y != 0.0D)
+				for (AxisAlignedBB aabb : list) {
+					double d = aabb.calculateYOffset(this.entity.getEntityBoundingBox(), y);
+					if (Math.abs(d) < Math.abs(this.dy))
+						this.dy = d;
+					if (d != y)
+						this.hitsList[(y > 0d ? EnumFacing.UP : EnumFacing.DOWN).getIndex()].add(aabb);
+				}
+			if (z != 0.0D)
+				for (AxisAlignedBB aabb : list) {
+					double d = aabb.calculateZOffset(this.entity.getEntityBoundingBox(), z);
+					if (Math.abs(d) < Math.abs(this.dz))
+						this.dz = d;
+					if (d != z)
+						this.hitsList[(z > 0d ? EnumFacing.SOUTH : EnumFacing.NORTH).getIndex()].add(aabb);
+				}
 		}
 
-		public void collideWithEntities(double x, double y, double z, @Nullable Predicate<Entity > predicate) {
+		public void collideWithEntities(double x, double y, double z, @Nullable Predicate<Entity> predicate) {
 			this.entitiesList.clear();
 			Vec3d vec3d = new Vec3d(this.entity.posX, this.entity.posY + this.entity.height / 2, this.entity.posZ);
 			Vec3d vec3d2 = vec3d.addVector(x, y, z);
-			for (Entity entity1 : this.entity.world.getEntitiesInAABBexcluding(this.entity,
-			 this.entity.getEntityBoundingBox().expand(x, y, z), predicate)) {
+			for (Entity entity1 : this.entity.world.getEntitiesInAABBexcluding(this.entity, this.entity.getEntityBoundingBox().expand(x, y, z),
+					predicate)) {
 				if (entity1.canBeCollidedWith() && ItemJutsu.canTarget(entity1)) {
-					RayTraceResult res = entity1.getEntityBoundingBox().grow(this.entity.width / 2,
-					 this.entity.height / 2, this.entity.width / 2).calculateIntercept(vec3d, vec3d2);
+					RayTraceResult res = entity1.getEntityBoundingBox().grow(this.entity.width / 2, this.entity.height / 2, this.entity.width / 2)
+							.calculateIntercept(vec3d, vec3d2);
 					if (res != null) {
 						this.entitiesList.put(entity1, res.sideHit.getOpposite());
 					}
@@ -1513,7 +1543,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		public void collideWithAll(double x, double y, double z, @Nullable Predicate<Entity > predicate) {
+		public void collideWithAll(double x, double y, double z, @Nullable Predicate<Entity> predicate) {
 			this.collideWithAABBs(this.entity.world.getCollisionBoxes(null, this.entity.getEntityBoundingBox().expand(x, y, z)), x, y, z);
 			this.collideWithEntities(this.dx, this.dy, this.dz, predicate);
 		}
@@ -1646,144 +1676,126 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-    public static class Vec2f {
-	    public static final Vec2f ZERO = new Vec2f(0.0F, 0.0F);
-	    public final float x;
-	    public final float y;
-	
-	    public Vec2f(float xIn, float yIn) {
-	        this.x = xIn;
-	        this.y = yIn;
-	    }
+	public static class Vec2f {
+		public static final Vec2f ZERO = new Vec2f(0.0F, 0.0F);
+		public final float x;
+		public final float y;
+		public Vec2f(float xIn, float yIn) {
+			this.x = xIn;
+			this.y = yIn;
+		}
 
-	    public boolean equals(Vec2f vec) {
-	    	return vec == this || (wrapDegrees(vec.x) == wrapDegrees(this.x) && wrapDegrees(vec.y) == wrapDegrees(this.y));
-	    }
+		public boolean equals(Vec2f vec) {
+			return vec == this || (wrapDegrees(vec.x) == wrapDegrees(this.x) && wrapDegrees(vec.y) == wrapDegrees(this.y));
+		}
 
-	    public Vec2f wrapDegrees() {
-	        return new Vec2f(wrapDegrees(this.x), wrapDegrees(this.y));
-	    }
+		public Vec2f wrapDegrees() {
+			return new Vec2f(wrapDegrees(this.x), wrapDegrees(this.y));
+		}
 
-	    public Vec2f add(float f0, float f1) {
-	    	return new Vec2f(wrapDegrees(this.x + f0), wrapDegrees(this.y + f1));
-	    }
+		public Vec2f add(float f0, float f1) {
+			return new Vec2f(wrapDegrees(this.x + f0), wrapDegrees(this.y + f1));
+		}
 
-	    public Vec2f add(Vec2f vec) {
-	    	return this.add(vec.x, vec.y);
-	    }
+		public Vec2f add(Vec2f vec) {
+			return this.add(vec.x, vec.y);
+		}
 
-	    public Vec2f subtract(float f0, float f1) {
-	    	return new Vec2f(wrapDegrees(this.x - f0), wrapDegrees(this.y - f1));
-	    }
+		public Vec2f subtract(float f0, float f1) {
+			return new Vec2f(wrapDegrees(this.x - f0), wrapDegrees(this.y - f1));
+		}
 
-	    public Vec2f subtract(Vec2f vec) {
-	    	return this.subtract(vec.x, vec.y);
-	    }
+		public Vec2f subtract(Vec2f vec) {
+			return this.subtract(vec.x, vec.y);
+		}
 
-	    public Vec2f scale(float f0) {
-	    	return new Vec2f(wrapDegrees(this.x * f0), wrapDegrees(this.y * f0));
-	    }
+		public Vec2f scale(float f0) {
+			return new Vec2f(wrapDegrees(this.x * f0), wrapDegrees(this.y * f0));
+		}
 
-	    public float lengthVector() {
-	    	return (float)MathHelper.sqrt((double)this.x * (double)this.x + (double)this.y * (double)this.y);
-	    }
+		public float lengthVector() {
+			return (float) MathHelper.sqrt((double) this.x * (double) this.x + (double) this.y * (double) this.y);
+		}
 
-	    public Vec2f rad2Deg() {
-	    	return this.scale(RAD2DEG);
-	    }
+		public Vec2f rad2Deg() {
+			return this.scale(RAD2DEG);
+		}
 
-	    public static float wrapDegrees(float f0) {
-	        while (f0 >= 180.0D) {
-	            f0 -= 360.0D;
-	        }
-	        while (f0 < -180.0D) {
-	            f0 += 360.0D;
-	        }
-	        return f0;
-	    }
+		public static float wrapDegrees(float f0) {
+			while (f0 >= 180.0D) {
+				f0 -= 360.0D;
+			}
+			while (f0 < -180.0D) {
+				f0 += 360.0D;
+			}
+			return f0;
+		}
 
-	    @Override
-	    public String toString() {
-	    	return "("+this.x+", "+this.y+")";
-	    }
-    }
+		@Override
+		public String toString() {
+			return "(" + this.x + ", " + this.y + ")";
+		}
+	}
 
 	public static class RotationMatrix {
-	    private float[][] matrix = {
-	    	{ 1.0f, 0.0f, 0.0f },
-	    	{ 0.0f, 1.0f, 0.0f },
-	    	{ 0.0f, 0.0f, 1.0f }
-	    };
+		private float[][] matrix = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
+		public RotationMatrix() {
+		}
 
-	    public RotationMatrix() {
-	    }
-	
-	    public RotationMatrix rotateYaw(float angle) {
-	    	return this.rotateY(angle * DEG2RAD);
-	    }
-	
-	    public RotationMatrix rotateY(float rad) {
-	        float cos = MathHelper.cos(rad);
-	        float sin = MathHelper.sin(rad);
-	        float[][] rotation = {
-	            { cos, 0.0f, sin },
-	            { 0.0f, 1.0f, 0.0f },
-	            { -sin, 0.0f, cos }
-	        };
-	        this.multiply(rotation);
-	        return this;
-	    }
+		public RotationMatrix rotateYaw(float angle) {
+			return this.rotateY(angle * DEG2RAD);
+		}
 
-	    public RotationMatrix rotatePitch(float angle) {
-	    	return this.rotateX(angle * DEG2RAD);
-	    }
-	
-	    public RotationMatrix rotateX(float rad) {
-	        float cos = MathHelper.cos(rad);
-	        float sin = MathHelper.sin(rad);
-	        float[][] rotation = {
-	            { 1.0f, 0.0f, 0.0f },
-	            { 0.0f, cos, sin },
-	            { 0.0f, -sin, cos }
-	        };
-	        this.multiply(rotation);
-	        return this;
-	    }
+		public RotationMatrix rotateY(float rad) {
+			float cos = MathHelper.cos(rad);
+			float sin = MathHelper.sin(rad);
+			float[][] rotation = {{cos, 0.0f, sin}, {0.0f, 1.0f, 0.0f}, {-sin, 0.0f, cos}};
+			this.multiply(rotation);
+			return this;
+		}
 
-	    public RotationMatrix rotateRoll(float angle) {
-	    	return this.rotateZ(angle * DEG2RAD);
-	    }
-	
-	    public RotationMatrix rotateZ(float rad) {
-	        float cos = MathHelper.cos(rad);
-	        float sin = MathHelper.sin(rad);
-	        float[][] rotation = {
-	            { cos, -sin, 0.0f },
-	            { sin, cos, 0.0f },
-	            { 0.0f, 0.0f, 1.0f }
-	        };
-	        this.multiply(rotation);
-	        return this;
-	    }
-	
-	    private void multiply(float[][] rotation) {
-	        float[][] result = new float[3][3];
-	        for (int i = 0; i < 3; i++) {
-	            for (int j = 0; j < 3; j++) {
-	                result[i][j] = 0.0f;
-	                for (int k = 0; k < 3; k++) {
-	                    result[i][j] += this.matrix[i][k] * rotation[k][j];
-	                }
-	            }
-	        }
-	        this.matrix = result;
-	    }
-	
-	    public Vec3d transform(Vec3d vec) {
-	        double x = vec.x * this.matrix[0][0] + vec.y * this.matrix[0][1] + vec.z * this.matrix[0][2];
-	        double y = vec.x * this.matrix[1][0] + vec.y * this.matrix[1][1] + vec.z * this.matrix[1][2];
-	        double z = vec.x * this.matrix[2][0] + vec.y * this.matrix[2][1] + vec.z * this.matrix[2][2];
-	        return new Vec3d(x, y, z);
-	    }
+		public RotationMatrix rotatePitch(float angle) {
+			return this.rotateX(angle * DEG2RAD);
+		}
+
+		public RotationMatrix rotateX(float rad) {
+			float cos = MathHelper.cos(rad);
+			float sin = MathHelper.sin(rad);
+			float[][] rotation = {{1.0f, 0.0f, 0.0f}, {0.0f, cos, sin}, {0.0f, -sin, cos}};
+			this.multiply(rotation);
+			return this;
+		}
+
+		public RotationMatrix rotateRoll(float angle) {
+			return this.rotateZ(angle * DEG2RAD);
+		}
+
+		public RotationMatrix rotateZ(float rad) {
+			float cos = MathHelper.cos(rad);
+			float sin = MathHelper.sin(rad);
+			float[][] rotation = {{cos, -sin, 0.0f}, {sin, cos, 0.0f}, {0.0f, 0.0f, 1.0f}};
+			this.multiply(rotation);
+			return this;
+		}
+
+		private void multiply(float[][] rotation) {
+			float[][] result = new float[3][3];
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					result[i][j] = 0.0f;
+					for (int k = 0; k < 3; k++) {
+						result[i][j] += this.matrix[i][k] * rotation[k][j];
+					}
+				}
+			}
+			this.matrix = result;
+		}
+
+		public Vec3d transform(Vec3d vec) {
+			double x = vec.x * this.matrix[0][0] + vec.y * this.matrix[0][1] + vec.z * this.matrix[0][2];
+			double y = vec.x * this.matrix[1][0] + vec.y * this.matrix[1][1] + vec.z * this.matrix[1][2];
+			double z = vec.x * this.matrix[2][0] + vec.y * this.matrix[2][1] + vec.z * this.matrix[2][2];
+			return new Vec3d(x, y, z);
+		}
 	}
 }

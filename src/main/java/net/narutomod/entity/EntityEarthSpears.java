@@ -70,8 +70,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 		}
 
 		public EC(EntityLivingBase userIn, float damageIn) {
-			this(userIn.world);
-			this.shootingEntity = userIn;
+			super(userIn, 0xFFFFFFFF);
 			//this.damage = Math.min(damageIn, 20f);
 		}
 

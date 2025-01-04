@@ -777,7 +777,6 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			SENJUTSU,
 			SIXPATHSENJUTSU,
 			KEKKEIMORA,
-			SHOTON,
 			OTHER;
 		}
 	}

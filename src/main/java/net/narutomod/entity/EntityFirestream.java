@@ -70,7 +70,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.JutsuEnum.Type.KATON;
+			return ItemJutsu.JutsuEnum.Type.RAITON;
 		}
 
 		@Override

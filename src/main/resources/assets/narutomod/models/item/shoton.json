@@ -1,6 +1,0 @@
-{
-  "parent": "narutomod:custom/shoton",
-  "textures": {
-    "1": "narutomod:blocks/shoton"
-  }
-}
