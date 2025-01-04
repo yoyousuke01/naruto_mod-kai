@@ -833,15 +833,16 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 				upperArmRight.cubeList.add(new ModelBox(upperArmRight, 0, 32, -3.6579F, -1.0603F, -2.0F, 4, 12, 4, 0.0F, true));
 
 				lowerArmRight = new ModelRenderer(this);
-				lowerArmRight.setRotationPoint(-5.5F, 8.2791F, -0.1201F);
-				bipedRightArm.addChild(lowerArmRight);
-				setRotationAngle(lowerArmRight, -0.5236F, 0.0F, -0.2618F);
-				lowerArmRight.cubeList.add(new ModelBox(lowerArmRight, 48, 32, -1.2588F, -0.1635F, -1.517F, 3, 12, 3, 0.0F, true));
-
+				lowerArmRight.setRotationPoint(-2.0F, 10.2791F, 1.1299F);
+				upperArmRight.addChild(lowerArmRight);
+				setRotationAngle(lowerArmRight, -1.309F, 0.2618F, -0.7854F);
+				lowerArmRight.cubeList.add(new ModelBox(lowerArmRight, 48, 32, -1.2588F, -0.1635F, -2.517F, 3, 12, 3, 0.0F, true));
+		
 				rightHand = new ModelRenderer(this);
 				rightHand.setRotationPoint(0.75F, 10.9709F, -0.6299F);
 				lowerArmRight.addChild(rightHand);
-				setRotationAngle(rightHand, 1.5708F, 0.5236F, 1.5708F);
+				setRotationAngle(rightHand, 1.5708F, 0.9599F, 1.5708F);
+				
 
 				bone5 = new ModelRenderer(this);
 				bone5.setRotationPoint(0.0F, 0.0F, 0.0F);
@@ -944,15 +945,16 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 				upperArmLeft.cubeList.add(new ModelBox(upperArmLeft, 0, 32, -0.3421F, -1.0603F, -2.0F, 4, 12, 4, 0.0F, false));
 
 				lowerArmLeft = new ModelRenderer(this);
-				lowerArmLeft.setRotationPoint(5.5F, 8.2791F, -0.1201F);
-				bipedLeftArm.addChild(lowerArmLeft);
-				setRotationAngle(lowerArmLeft, -0.5236F, 0.0F, 0.2618F);
-				lowerArmLeft.cubeList.add(new ModelBox(lowerArmLeft, 48, 32, -1.7412F, -0.1635F, -1.517F, 3, 12, 3, 0.0F, false));
-
+				lowerArmLeft.setRotationPoint(2.0F, 10.2791F, 1.1299F);
+				upperArmLeft.addChild(lowerArmLeft);
+				setRotationAngle(lowerArmLeft, -1.309F, -0.2618F, 0.7854F);
+				lowerArmLeft.cubeList.add(new ModelBox(lowerArmLeft, 48, 32, -1.7412F, -0.1635F, -2.517F, 3, 12, 3, 0.0F, false));
+		
 				leftHand = new ModelRenderer(this);
 				leftHand.setRotationPoint(-0.75F, 10.9709F, -0.6299F);
 				lowerArmLeft.addChild(leftHand);
-				setRotationAngle(leftHand, 1.5708F, -0.5236F, -1.5708F);
+				setRotationAngle(leftHand, 1.5708F, -0.9599F, -1.5708F);
+				
 
 				bone2 = new ModelRenderer(this);
 				bone2.setRotationPoint(0.0F, 0.0F, 0.0F);
