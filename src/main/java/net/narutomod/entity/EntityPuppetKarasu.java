@@ -125,6 +125,10 @@ public class EntityPuppetKarasu extends ElementsNarutomodMod.ModElement {
 				public boolean shouldContinueExecuting() {
 					return super.shouldContinueExecuting() && EntityCustom.this.meleeTime > 0;
 				}
+				@Override
+				protected double getAttackReachSqr(EntityLivingBase attackTarget) {
+					return (2.4f + attackTarget.width) * (2.4f + attackTarget.width);
+				}
 			});
 		}
 
@@ -216,18 +220,18 @@ public class EntityPuppetKarasu extends ElementsNarutomodMod.ModElement {
 				
 				bipedHead = new ModelRenderer(this);
 				bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bipedHead.cubeList.add(new ModelBox(bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F, false));
+				bipedHead.cubeList.add(new ModelBox(bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, -0.5F, false));
 		
 				jaw = new ModelRenderer(this);
-				jaw.setRotationPoint(0.0F, 0.0F, -2.0F);
+				jaw.setRotationPoint(0.0F, -0.5F, -1.5F);
 				bipedHead.addChild(jaw);
-				setRotationAngle(jaw, 0.5236F, 0.0F, 0.0F);
-				jaw.cubeList.add(new ModelBox(jaw, 0, 0, -1.0F, -1.0F, -2.0F, 2, 1, 2, 0.25F, false));
+				setRotationAngle(jaw, 0.3491F, 0.0F, 0.0F);
+				jaw.cubeList.add(new ModelBox(jaw, 0, 0, -1.0F, -1.0F, -2.0F, 2, 1, 2, 0.0F, false));
 		
 				shooter = new ModelRenderer(this);
-				shooter.setRotationPoint(0.0F, -0.5F, -5.0F);
+				shooter.setRotationPoint(0.0F, -1.25F, -4.0F);
 				bipedHead.addChild(shooter);
-				shooter.cubeList.add(new ModelBox(shooter, 11, 16, -0.5F, -0.5F, -1.0F, 1, 1, 2, 0.0F, false));
+				shooter.cubeList.add(new ModelBox(shooter, 11, 16, -0.5F, -0.5F, -1.0F, 1, 1, 2, -0.1F, false));
 		
 				bipedHeadwear = new ModelRenderer(this);
 				bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);

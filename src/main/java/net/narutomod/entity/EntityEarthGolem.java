@@ -89,7 +89,8 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.1D);
 			super.postScaleFixup();
-			this.experienceValue = (int) (f * 10);
+			this.experienceValue = (int)(f * 10);
+			this.stepHeight = this.height * 0.3333f;
 		}
 
 		@Override

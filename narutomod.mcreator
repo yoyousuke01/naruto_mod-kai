@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 479,
-    "DIMENSION": 13,
-    "GUI": 70
+    "ENTITY": 489,
+    "GUI": 70,
+    "DIMENSION": 13
   },
   "mod_elements": [
     {
@@ -1614,14 +1614,6 @@
         "0": 83,
         "1": 84
       }
-    },
-    {
-      "name": "LocateEntity",
-      "type": "command",
-      "sortid": 300,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {}
     },
     {
       "name": "AltCamView",
@@ -4491,7 +4483,7 @@
       "type": "mob",
       "sortid": 619,
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "ids": {
         "0": 295,
         "1": 296
@@ -7738,6 +7730,75 @@
         "1": 479
       },
       "registry_name": "crystal_ray"
+    },
+    {
+      "name": "Shikigami",
+      "type": "mob",
+      "sortid": 906,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 480,
+        "1": 481
+      },
+      "registry_name": "shikigami"
+    },
+    {
+      "name": "Konan",
+      "type": "mob",
+      "sortid": 907,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 482,
+        "1": 483
+      },
+      "registry_name": "konan"
+    },
+    {
+      "name": "ModCommands",
+      "type": "command",
+      "sortid": 908,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "mod_commands"
+    },
+    {
+      "name": "GiantChameleon",
+      "type": "mob",
+      "sortid": 909,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 484,
+        "1": 485
+      },
+      "registry_name": "giant_chameleon"
+    },
+    {
+      "name": "PaperBind",
+      "type": "mob",
+      "sortid": 910,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 486,
+        "1": 487
+      },
+      "registry_name": "paper_bind"
+    },
+    {
+      "name": "Guren",
+      "type": "mob",
+      "sortid": 911,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {
+        "0": 488,
+        "1": 489
+      },
+      "registry_name": "guren"
     }
   ],
   "variable_elements": [
@@ -7824,6 +7885,12 @@
       "type": "string",
       "scope": "global",
       "value": "temporaryDisableAI"
+    },
+    {
+      "name": "JutsuKey1Pressed",
+      "type": "string",
+      "scope": "global",
+      "value": "JutsuKey1Pressed"
     }
   ],
   "sound_elements": [
@@ -8467,14 +8534,6 @@
       "subtitle": ""
     },
     {
-      "name": "eightgatesrelease",
-      "files": [
-        "eightgatesrelease"
-      ],
-      "category": "master",
-      "subtitle": ""
-    },
-    {
       "name": "waterblast",
       "files": [
         "waterblast"
@@ -8841,6 +8900,22 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "paperflip",
+      "files": [
+        "paperflip"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
+      "name": "eightgatesrelease",
+      "files": [
+        "eightgatesrelease"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
@@ -8883,6 +8958,7 @@
       "item.tenseiganhelmet.name": "Tenseigan",
       "item.ninja_armor_jiraiyalegs.name": "Jiraiya Clothes",
       "chattext.shinratensei": "Almighty Push",
+      "entity.shikigami.name": "Dance of Shikigami",
       "subtitles.shinsusenju": "",
       "entity.genjutsu.name": "Genjutsu",
       "tooltip.cleaver.descr": "Lightning natured users can imbue this sword with lightning chakra to increase its lethality.",
@@ -8911,6 +8987,7 @@
       "item.onigiri.name": "Onigiri",
       "subtitles.chainsound": "",
       "entity.limbo_clone.name": "Limbo Clone",
+      "entity.konan.name": "Konan",
       "subtitles.charging_chakra": "",
       "item.poisonbomb.name": "Poison Bomb",
       "item.smoke_bomb.name": "Smoke Bomb",
@@ -9294,6 +9371,7 @@
       "item.scroll_water_shockwave.name": "Water Release - Water Shockwave",
       "item.ninja_armor_iwahelmet.name": "Forehead Protector (Iwagakure)",
       "item.byakuganhelmet.name": "Byakugan",
+      "entity.giant_chameleon.name": "Giant Chameleon",
       "subtitles.snake_hiss": "",
       "subtitles.highpitch": "",
       "item.kunai_hiraishin.name": "Kunai Hiraishin",
@@ -9539,7 +9617,9 @@
       "item.byakurinnesharinganbody.name": "",
       "entity.kirin.name": "Kirin",
       "potion.effect.corrosion": "Corrosion",
+      "entity.paper_bind.name": "Paper Bind",
       "item.clothes_hokagelegs.name": "",
+      "entity.guren.name": "Guren",
       "entity.lightning_panther.name": "Black Panther",
       "potion.effect.reach": "Reach",
       "subtitles.bugs": "",
@@ -9604,6 +9684,7 @@
       "entity.hiraishin.name": "Flying Thunder God Jutsu",
       "item.anbu_sword.name": "Anbu Sword",
       "effect.flight": "Flight",
+      "subtitles.paperflip": "",
       "item.rinneganlegs.name": "Rinne Sharingan Leggings",
       "entity.entityjitonshield.name": "Shield of Sand",
       "item.kabutowari.name": "Kabutowari",

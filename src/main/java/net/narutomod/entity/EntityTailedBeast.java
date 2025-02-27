@@ -310,7 +310,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(2, new EntityAIAttackMelee(this, 1.2D, true) {
 				@Override
 				public boolean shouldExecute() {
-					return !Base.this.isMotionHalted() && Base.this.meleeTime > 0 && super.shouldExecute();
+					return !Base.this.isMotionHalted() && super.shouldExecute();
 				}
 				@Override
 				public boolean shouldContinueExecuting() {
@@ -1266,7 +1266,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 	    @Override
 	    protected void checkForStuck(Vec3d positionVec3) {
-	        if (this.totalTicks - this.ticksAtLastPos > 60) {
+	        if (this.totalTicks - this.ticksAtLastPos > 30) {
 	            if (positionVec3.squareDistanceTo(this.lastPosCheck) < this.entity.width * this.entity.width) {
 	                this.clearPath();
 	            }

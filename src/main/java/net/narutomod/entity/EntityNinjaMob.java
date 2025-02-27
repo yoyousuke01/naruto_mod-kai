@@ -63,6 +63,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNavigateSwimmer;
 
 import net.narutomod.item.ItemOnBody;
 import net.narutomod.potion.PotionFeatherFalling;
@@ -90,7 +91,7 @@ import com.google.common.collect.Maps;
 public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	public static final List<Class <? extends Base>> TeamKonoha = Arrays.asList(EntityTenten.EntityCustom.class, EntitySakuraHaruno.EntityCustom.class, EntityIrukaSensei.EntityCustom.class, EntityMightGuy.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamZabuza = Arrays.asList(EntityZabuzaMomochi.EntityCustom.class, EntityHaku.EntityCustom.class);
-	public static final List<Class <? extends Base>> TeamAkatsuki = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityHidan.EntityCustom.class, EntityKakuzu.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamAkatsuki = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityHidan.EntityCustom.class, EntityKakuzu.EntityCustom.class, EntityKonan.EntityCustom.class);
 
 	public EntityNinjaMob(ElementsNarutomodMod instance) {
 		super(instance, 404);
@@ -263,7 +264,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.fixOnClientSpawn();
 			super.onUpdate();
 			BlockPos pos = new BlockPos(this);
-			if (this.navigator instanceof PathNavigateGround
+			if (!(this.navigator instanceof PathNavigateSwimmer)
 			 && this.world.getBlockState(pos).getMaterial() == Material.WATER
 			 && this.world.getBlockState(pos.up()).getMaterial() != Material.WATER) {
 				this.motionY = 0.01d;
@@ -334,6 +335,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void setRevengeTarget(@Nullable EntityLivingBase livingBase) {
+			this.ticksExisted += 120;
+			super.setRevengeTarget(livingBase);
+			this.ticksExisted -= 120;
+		}
+
+		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			return ProcedureUtils.attackEntityAsMob(this, entityIn);
 		}
@@ -393,6 +401,35 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean getCanSpawnHere() {
 			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL : true);
+		}
+
+		@Override
+		protected void despawnEntity() {
+			net.minecraftforge.fml.common.eventhandler.Event.Result result = null;
+			if (this.isNoDespawnRequired()) {
+				this.idleTime = 0;
+			} else if ((this.idleTime & 0x1F) == 0x1F && (result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this)) != net.minecraftforge.fml.common.eventhandler.Event.Result.DEFAULT) {
+				if (result == net.minecraftforge.fml.common.eventhandler.Event.Result.DENY) {
+					this.idleTime = 0;
+				} else {
+					this.setDead();
+				}
+			} else {
+				Entity entity = this.world.getClosestPlayerToEntity(this, -1.0D);
+				if (entity != null) {
+					double d3 = entity.getDistanceSq(this);
+					if (d3 < 16384.0D) {
+						this.idleTime = 0;
+					} else if (this.canDespawn() && this.idleTime > 600 && this.rand.nextInt(800) == 0) {
+						this.setDead();
+					}
+				}
+			}
+		}
+
+		@Override
+		protected boolean canBeRidden(Entity entityIn) {
+			return false;
 		}
 
 		@Override

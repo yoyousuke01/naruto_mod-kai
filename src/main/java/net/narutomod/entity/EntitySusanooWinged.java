@@ -95,7 +95,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			this.setSize(MODELSCALE * 0.8f, MODELSCALE * 2.0f);
 			this.stepHeight = this.height / 3.0F;
 			//this.setFlameColor(0x20b83dba);
-			this.chakraUsage = 90d;
+			this.chakraUsage = 100d;
 			this.wingSwingProgressInt = 0;
 			this.isWingDetracting = false;
 			this.isWingExtending = false;

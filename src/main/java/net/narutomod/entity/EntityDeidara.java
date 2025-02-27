@@ -165,7 +165,7 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 						this.c2Entity.setLocationAndAngles(vec.x, vec.y, vec.z, this.rotationYaw, 0f);
 						ProcedureUtils.poofWithSmoke(this.c2Entity);
 						this.world.spawnEntity(this.c2Entity);
-						this.startRiding(this.c2Entity);
+						this.startRiding(this.c2Entity, true);
 						this.c2Entity.setRemainingLife(10000);
 					}
 				} 
@@ -194,7 +194,7 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 			 && EntityAITarget.isSuitableTarget(this, (EntityLivingBase)source.getTrueSource(), false, false)
 			 && this.consumeChakra(ItemBakuton.CLONE.chakraUsage)) {
 				this.setRevengeTarget((EntityLivingBase)source.getTrueSource());
-				EntityExplosiveClone.EC clone = new EntityExplosiveClone.EC.Jutsu().createJutsu(this);
+				EntityExplosiveClone.EC clone = EntityExplosiveClone.EC.Jutsu.createJutsu(this);
 				clone.attackEntityFrom(source, amount);
 				this.explosiveCloneLastUsed = this.ticksExisted;
 				return false;

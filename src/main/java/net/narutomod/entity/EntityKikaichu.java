@@ -43,6 +43,7 @@ import java.util.List;
 public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 323;
 	public static final int ENTITYID_RANGED = 324;
+	private static final String kikaichuSlownessAmp = "kikaichuSlownessAmplitude";
 
 	public EntityKikaichu(ElementsNarutomodMod instance) {
 		super(instance, 674);
@@ -111,8 +112,13 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void setDead() {
 			super.setDead();
-			if (!this.world.isRemote && this.bugsTarget != null && !this.bugsTarget.shouldRemove()) {
-				this.bugsTarget.forceRemove();
+			if (!this.world.isRemote) {
+				if (this.target != null) {
+					this.target.getEntityData().removeTag(kikaichuSlownessAmp);
+				}
+				if (this.bugsTarget != null && !this.bugsTarget.shouldRemove()) {
+					this.bugsTarget.forceRemove();
+				}
 			}
 		}
 
@@ -124,9 +130,9 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				if (this.target.isEntityAlive() && this.ticksExisted < MAXTIME) {
 					if (this.bugsTarget.allParticlesReachedTarget()) {
 						this.bugsTarget.setTarget(this.getTargetVector(), 0.2f, 0.01f, false);
-						if (this.ticksExisted % 10 == 1) {
-							target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 2, false, false));
-						}
+						//if (this.ticksExisted % 10 == 1) {
+						//	target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 2, false, false));
+						//}
 					} else {
 						this.bugsTarget.setTarget(this.getTargetVector(), 1.5f, 0.05f, false);
 					}
@@ -168,7 +174,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 1.5d, true);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 3.0d, true);
 				if (result != null) {
 					if (result.entityHit instanceof EC) {
 						result.entityHit.ticksExisted = EC.MAXTIME;
@@ -202,6 +208,8 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends Entity implements ItemJiton.ISwarmEntity {
 		private EntityLivingBase host;
 		private int maxAge;
+		public float prevRotationRoll;
+		public float rotationRoll;
 	    public float prevLimbSwingAmount;
 	    public float limbSwingAmount;
 	    public float limbSwing;
@@ -255,21 +263,18 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	    }
 
 		private void updateInFlightRotations() {
-            float f4 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            this.rotationYaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
-            for (this.rotationPitch = -(float)(MathHelper.atan2(this.motionY, (double)f4) * (180D / Math.PI)); 
-             this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F) ;
-            while (this.rotationPitch - this.prevRotationPitch >= 180.0F) {
-                this.prevRotationPitch += 360.0F;
-            }
-            while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
-                this.prevRotationYaw -= 360.0F;
-            }
-            while (this.rotationYaw - this.prevRotationYaw >= 180.0F) {
-                this.prevRotationYaw += 360.0F;
-            }
-            this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
-            this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+            double d = (double)MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+            float yaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
+            float pitch = -(float)(MathHelper.atan2(this.motionY, d) * (180D / Math.PI));
+            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.prevRotationYaw);
+            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.prevRotationPitch);
+            float roll = MathHelper.wrapDegrees(deltaYaw * 1.5f);
+            this.prevRotationYaw = yaw - deltaYaw;
+            this.prevRotationPitch = pitch - deltaPitch;
+            this.prevRotationRoll = this.rotationRoll;
+            this.rotationPitch = this.prevRotationPitch + (pitch - this.prevRotationPitch) * 0.2F;
+            this.rotationYaw = this.prevRotationYaw + (yaw - this.prevRotationYaw) * 0.2F;
+            this.rotationRoll = this.prevRotationRoll + (roll - this.prevRotationRoll) * 0.2F;
 		}
 
 		@Override
@@ -288,9 +293,18 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox())) {
 					if (!entity.equals(this.host)) {
-						if (!entity.isPotionActive(PotionHeaviness.potion) || entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier() < 1) {
-							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 1, false, false));
+						float ampf = entity.getEntityData().getFloat(kikaichuSlownessAmp);
+						PotionEffect effect = entity.getActivePotionEffect(PotionHeaviness.potion);
+						if (effect == null) {
+							ampf = 0.0f;
+							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, 0, false, false));
+						} else if (effect.getAmplifier() < (int)ampf) {
+							if (effect.getAmplifier() < (int)ampf - 1) {
+								ampf = effect.getAmplifier();
+							}
+							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, Math.min((int)ampf, 5), false, false));
 						}
+						entity.getEntityData().setFloat(kikaichuSlownessAmp, ampf + 0.01f);
 						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.25d)) {
 							this.chakra += 0.25d;
 						}
@@ -396,6 +410,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				GlStateManager.translate(x, y + 0.03125d, z);
 				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * partialTicks, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks - 180.0F, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate(entity.prevRotationRoll + (entity.rotationRoll - entity.prevRotationRoll) * partialTicks, 0.0F, 0.0F, 1.0F);
 				GlStateManager.scale(0.1F, 0.1F, 0.1F);
 				GlStateManager.enableBlend();
 				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
