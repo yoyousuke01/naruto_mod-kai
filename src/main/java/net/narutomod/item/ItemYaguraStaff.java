@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.HashMap;
 
 import com.google.common.collect.Multimap;
+import com.google.common.collect.HashMultimap;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemYaguraStaff extends ElementsNarutomodMod.ModElement {
@@ -36,12 +37,18 @@ public class ItemYaguraStaff extends ElementsNarutomodMod.ModElement {
 	}
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new ItemCustom().setUnlocalizedName("yagura_staff").setRegistryName("yagura_staff").setCreativeTab(TabModTab.tab));
-	}
-	public static class ItemCustom extends ItemSword implements ItemOnBody.Interface {
-		public ItemCustom() {
-			super(EnumHelper.addToolMaterial("YAGURA_STAFF", 0, 100000, 10f, 12f, 0));
-		}
+		elements.items.add(() -> new ItemSword(EnumHelper.addToolMaterial("YAGURA_STAFF", 0, 100000, 10f, 12f, 0)) {
+			@Override
+			public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
+				Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+				if (slot == EntityEquipmentSlot.MAINHAND) {
+					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
+					multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
+							new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", 2, 0));
+				}
+				return multimap;
+			}
 
 		@Override
 		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {

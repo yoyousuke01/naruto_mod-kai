@@ -15,6 +15,10 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
@@ -70,24 +74,22 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 
 		public EntityCustom(World world) {
 			super(world);
-			this.setSize(5.0F, 4.8F);
-			this.experienceValue = 0;
-			this.isImmuneToFire = true;
+			this.setSize(3.0F, 4.5F);
 			this.swingProgress = 0.0F;
 			this.swingProgressInt = 0;
 			this.setNoAI(true);
 			this.enablePersistence();
 		}
 
-		public EntityCustom(EntityPlayer player) {
+		public EntityCustom(EntityLivingBase player, double chakraburn) {
 			this(player.world);
-			this.summoningPlayer = player;
-			RayTraceResult res = ProcedureUtils.raytraceBlocks(player, 4.0D);
-			double x = res.getBlockPos().getX();
-			double z = res.getBlockPos().getZ();
-			this.setPosition(x + 0.5D, player.posY, z + 0.5D);
-			this.rotationYaw = this.rotationYawHead = player.rotationYaw - 180.0F;
-			this.chakraUsage = ItemRinnegan.getNarakaPathChakraUsage(player);
+			this.setSummoner(player);
+			Vec3d vec = player.getLookVec().scale(4d).add(player.getPositionEyes(1f));
+			for (; !this.world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
+			for (; this.world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
+			this.rotationYaw = this.rotationYawHead = this.renderYawOffset = player.rotationYawHead - 180.0F;
+			this.setLocationAndAngles(vec.x, new BlockPos(vec).up().getY(), vec.z, this.rotationYaw, 0.0f);
+			this.chakraUsage = chakraburn;
 		}
 
 		@Override
@@ -144,17 +146,36 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public AxisAlignedBB getCollisionBoundingBox() {
+			return this.getEntityBoundingBox();
+		}
+
+		@Override
+		public boolean canBePushed() {
+			return false;
+		}
+
+		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			return false;
 		}
 
 		@Override
-		public boolean processInteract(EntityPlayer entity, EnumHand hand) {
-			if (this.healingPlayer == null && this.summoningPlayer != null 
-			 && (entity.equals(this.summoningPlayer) || this.summoningPlayer.isOnSameTeam(entity))) {
-				this.healingPlayer = entity;
-				this.toggleArmSwing();
-				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")), 1.0F, 1.0F);
+		protected void turnBodyAndHead(Entity passenger) {
+		}
+
+		public void setHealingEntity(EntityLivingBase entity) {
+			this.healingPlayer = entity;
+			this.toggleArmSwing();
+			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")), 1.0F, 1.0F);
+		}
+
+		@Override
+		public boolean processInitialInteract(EntityPlayer entity, EnumHand hand) {
+			EntityLivingBase summoner = this.getSummoner();
+			if (this.healingPlayer == null && summoner != null 
+			 && (entity.equals(summoner) || summoner.isOnSameTeam(entity))) {
+				this.setHealingEntity(entity);
 				return true;
 			}
 			return super.processInteract(entity, hand);
@@ -208,7 +229,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 					this.healingPlayer.clearActivePotions();
 					this.healingPlayer.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 160, 4));
 				}
-				this.healingPlayer.heal(0.2F);
+				this.healingPlayer.heal(0.3F);
 				this.healingPlayer.setSneaking(false);
 				if (this.healingPlayer.getHealth() >= this.healingPlayer.getMaxHealth()) {
 					this.healingPlayer.dismountRidingEntity();
@@ -283,12 +304,14 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		public void writeEntityToNBT(NBTTagCompound compound) {
 			super.writeEntityToNBT(compound);
 			compound.setInteger("age", this.getAge());
+			compound.setDouble("chakraUsage", this.chakraUsage);
 		}
 
 		@Override
 		public void readEntityFromNBT(NBTTagCompound compound) {
 			super.readEntityFromNBT(compound);
 			this.setAge(compound.getInteger("age"));
+			this.chakraUsage = compound.getDouble("chakraUsage");
 		}
 	}
 
@@ -314,7 +337,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public class ModelKingofhell extends ModelBase {
 			private final ModelRenderer head;
-			private final ModelRenderer bone3;
+			private final ModelRenderer bone14;
 			private final ModelRenderer mask_right;
 			private final ModelRenderer bone4;
 			private final ModelRenderer mask_left;
@@ -350,8 +373,13 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 				head.setRotationPoint(0.0F, 24.0F, 0.0F);
 				head.cubeList.add(new ModelBox(head, 0, 0, -8.0F, -24.0F, -8.0F, 16, 32, 16, 0.0F, false));
 				head.cubeList.add(new ModelBox(head, 48, 0, -2.5F, -28.5F, -2.5F, 5, 5, 5, 0.0F, false));
-				head.cubeList.add(new ModelBox(head, -16, 112, -8.0F, -0.1F, -8.0F, 16, 0, 16, 0.0F, false));
 				head.cubeList.add(new ModelBox(head, 68, 32, -10.0F, -6.0F, -9.0F, 20, 14, 18, 0.0F, false));
+		
+				bone14 = new ModelRenderer(this);
+				bone14.setRotationPoint(0.0F, -0.1F, -8.0F);
+				head.addChild(bone14);
+				setRotationAngle(bone14, 0.5236F, 0.0F, 0.0F);
+				bone14.cubeList.add(new ModelBox(bone14, 0, 112, -6.0F, -12.0F, 0.0F, 12, 12, 16, 0.0F, false));
 		
 				mask_right = new ModelRenderer(this);
 				mask_right.setRotationPoint(-0.1F, 0.0F, 0.0F);

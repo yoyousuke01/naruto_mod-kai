@@ -1,17 +1,14 @@
 
 package net.narutomod.entity;
 
-import org.apache.logging.log4j.message.Message;
-
+import net.narutomod.potion.PotionAmaterasuFlame;
+import net.narutomod.potion.PotionCorrosion;
+import net.narutomod.potion.PotionInstantDamage;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.item.ItemSenbonArm;
-import net.narutomod.item.ItemSenbon;
-import net.narutomod.item.ItemScrollHiruko;
-import net.narutomod.item.ItemPoisonSenbon;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemAkatsukiRobe;
+import net.narutomod.Chakra;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -110,7 +107,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = 4.0f;
 			this.isImmuneToFire = false;
 			this.dieOnNoPassengers = false;
-			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion));
+			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion, PotionInstantDamage.potion));
 		}
 
 		public EntityCustom(EntityLivingBase summonerIn, double x, double y, double z) {
@@ -119,7 +116,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = 4.0f;
 			this.isImmuneToFire = false;
 			this.dieOnNoPassengers = false;
-			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion));
+			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion, PotionInstantDamage.potion));
 			this.setHealth(this.getMaxHealth());
 		}
 
@@ -256,7 +253,12 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			if (this.isAkatsuki() && !robeOff && !this.maskOff && this.rand.nextInt(200) == 0) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dingding")), 0.8f, this.rand.nextFloat() * 0.1f + 0.95f);
 			}
-			this.setOwnerCanSteer(this.hasPuppetJutsu(this.getControllingPassenger()), robeOff ? 1.5f : 0.5f);
+			Entity passenger = this.getControllingPassenger();
+			this.setOwnerCanSteer(this.hasPuppetJutsu(passenger), robeOff ? 1.5f : 0.5f);
+			if (!this.world.isRemote && this.isBeingRidden() && this.ticksExisted % 20 == 1 && passenger instanceof EntityLivingBase
+			 && !Chakra.pathway((EntityLivingBase)passenger).consume(ItemNinjutsu.PUPPET.chakraUsage * 10)) {
+				passenger.dismountRidingEntity();
+			}
 		}
 
 		@Override
