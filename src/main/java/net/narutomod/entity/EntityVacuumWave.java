@@ -105,10 +105,10 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							ProcedureUtils.Vec2f vec = ProcedureUtils
 									.getYawPitchFromVec(entity.getPositionVector().subtract(this.getPositionVector()));
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
-							if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
-								entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 17.0f + MathHelper.sqrt(scale));
-							}
+				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
+							 	entity.hurtResistantTime = 10;
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20.0f + scale);
+				            }
 						}
 					}
 				}

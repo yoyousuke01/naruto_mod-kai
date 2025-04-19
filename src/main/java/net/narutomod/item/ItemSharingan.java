@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.util.math.RayTraceResult;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSharingan extends ElementsNarutomodMod.ModElement {
@@ -68,7 +69,19 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 		public ItemDojutsu.Type getType() {
 			return ItemDojutsu.Type.SHARINGAN;
 		}
-			
+
+		public Type getSubType() {
+			return Type.BASE;
+		}
+
+		public boolean isMangekyo() {
+			return false;
+		}
+
+		public boolean isEternal() {
+			return false;
+		}
+
 		@SideOnly(Side.CLIENT)
 		@Override
 		public ModelBiped getArmorModel(EntityLivingBase living, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
@@ -94,7 +107,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 				ProcedureSharinganHelmetTickEvent.executeProcedure((HashMap) $_dependencies);
 			}
 			if (!world.isRemote && entity.ticksExisted % 6 == 1
-			 && (itemstack.getItem() != ItemMangekyoSharinganEternal.helmet || !this.isOwner(itemstack, entity))
+			 && (!((Base)itemstack.getItem()).isEternal() || !this.isOwner(itemstack, entity))
 			 && (entity.getEntityData().getBoolean("amaterasu_active")
 			  || entity.getEntityData().getBoolean("susanoo_activated") || entity.getEntityData().getBoolean("kamui_teleport"))) {
 			 	((Base)itemstack.getItem()).canDamage = true;
@@ -182,14 +195,6 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 			return stack.hasTagCompound() ? stack.getTagCompound().getInteger("color") : 0;
 		}
 
-		public boolean isMangekyo() {
-			return false;
-		}
-
-		public boolean isEternal() {
-			return false;
-		}
-
 		@Override
 		public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 			super.addInformation(stack, worldIn, tooltip, flagIn);
@@ -270,10 +275,13 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 					if (entity.world.isRemote) {
 						ProcedureOnLivingUpdate.setGlowingFor(target, 3);
 					}
-					if (entity.getEntityData().getBoolean(shouldTargetLockOnEntity)) {
-						Vec3d vec2 = target.getPositionEyes(1f).subtract(entity.getPositionEyes(1f));
-						entity.rotationYaw = ProcedureUtils.getYawFromVec(vec2);
-						entity.rotationPitch = ProcedureUtils.getPitchFromVec(vec2);
+					if (this.shouldLockOnTarget(entity)) {
+						RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(entity, 32d);
+						if (rtr == null || rtr.entityHit != target) {
+							Vec3d vec2 = target.getPositionEyes(1f).subtract(entity.getPositionEyes(1f));
+							entity.rotationYaw = ProcedureUtils.getYawFromVec(vec2);
+							entity.rotationPitch = ProcedureUtils.getPitchFromVec(vec2);
+						}
 					}
 					this.lockOnTarget(entity, target, remaining - 1);
 				}
@@ -323,6 +331,10 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+
+		private boolean shouldLockOnTarget(EntityLivingBase entity) {
+			return entity.getEntityData().getBoolean(shouldTargetLockOnEntity);
+		}
 	
 		private boolean hasTargetLockOnEntity(EntityLivingBase entity) {
 			return entity.getEntityData().hasKey(targetLockOnEntityId);
@@ -359,5 +371,10 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new PlayerHook());
+	}
+	public enum Type {
+		BASE,
+		AMATERASU,
+		KAMUI;
 	}
 }

@@ -24,10 +24,10 @@ import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.procedure.ProcedureGrabEntity;
 import net.narutomod.procedure.ProcedureKamuiJikukanIdo;
 import net.narutomod.procedure.ProcedureSusanoo;
+import net.narutomod.procedure.ProcedureWhenPlayerAttcked;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.Chakra;
-import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Maps;
@@ -78,9 +78,15 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 					}
 					if (entity.getEntityData().getBoolean("kamui_intangible")) {
 						Chakra.pathway(entity).consume(getIntangibleChakraUsage(entity));
-						entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 2.0d);
+						ProcedureWhenPlayerAttcked.setInvulnerable(entity, 2);
+						//entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 2.0d);
 					}
 				}
+			}
+
+			@Override
+			public ItemSharingan.Type getSubType() {
+				return ItemSharingan.Type.KAMUI;
 			}
 
 			@Override

@@ -60,6 +60,7 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	private static final String RINNESHARINGAN_KEY = NarutomodModVariables.RINNESHARINGAN_ACTIVATED;
 	protected static final UUID RINNESHARINGAN_MODIFIER = UUID.fromString("135da083-a632-483e-85bd-2281f15ca7e0");
 	public static final double SHINRATENSEI_CHAKRA_USAGE = 10d;
+	public static final double BANSHOTENIN_CHAKRA_USAGE = 0.5d; // per tick
 	public static final double CHIBAKUTENSEI_CHAKRA_USAGE = 5000d;
 	public static final double NARAKAPATH_CHAKRA_USAGE = 100d;
 	public static final double PRETAPATH_CHAKRA_USAGE = 10d;
@@ -73,49 +74,56 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 
 	public static double getShinratenseiChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? SHINRATENSEI_CHAKRA_USAGE : SHINRATENSEI_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
+	public static double getBanshoteninChakraUsage(EntityLivingBase entity) {
+		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		return stack.getItem() instanceof Base
+		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
+		  ? BANSHOTENIN_CHAKRA_USAGE : BANSHOTENIN_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
+	}
+
 	public static double getChibaukutenseiChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? CHIBAKUTENSEI_CHAKRA_USAGE : CHIBAKUTENSEI_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getNarakaPathChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? NARAKAPATH_CHAKRA_USAGE : NARAKAPATH_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getPretaPathChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? PRETAPATH_CHAKRA_USAGE : PRETAPATH_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getAnimalPathChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? ANIMALPATH_CHAKRA_USAGE : ANIMALPATH_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getOuterPathChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? OUTERPATH_CHAKRA_USAGE : OUTERPATH_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getTengaishinseiChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemTenseigan.helmet
+		return stack.getItem() instanceof Base
 		 ? ((ItemDojutsu.Base)stack.getItem()).isOwner(stack, entity)
 		  ? TENGAISHINSEI_CHAKRA_USAGE : TENGAISHINSEI_CHAKRA_USAGE * 2 : (Double.MAX_VALUE * 0.001d);
 	}
@@ -281,11 +289,11 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (entity instanceof EntityPlayer) {
-				this.onPlayerTickEventPost((EntityPlayer)entity);
+				this.onUpdatePost((EntityPlayer)entity);
 			}
 		}
 
-		public void onPlayerTickEventPost(EntityPlayer player) {
+		public void onUpdatePost(EntityPlayer player) {
 			if (!player.world.isRemote && player.ticksExisted % 20 == 3) {
 				ItemStack helmetStack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				GuiNinjaScroll.enableJutsu(player, (ItemJutsu.Base)ItemYoton.block, ItemYoton.SEALING9D, helmetStack.getItem() == helmet);
@@ -458,9 +466,15 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean hasRinnesharingan(EntityPlayer player) {
-		ItemStack stack1 = ProcedureUtils.getMatchingItemStack(player, helmet);
-		ItemStack stack2 = ProcedureUtils.getMatchingItemStack(player, ItemTenseigan.helmet);
-		return (stack1 != null && isRinnesharinganActivated(stack1)) || (stack2 != null && isRinnesharinganActivated(stack2));
+		//ItemStack stack1 = ProcedureUtils.getMatchingItemStack(player, helmet);
+		//ItemStack stack2 = ProcedureUtils.getMatchingItemStack(player, ItemTenseigan.helmet);
+		//return (stack1 != null && isRinnesharinganActivated(stack1)) || (stack2 != null && isRinnesharinganActivated(stack2));
+		for (ItemStack stack : ProcedureUtils.getAllItemsOfSubType(player, Base.class)) {
+			if (isRinnesharinganActivated(stack)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*public class EventHook {

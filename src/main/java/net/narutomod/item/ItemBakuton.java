@@ -101,8 +101,6 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			this.defaultCooldownMap[CLAY.index] = 0;
 			this.defaultCooldownMap[CLONE.index] = 0;
 		}
-
-		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
 			if (player instanceof EntityPlayer && !player.world.isRemote && this.getCurrentJutsu(stack) == CLAY) {
 				((EntityPlayer) player).sendStatusMessage(new TextComponentString("C-" + Math.max(1, (int) this.getPower(stack, player, count))),
@@ -396,7 +394,54 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			public float getMaxPower() {
 				return 4.1f;
 			}
-		}
+
+			@Override
+			public void onUsingTick(ItemStack stack, EntityLivingBase player, float power) {
+				if (player instanceof EntityPlayer) {
+					((EntityPlayer)player).sendStatusMessage(new TextComponentString("C-" + Math.max(1, (int)power)), true);
+				}
+			}
+	    }
+	
+	    class AIChargeAttack extends EntityAIBase {
+	        public AIChargeAttack() {
+	            this.setMutexBits(1);
+	        }
+	
+	        @Override
+	        public boolean shouldExecute() {
+	        	EntityLivingBase target = ExplosiveClay.this.getAttackTarget();
+	            if (target != null
+	             && !ExplosiveClay.this.getMoveHelper().isUpdating() && ExplosiveClay.this.rand.nextInt(5) == 0) {
+	                return ExplosiveClay.this.getDistanceSq(target) > 4.0D;
+	            }
+                return false;
+	        }
+	
+	        @Override
+	        public boolean shouldContinueExecuting() {
+	            return //ExplosiveClay.this.getMoveHelper().isUpdating() &&
+	             ExplosiveClay.this.getAttackTarget() != null && ExplosiveClay.this.getAttackTarget().isEntityAlive();
+	        }
+	
+	        @Override
+	        public void startExecuting() {
+	            EntityLivingBase entitylivingbase = ExplosiveClay.this.getAttackTarget();
+	            Vec3d vec3d = entitylivingbase.getPositionEyes(1.0F);
+	            ExplosiveClay.this.moveHelper.setMoveTo(vec3d.x, vec3d.y, vec3d.z, 2.0D);
+	        }
+	
+	        @Override
+	        public void updateTask() {
+	            EntityLivingBase target = ExplosiveClay.this.getAttackTarget();
+	            if (ExplosiveClay.this.getEntityBoundingBox().intersects(target.getEntityBoundingBox().grow(target.width * 0.5f))) {
+	                ExplosiveClay.this.attackEntityAsMob(target);
+	            } else { //if (ExplosiveClay.this.getDistanceSq(entitylivingbase) < 9.0D) {
+	                Vec3d vec3d = target.getPositionEyes(1.0F);
+	                ExplosiveClay.this.moveHelper.setMoveTo(vec3d.x, vec3d.y, vec3d.z, 2.0D);
+	            }
+	        }
+	    }
 
 		class AIChargeAttack extends EntityAIBase {
 			public AIChargeAttack() {

@@ -1,8 +1,8 @@
 {
   "id_map": {
+    "GUI": 73,
     "DIMENSION": 13,
-    "GUI": 72,
-    "ENTITY": 507
+    "ENTITY": 515
   },
   "mod_elements": [
     {
@@ -1127,34 +1127,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      }
-    },
-    {
-      "name": "WhiteZetsuEntityEntityDies",
-      "type": "procedure",
-      "sortid": 230,
-      "compiles": true,
-      "locked_code": false,
-      "ids": {},
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
           },
           {
             "name": "world",
@@ -5450,6 +5422,18 @@
             "type": "itemstack"
           },
           {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
             "name": "world",
             "type": "world"
           }
@@ -7914,6 +7898,74 @@
         "eb": false,
         "ec": true
       }
+    },
+    {
+      "name": "Zetsu",
+      "type": "mob",
+      "sortid": 924,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 508,
+        "1": 509
+      },
+      "registry_name": "zetsu"
+    },
+    {
+      "name": "Obito",
+      "type": "mob",
+      "sortid": 925,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 510,
+        "1": 511
+      },
+      "registry_name": "obito"
+    },
+    {
+      "name": "WoodCutting",
+      "type": "mob",
+      "sortid": 926,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 512,
+        "1": 513
+      },
+      "registry_name": "wood_cutting"
+    },
+    {
+      "name": "ScrollMultiCloneGui",
+      "type": "gui",
+      "sortid": 927,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 73
+      },
+      "registry_name": "scroll_multi_clone_gui"
+    },
+    {
+      "name": "ScrollMultiClone",
+      "type": "item",
+      "sortid": 928,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "scroll_multi_clone"
+    },
+    {
+      "name": "WoodForest",
+      "type": "mob",
+      "sortid": 929,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {
+        "0": 514,
+        "1": 515
+      },
+      "registry_name": "wood_forest"
     }
   ],
   "variable_elements": [
@@ -9032,6 +9084,14 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "grill_open",
+      "files": [
+        "grill_open"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
@@ -9057,6 +9117,7 @@
       "item.byakurinnesharinganhelmet.name": "Fake Rinne Sharingan",
       "subtitles.gunbai_deflect": "",
       "entity.tensei_baku_silver.name": "Silver Wheel Rebirth Blast",
+      "entity.wood_forest.name": "Deep Forest Emergence",
       "entity.crystal_armor.name": "Crystal Armor",
       "item.rinneganboots.name": "",
       "item.ninja_armor_naruto_sbody.name": "Naruto Jacket",
@@ -9074,6 +9135,7 @@
       "entity.iruka_sensei.name": "Iruka Sensei",
       "tooltip.nuibari.general": "The Nuibari is one of the swords of the Seven Swordsmen of the Mist. The blade itself assumes the form of a narrow \"longsword\" that greatly resembles a large needle. This sword is said to possess the ability to pierce all and stitch them together.",
       "item.tenseiganhelmet.name": "Tenseigan",
+      "entity.kage_bunshin_multi.name": "Multi Shadow Clone Jutsu",
       "item.ninja_armor_jiraiyalegs.name": "Jiraiya Clothes",
       "chattext.shinratensei": "Almighty Push",
       "entity.shikigami.name": "Dance of Shikigami",
@@ -9279,6 +9341,7 @@
       "potion.effect.amaterasuflame": "Amaterasu",
       "item.samehada.name": "Samehada",
       "tile.portalblock.name": "Portal Block",
+      "subtitles.grill_open": "",
       "item.ninja_armor_iwabody.name": "Flak Jacket (Iwagakure)",
       "advancements.learned_1st_jutsu.descr": "Congratulations! You are now on the road to becoming a real shinobi.",
       "entity.temari.name": "Temari",
@@ -9362,6 +9425,7 @@
       "subtitles.makyohyosho": "",
       "item.kusanagi_sword.name": "Kusanagi Sword",
       "item.scroll_healing.name": "Medical Ninjutsu - Healing jutsu",
+      "item.scroll_multi_clone.name": "Multi Shadow Clone jutsu",
       "item.poison_senbon.name": "Poison Senbons",
       "tooltip.shikotsumyaku.dancecamellia": "Camellia Dance",
       "subtitles.opengate": "",
@@ -9442,6 +9506,7 @@
       "item.gunbai.name": "Gunbai",
       "entity.itachi.name": "Itachi Uchiha",
       "tipped_arrow.effect.paralysis": "Arrow of Paralysis",
+      "entity.tobi.name": "Tobi",
       "chattext.medicalgui.notmedninja": "You are not a medical ninja.",
       "tooltip.shikotsumyaku.dancelarch": "Larch Dance",
       "advancements.futton_acquired.title": "Boil Release Acquired",
@@ -9571,7 +9636,6 @@
       "entity.enma.name": "Monkey King: Enma",
       "subtitles.kairikimuso": "",
       "item.mask_anbu_3helmet.name": "Mask Anbu",
-      "chattext.mttitan": "Mount Titan",
       "item.scroll_earth_wall.name": "Earth Release - Earth Wall jutsu scroll",
       "entity.wood_golem.name": "Wood Golem",
       "item.gaunlet.name": "Metal Gauntlet",
@@ -9696,6 +9760,7 @@
       "item.ninjutsu.amenotejikara": "Amenotejikara",
       "subtitles.swoosh": "",
       "entity.unrivaled_strength.name": "Unrivaled Strength",
+      "entity.wood_cutting.name": "Thrusting Spear",
       "entity.biju_manager.name": "Biju Manager",
       "entity.five_tails.name": "Kokuo",
       "item.eightgates.name": "Eight Gates Release",
@@ -9719,6 +9784,7 @@
       "item.ninja_armor_konohalegs.name": "Ninja Pants (Konoha)",
       "item.scroll_hiding_in_mist.name": "Water Release - Hiding In Mist",
       "advancements.openedgates.title": "Power of Youth!",
+      "entity.zetsu.name": "Zetsu",
       "item.clothes_hokagehelmet.name": "Hokage Hat",
       "item.scroll_water_stream.name": "Water Release - Water Bullet",
       "entity.altcamview.name": "Cam",
@@ -9746,6 +9812,7 @@
       "entity.kirin.name": "Kirin",
       "potion.effect.corrosion": "Corrosion",
       "entity.paper_bind.name": "Paper Bind",
+      "entity.obito.name": "Obito Uchiha",
       "item.clothes_hokagelegs.name": "",
       "entity.guren.name": "Guren",
       "item.akatsuki_robe_oldlegs.name": "Akatsuki Robe Old Leggings",

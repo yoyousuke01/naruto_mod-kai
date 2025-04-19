@@ -97,19 +97,17 @@ public class ItemDojutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
-			if (ProcedureUtils.getOwnerId(stack) == null && entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative()) {
+			if (entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative() && ProcedureUtils.getOwnerId(stack) == null) {
 				this.setOwner(stack, (EntityLivingBase)entity);
 				stack.setStackDisplayName(stack.getDisplayName() + " (creative)");
 			}
-			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
+			if (entity.ticksExisted % 20 == 1 && stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
 				stack.getTagCompound().removeTag("ench");
 			}
 			super.onUpdate(stack, world, entity, par4, par5);
 		}
 
-		public Type getType() {
-			return Type.OTHER;
-		}
+		public abstract Type getType();
 
 		public boolean onJutsuKey1(boolean is_pressed, ItemStack stack, EntityPlayer player) {
 			return false;
@@ -143,8 +141,7 @@ public class ItemDojutsu extends ElementsNarutomodMod.ModElement {
 	public enum Type {
 		BYAKUGAN,
 		SHARINGAN,
-		RINNE_TENSEI,
-		OTHER;
+		RINNE_TENSEI;
 	}
 
 	public static class ClientModel {
@@ -168,7 +165,7 @@ public class ItemDojutsu extends ElementsNarutomodMod.ModElement {
 
 				bipedHead = new ModelRenderer(this);
 				bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.05F, false));
+				bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.01F, false));
 
 				onface = new ModelRenderer(this);
 				onface.setRotationPoint(0.0F, 0.0F, 0.0F);
@@ -271,11 +268,11 @@ public class ItemDojutsu extends ElementsNarutomodMod.ModElement {
 
 				this.highlight = new ModelRenderer(this);
 				this.highlight.setRotationPoint(0.0F, 0.0F, 0.0F);
-				this.highlight.cubeList.add(new ModelBox(this.highlight, 24, 0, -4.0F, -8.0F, -4.1F, 8, 8, 0, 0.0F, false));
+				this.highlight.cubeList.add(new ModelBox(this.highlight, 24, 0, -4.0F, -8.0F, -4.06F, 8, 8, 0, 0.0F, false));
 				//this.bipedHead.addChild(this.highlight);
 				this.forehead = new ModelRenderer(this);
 				this.forehead.setRotationPoint(0.0F, 0.0F, 0.0F);
-				this.forehead.cubeList.add(new ModelBox(this.forehead, 0, 0, -1.94F, -6.62F, -4.2F, 4, 4, 0, 0.0F, false));
+				this.forehead.cubeList.add(new ModelBox(this.forehead, 0, 0, -1.94F, -6.62F, -4.15F, 4, 4, 0, 0.0F, false));
 			}
 	
 			@Override
