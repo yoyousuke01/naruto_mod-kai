@@ -32,7 +32,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
+
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.block.material.Material;
 
 import net.narutomod.procedure.ProcedureSharinganHelmetTickEvent;
@@ -179,6 +180,14 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 
 		public int getColor(ItemStack stack) {
 			return stack.hasTagCompound() ? stack.getTagCompound().getInteger("color") : 0;
+		}
+
+		public boolean isMangekyo() {
+			return false;
+		}
+
+		public boolean isEternal() {
+			return false;
 		}
 
 		@Override

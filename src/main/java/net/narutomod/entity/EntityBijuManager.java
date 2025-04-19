@@ -537,7 +537,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 					}
 					return;
 				}
-				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 800) {
+				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 20000) {
 					ItemSenjutsu.deactivateSageMode(this.jinchurikiPlayer);
 				}
 				double d = 5000d + this.getCloakXp();
@@ -592,7 +592,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 	public int increaseCloakLevel() {
 		if (this.cloakLevel < 3) {
 			if (this.jinchurikiPlayer != null
-			 && ((this.cloakLevel == 1 && this.cloakXp[0] >= 3600) || (this.cloakLevel == 2 && this.cloakXp[1] >= 4800))) {
+			 && ((this.cloakLevel == 1 && this.cloakXp[0] >= 10000) || (this.cloakLevel == 2 && this.cloakXp[1] >= 20000))) {
 				Chakra.Pathway chakra = Chakra.pathway(this.jinchurikiPlayer);
 				double d = 5000d + this.getCloakXp();
 				if (chakra.getAmount() + d > chakra.getMax() * 4 && !this.jinchurikiPlayer.isCreative()) {

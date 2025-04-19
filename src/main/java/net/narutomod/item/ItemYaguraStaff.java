@@ -35,6 +35,7 @@ public class ItemYaguraStaff extends ElementsNarutomodMod.ModElement {
 	public ItemYaguraStaff(ElementsNarutomodMod instance) {
 		super(instance, 768);
 	}
+
 	@Override
 	public void initElements() {
 		elements.items.add(() -> new ItemSword(EnumHelper.addToolMaterial("YAGURA_STAFF", 0, 100000, 10f, 12f, 0)) {
@@ -50,28 +51,18 @@ public class ItemYaguraStaff extends ElementsNarutomodMod.ModElement {
 				return multimap;
 			}
 
-		@Override
-		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
-			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
-			if (slot == EntityEquipmentSlot.MAINHAND) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
-				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2, 0));
+			public Set<String> getToolClasses(ItemStack stack) {
+				HashMap<String, Integer> ret = new HashMap<String, Integer>();
+				ret.put("sword", 0);
+				return ret.keySet();
 			}
-			return multimap;
-		}
 
-		@Override
-		public void addInformation(ItemStack itemstack, World world, List<String> list, ITooltipFlag flag) {
-			super.addInformation(itemstack, world, list, flag);
-			list.add("Weapon of the 4th Mizukage Yagura");
-		}
-
-		public Set<String> getToolClasses(ItemStack stack) {
-			HashMap<String, Integer> ret = new HashMap<String, Integer>();
-			ret.put("sword", 1);
-			return ret.keySet();
-		}
+			@Override
+			public void addInformation(ItemStack itemstack, World world, List<String> list, ITooltipFlag flag) {
+				super.addInformation(itemstack, world, list, flag);
+				list.add("Weapon of the 4th Mizukage Yagura");
+			}
+		}.setUnlocalizedName("yagura_staff").setRegistryName("yagura_staff").setCreativeTab(TabModTab.tab));
 	}
 
 	@SideOnly(Side.CLIENT)

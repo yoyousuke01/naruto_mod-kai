@@ -254,7 +254,8 @@ public abstract class EntityShieldBase extends EntityLivingBase implements Entit
 		this.clampMotion(0.1D);
 		EntityLivingBase summoner = this.getSummoner();
 		if ((this.getPassengers().isEmpty() && this.dieOnNoPassengers) 
-		 || (summoner != null && !summoner.isEntityAlive())) {
+		 || (summoner != null && !summoner.isEntityAlive())
+) {
 			this.setDead();
 		}
 	}

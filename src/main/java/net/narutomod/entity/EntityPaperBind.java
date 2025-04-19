@@ -180,7 +180,7 @@ public class EntityPaperBind extends ElementsNarutomodMod.ModElement {
 							this.setEntityBoundingBox(this.targetEntity.getEntityBoundingBox().grow(0.05d));
 						}
 					} else {
-						this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 4.0f);
+						this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 1.0f);
 					}
 				} else if (swarmactive && this.targetEntity != null) {
 					this.swarmTarget.setTarget(this.targetEntity.getEntityBoundingBox(), 2.5f, 0.03f, false);

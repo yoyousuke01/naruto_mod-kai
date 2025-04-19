@@ -55,7 +55,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 				if (entity instanceof EntityLivingBase)
 					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.INSTANT_HEALTH, (int) 10, (int) 4, (false), (false)));
 			} else {
-				entity.attackEntityFrom(DamageSource.STARVE, (float) ((Math.random() * 220) + 20));
+				entity.attackEntityFrom(DamageSource.STARVE, (float) ((Math.random() * 480) + 20));
 				if (entity instanceof EntityLivingBase)
 					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.HUNGER, (int) 300, (int) 1, (false), (false)));
 			}

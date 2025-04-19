@@ -219,7 +219,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void launchAtTarget(EntityLivingBase target) {
-			if (!ItemSharingan.wearingAny(this.summoner)) {
+			if (!(ItemSharingan.wearingAny(this.summoner) || ItemRaiton.CHAKRAMODE.jutsu.isActivated(this.summoner))) {
 				ProcedureRenderView.setFOV(this.summoner, 100, 10f);
 			}
 			double d0 = target.posX - this.summoner.posX;

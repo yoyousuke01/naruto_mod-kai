@@ -120,7 +120,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 				if (power >= 1.0F) {
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
 					if (entity instanceof EntityPlayer) {
-						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 120));
+						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 200));
 					}
 					return true;
 				}

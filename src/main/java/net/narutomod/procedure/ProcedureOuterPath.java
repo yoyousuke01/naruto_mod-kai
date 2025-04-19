@@ -109,9 +109,9 @@ public class ProcedureOuterPath extends ElementsNarutomodMod.ModElement {
 									SoundCategory.NEUTRAL, (float) 2, (float) 0.9);
 							{
 								MinecraftServer mcserv = FMLCommonHandler.instance().getMinecraftServerInstance();
-								if (mcserv != null)
-									mcserv.getPlayerList().sendMessage(new TextComponentString((((entity.getDisplayName().getUnformattedText())) + ""
-											+ (" has summoned the ") + "" + ((entityToSpawn.getDisplayName().getUnformattedText())))));
+								//if (mcserv != null)
+									//mcserv.getPlayerList().sendMessage(new TextComponentString((((entity.getDisplayName().getUnformattedText())) + ""
+											//+ (" has summoned the ") + "" + ((entityToSpawn.getDisplayName().getUnformattedText())))));
 							}
 						}
 					} else {

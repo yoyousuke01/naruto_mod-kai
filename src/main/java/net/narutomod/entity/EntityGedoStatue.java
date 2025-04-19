@@ -23,8 +23,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIMoveTowardsTarget;
 import net.minecraft.entity.player.EntityPlayer;
@@ -77,8 +75,10 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "gedo_statue"), ENTITYID).name("gedo_statue")
+		elements.entities
+.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
+		 .id(new ResourceLocation("narutomod", "gedo_statue"), ENTITYID)
+.name("gedo_statue")
 		 .tracker(128, 3, true).egg(-8621734, -10069692).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityPurpleDragon.class)
 		 .id(new ResourceLocation("narutomod", "purple_dragon"), ENTITYID_RANGED).name("purple_dragon")

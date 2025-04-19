@@ -25,6 +25,7 @@ import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 import net.narutomod.entity.EntityEarthBlocks;
 import net.narutomod.entity.EntityChibakuTenseiBall;
+import net.narutomod.entity.EntityShieldBase;
 
 import java.util.List;
 import java.util.Map;

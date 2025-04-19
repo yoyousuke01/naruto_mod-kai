@@ -130,7 +130,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					}
 					Chakra.Pathway chakra = Chakra.pathway(user);
 					this.isShooting = this.ticksExisted > this.waitTime
-					 && user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed) && chakra.consume(this.chakraUsage * 0.05d);
+					 && user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed) && chakra.consume(this.chakraUsage * 0.2d);
 					if (this.isShooting) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.5f, this.rand.nextFloat() * 0.4f + 0.9f);
 						Vec3d shootvec = user.getLookVec();
@@ -235,7 +235,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			Entity entity = raytraceResultIn.entityHit;
 			if (entity != null) {
 				float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-				int i = MathHelper.ceil((double)f * this.getDamage());
+				int i = MathHelper.ceil((double)f * this.getDamage() * 0.3F);
 				if (this.getIsCritical()) {
 					i += this.rand.nextInt(i / 2 + 2);
 				}

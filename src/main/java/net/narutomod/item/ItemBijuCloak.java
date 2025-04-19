@@ -141,7 +141,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 				boolean b = tails == 1 && cloaklevel == 2;
 				armorModel.sandArmLeft.showModel = b;
 				armorModel.sandBodyL2.showModel = b;
-				armorModel.bodyShine = tails == 9 && cloaklevel == 2 && getCloakXp(stack) >= 800;
+				armorModel.bodyShine = tails == 9 && cloaklevel == 2 && getCloakXp(stack) >= 2100;
 				armorModel.allTails.showModel = !armorModel.bodyShine;
 				armorModel.layerShine = true;
 				return armorModel;
@@ -177,7 +177,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 						 	 		}
 									setWearingTicks(livingEntity, wearingTicks);
 									int tails = getTails(itemstack);
-									if (cloakXp >= 800 || (cloakLevel == 1 && cloakXp >= 400)) {
+									if (cloakXp >= 8000 || (cloakLevel == 1 && cloakXp >= 1500)) {
 										revertOriginal(livingEntity, itemstack);
 										applyEffects(livingEntity, cloakLevel, tails != 1 && cloakLevel == 1 ? 0x2088001b : tails == 9 ? 0x20ff8c00 : 0);
 									} else {
@@ -188,7 +188,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 										 SoundCategory.AMBIENT, 0.6f, this.itemRand.nextFloat() * 0.6f + 0.3f);
 									}
 						 	 	} else {
-						 	 		if (cloakXp < 400 || (cloakLevel == 2 && cloakXp < 800)) {
+						 	 		if (cloakXp < 1500 || (cloakLevel == 2 && cloakXp < 8000)) {
 						 	 			revertOriginal(livingEntity, itemstack);
 						 	 		}
 						 	 		EntityBijuManager.toggleBijuCloak(livingEntity);
@@ -322,7 +322,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 		if (!entity.world.isRemote && entity.ticksExisted % 20 == 4) {
 			//entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 5, 0, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, level * 32, false, false));
-			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 24, false, false));
+			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 12, false, false));
 			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {

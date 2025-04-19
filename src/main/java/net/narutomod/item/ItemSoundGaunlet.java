@@ -98,6 +98,14 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 			}
 			return false;
 		}
+		
+		@Override
+		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
+				stack.getTagCompound().removeTag("ench");
+			}
+			super.onUpdate(stack, world, entity, par4, par5);
+		}
 
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {

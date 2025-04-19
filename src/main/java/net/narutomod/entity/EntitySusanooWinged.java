@@ -87,7 +87,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(MODELSCALE * 0.8f, MODELSCALE * 2.0f);
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
-			this.chakraUsage = 280d;
+			this.chakraUsage = 100d;
 		}
 
 		public EntityCustom(EntityPlayer player) {
@@ -286,9 +286,11 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				if ((!this.onGround || entity.rotationPitch < 0.0F) && entity.moveForward > 0.0F) {
 					this.motionY -= entity.rotationPitch / 45.0D;
 				}
-				if (!this.onGround) {
+				if (!this.onGround)
+ {
 					this.extendWings();
-				} else {
+				} else
+ {
 					this.detractWings();
 				}
 			}
@@ -298,7 +300,8 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void collideWithEntity(Entity entity) {
-			if (!this.world.isRemote && entity instanceof EntityLivingBase && !entity.equals(this.getOwnerPlayer())) {
+			if (!this.world.isRemote && entity instanceof EntityLivingBase && !entity.equals(this.getOwnerPlayer()))
+ {
 				if (this.getOwnerPlayer() != null 
 				 && this.getOwnerPlayer().getHeldItemMainhand().getItem() == ItemKagutsuchiSwordRanged.block)
 					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 200, 2, false, false));

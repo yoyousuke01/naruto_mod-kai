@@ -42,7 +42,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends ItemMokuton.WoodSegment implements ItemJutsu.IJutsu {
-		private int lifespan = 300;
+		private int lifespan = 200;
 		private EC prevSegment;
 		private Entity target;
 		private Vec3d targetVec;
@@ -120,7 +120,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
 					if (this.ticksExisted > 50) {
-						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 10.0f);
+						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 2.0f);
 					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}

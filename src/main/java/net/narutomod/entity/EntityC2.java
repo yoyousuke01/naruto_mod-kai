@@ -35,11 +35,6 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 233;
 	public static final int ENTITYID_RANGED = 234;
 
-@ElementsNarutomodMod.ModElement.Tag
-public class EntityC2 extends ElementsNarutomodMod.ModElement {
-	public static final int ENTITYID = 233;
-	public static final int ENTITYID_RANGED = 234;
-
 	public EntityC2(ElementsNarutomodMod instance) {
 		super(instance, 545);
 	}

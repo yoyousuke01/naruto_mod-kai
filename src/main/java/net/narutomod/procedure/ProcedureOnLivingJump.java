@@ -1,8 +1,5 @@
 package net.narutomod.procedure;
 
-import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.Chakra;
-
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -12,6 +9,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
+
+import net.narutomod.ElementsNarutomodMod;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
@@ -38,9 +37,9 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 			float yaw = entity.rotationYaw * 0.017453292F;
 			float pitch = entity.rotationPitch * -0.017453292F;
 			double d0 = Math.min(Math.cos(pitch) / 0.7071d, 1.0d);
-			entity.motionX += -Math.sin(yaw) * d0 * speed * 2.5d;
-			entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
-			entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.42d);
+			entity.motionX += -Math.sin(yaw) * d0 * speed * 3.5d;
+			entity.motionZ += Math.cos(yaw) * d0 * speed * 3.5d;
+			entity.motionY = Math.max(motionY * Math.sin(pitch) * 3.0d, 0.42d);
 		}
 		entity.addExhaustion(1.0f);
 	}
