@@ -96,7 +96,6 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 
 	public static class GUIRenderEventClass {
 		private final List<EntityLivingBase> glowList = Lists.newArrayList();
-		private float prevrenderDistanceChunks;
 		private int prevRenderDistance;
 		private boolean first_on = true;
 		private EntityAltCamView.EntityCustom camEntity = null;
@@ -120,7 +119,7 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 					GlStateManager.disableAlpha();
 					GuiIngame.drawRect(sWidth / 2 - 5, sHeight / 2, sWidth / 2 + 5, sHeight / 2 + 1, -1);
 					GuiIngame.drawRect(sWidth / 2, sHeight / 2 - 5, sWidth / 2 + 1, sHeight / 2 + 5, -1);
-					this.setFOV(player);
+					this.setFOV(player, event.getPartialTicks());
 					for (EntityLivingBase entitylb : mc.world.getEntitiesWithinAABB(EntityLivingBase.class, 
 					 player.getEntityBoundingBox().grow(mc.gameSettings.renderDistanceChunks * 8))) {
 						if (!entitylb.isGlowing() && !entitylb.equals(player)) {
@@ -143,21 +142,23 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 		}
 
 		@SideOnly(Side.CLIENT)
-		private void setFOV(EntityPlayer player) {
-			double xp = PlayerTracker.getNinjaLevel(player) / 3;
+		private void setFOV(EntityPlayer player, float partialTicks) {
+			double xp = PlayerTracker.getNinjaLevel(player) * 0.33333d;
+			Minecraft mc = Minecraft.getMinecraft();
 			if (this.first_on) {
-				Minecraft mc = Minecraft.getMinecraft();
 				this.prevRenderDistance = mc.gameSettings.renderDistanceChunks;
-				mc.gameSettings.renderDistanceChunks = MathHelper.clamp((int)xp * 11 / 16, 16, 32);
+				mc.gameSettings.renderDistanceChunks = this.prevRenderDistance + 1;
 				this.camEntity = new EntityAltCamView.EntityCustom(player);
 				mc.world.spawnEntity(this.camEntity);
 				mc.setRenderViewEntity(this.camEntity);
 				this.first_on = false;
 			}
 			if (this.camEntity != null) {
-				Vec3d vec3d1 = player.getPositionEyes(1.0F)
-				 .add(player.getLookVec().scale(((110.0F - renderDistanceChunks) * Math.min((float)xp, 70f) / 10.0F + 1.0F)));
-				this.camEntity.setLocationAndAngles(vec3d1.x, vec3d1.y, vec3d1.z, player.rotationYaw, player.rotationPitch);
+				Vec3d vec3d1 = player.getPositionEyes(partialTicks)
+				 .add(player.getLook(partialTicks).scale(((110.0F - renderDistanceChunks) * Math.min((float)xp, 70f) / 10.0F + 1.0F)));
+				if (this.camEntity.posX != vec3d1.x || this.camEntity.posY != vec3d1.y || this.camEntity.posZ != vec3d1.z) {
+					this.camEntity.setLocationAndAngles(vec3d1.x, vec3d1.y, vec3d1.z, player.rotationYaw, player.rotationPitch);
+				}
 			}
 		}
 
@@ -167,7 +168,7 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.setRenderViewEntity(player);
 				if (this.camEntity != null) {
-					player.world.removeEntity(this.camEntity);
+					this.camEntity.setDead();
 					this.camEntity = null;
 				}
 				mc.gameSettings.renderDistanceChunks = this.prevRenderDistance;
@@ -180,7 +181,6 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 		public void onMouseEvent(MouseEvent event) {
 			if ((event.getButton() == 0 || event.getButton() == 1) && event.isButtonstate()) {
 				Minecraft mc = Minecraft.getMinecraft();
-
 				if (mc.objectMouseOver != null && mc.objectMouseOver.entityHit instanceof EntityPlayer && mc.objectMouseOver.entityHit.equals(mc.player)) {
 					event.setCanceled(true);
 				}

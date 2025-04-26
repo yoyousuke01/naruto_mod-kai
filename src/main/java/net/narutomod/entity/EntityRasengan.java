@@ -82,14 +82,14 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 
 		public EC(World a) {
 			super(a);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(0.5F, 0.35F);
 			this.isImmuneToFire = true;
 			this.damageSource = ItemJutsu.causeJutsuDamage(this, this.getOwner());
 		}
 
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(0.5F, 0.35F);
 			this.setEntityScale(0.1f);
 			this.setOwner(shooter);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, 0.0f, 0.0f);
@@ -198,6 +198,11 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void checkOnGround() {
+		}
+
+		@Override
+		public boolean canBeCollidedWith() {
+			return false;
 		}
 
 		@Override

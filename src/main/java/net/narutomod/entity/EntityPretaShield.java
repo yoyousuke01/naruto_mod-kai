@@ -112,9 +112,6 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (source.getImmediateSource() != null && this.absorbEntityChakra(source.getImmediateSource(), amount)) {
-				if (this.world instanceof WorldServer) {
-					((WorldServer)this.world).getEntityTracker().sendToTracking(this, new SPacketAnimation(this, 1));
-				}
 				return false;
 			}
 			if (ItemJutsu.isDamageSourceNinjutsu(source)) {
@@ -178,6 +175,9 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					if (ret) {
+						if (this.world instanceof WorldServer) {
+							((WorldServer)this.world).getEntityTracker().sendToTracking(this, new SPacketAnimation(this, 1));
+						}
 						Chakra.pathway(summoner).consume((double)-amount, true);
 						summoner.heal(amount * 0.01F);
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:charging_chakra")),
