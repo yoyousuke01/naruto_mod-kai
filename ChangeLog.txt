@@ -31,7 +31,7 @@ Jutsus
  - added wood release deep forest emergence (AOE jutsu)
  - biju cloak xp capped to 20,000
  - slightly buffed Vacuum wave damage
- - byakugan zoom/remove view: reduce client side lag, can spy on mobs/players from very far away
+ - byakugan zoom/remote view: reworked, reduce client lag, can spy on mobs/players from very far away
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)

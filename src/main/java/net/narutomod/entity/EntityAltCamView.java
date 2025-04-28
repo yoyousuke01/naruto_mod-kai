@@ -14,39 +14,23 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityTracker;
+import net.minecraft.entity.EntityTrackerEntry;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.network.play.server.SPacketChunkData;
-import net.minecraft.network.play.server.SPacketEntityMetadata;
-import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.network.play.server.SPacketEntityProperties;
-import net.minecraft.network.play.server.SPacketEntityEquipment;
-import net.minecraft.network.play.server.SPacketSpawnMob;
-import net.minecraft.network.play.server.SPacketEntityTeleport;
-import net.minecraft.network.play.server.SPacketEntity;
-import net.minecraft.network.play.server.SPacketEntityHeadLook;
-import net.minecraft.network.play.server.SPacketDestroyEntities;
-import net.minecraft.network.play.server.SPacketSpawnPlayer;
 import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.server.management.PlayerChunkMapEntry;
-import net.minecraft.inventory.EntityEquipmentSlot;
 
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.NarutomodMod;
@@ -56,13 +40,16 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Iterator;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import com.google.common.collect.ImmutableList;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 60;
-	private static final int CAMERA_RADIUS = 5;
+	private static final int CAMERA_RADIUS = 4;
 
 	public EntityAltCamView(ElementsNarutomodMod instance) {
 		super(instance, 268);
@@ -76,7 +63,6 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends Entity {
 		//private static final DataParameter<Integer> VIEWERID = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private EntityPlayer cachedViewer;
-		private final Set<ChunkPos> cameraLoadedChunks = new HashSet<>();
 
 		public EntityCustom(World world) {
 			super(world);
@@ -119,9 +105,18 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-		@SideOnly(Side.CLIENT)
 		@Override
 		public void onUpdate() {
+			if (this.world.isRemote) {
+				this.onEntityUpdate();
+		        // send chunk coordinates to server to load chunks and track entities
+		        PacketCameraPosition.sendToServer(this);
+			}
+		}
+
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void onEntityUpdate() {
 			EntityPlayer viewer = this.getViewer();
 			if (viewer instanceof EntityPlayerSP) {
 				EntityPlayerSP player = (EntityPlayerSP)viewer;
@@ -168,63 +163,9 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	            Minecraft mc = Minecraft.getMinecraft();
 	            ObfuscationReflectionHelper.setPrivateValue(EntityPlayerSP.class, player, player.onGround, 9);//player.prevOnGround = player.onGround;
 	            ObfuscationReflectionHelper.setPrivateValue(EntityPlayerSP.class, player, mc.gameSettings.autoJump, 30);//player.autoJumpEnabled = player.mc.gameSettings.autoJump;
-
-		        // load additional chunks for the camera
-		        Set<ChunkPos> cameraChunks = new HashSet<>();
-		        for (int dx = -CAMERA_RADIUS; dx <= CAMERA_RADIUS; dx++) {
-		            for (int dz = -CAMERA_RADIUS; dz <= CAMERA_RADIUS; dz++) {
-	                	cameraChunks.add(new ChunkPos(this.chunkCoordX + dx, this.chunkCoordZ + dz));
-		            }
-		        }
-		        for (ChunkPos pos : cameraChunks) {
-	            	if (!this.cameraLoadedChunks.contains(pos) && !this.world.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z)) {
-		                PacketCameraChunkRequest.sendToServer(pos.x, pos.z, (byte)0);
-		                this.cameraLoadedChunks.add(pos);
-		            }
-		        }
-		        Set<ChunkPos> toUnload = new HashSet<>(this.cameraLoadedChunks);
-		        toUnload.removeAll(cameraChunks);
-		        for (ChunkPos pos : toUnload) {
-		            this.unloadChunk(pos);
-		            this.cameraLoadedChunks.remove(pos);
-		        }
-		        // update camera loaded chunk's entities on the server
-		        for (ChunkPos pos : this.cameraLoadedChunks) {
-		        	if (this.world.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z)) {
-		        		PacketCameraChunkRequest.sendToServer(pos.x, pos.z, (byte)1);
-		        	}
-		        }
 			//} else {
 			//	this.setDead();
 			}
-		}
-
-		@SideOnly(Side.CLIENT)
-		private void unloadChunk(ChunkPos pos) {
-			WorldClient worldclient = (WorldClient)this.world;
-        	worldclient.doPreChunk(pos.x, pos.z, false);
-        	PacketCameraChunkRequest.sendToServer(pos.x, pos.z, (byte)2);
-		    // 2) Remove any entities left behind in those chunks
-		    /*Set<Entity> toRemove = new HashSet<>();
-		    for (Entity e : worldclient.loadedEntityList) {
-		        if (e.chunkCoordX == pos.x && e.chunkCoordZ == pos.z && !(e instanceof EntityPlayer)) {
-		            toRemove.add(e);
-		        }
-		    }
-		    // 3) Purge them from the client world
-		    for (Entity e : toRemove) {
-		        worldclient.removeEntityFromWorld(e.getEntityId());
-		    }*/
-		}
-
-		@SideOnly(Side.CLIENT)
-		@Override
-		public void setDead() {
-			super.setDead();
-	        for (ChunkPos pos : this.cameraLoadedChunks) {
-	        	this.unloadChunk(pos);
-	        }
-			this.cameraLoadedChunks.clear();
 		}
 
 		@Override
@@ -236,61 +177,37 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	/*@Override
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new ChunkEventHook());
-	}
-
-	public static class ChunkEventHook {
-		@SubscribeEvent
-		public void onChunkLoad(ChunkEvent.Load event) {
-	        if (event.getWorld().isRemote) {
-	            System.out.println("++++++ [Camera] Chunk loaded at " + event.getChunk().getPos());
-	        }
-		}
-
-		@SubscribeEvent
-		public void onChunkUnload(ChunkEvent.Unload event) {
-	        if (event.getWorld().isRemote) {
-	            System.out.println("++++++ [Camera] Chunk "+event.getChunk().getPos()+" unloaded");
-	        }
-		}
-	}*/
-
-	public static class PacketCameraChunkRequest implements IMessage {
-	    int chunkX, chunkZ;
-	    byte operation; // 0: load chunk and spawn entities; 1: update only; 2: unload chunk and destroy entities
+	public static class PacketCameraPosition implements IMessage {
+	    int x;
+	    int z;
 	
-	    public PacketCameraChunkRequest() {}
+	    public PacketCameraPosition() {}
 	
-	    public PacketCameraChunkRequest(int x, int z, byte op) {
-	        this.chunkX = x;
-	        this.chunkZ = z;
-	        this.operation = op;
+	    public PacketCameraPosition(Entity entity) {
+	    	this.x = entity.chunkCoordX;
+	    	this.z = entity.chunkCoordZ;
 	    }
-	
+
 	    @Override
 	    public void toBytes(ByteBuf buf) {
-	        buf.writeInt(chunkX);
-	        buf.writeInt(chunkZ);
-	        buf.writeByte(operation);
+	        buf.writeInt(this.x);
+	        buf.writeInt(this.z);
 	    }
 	
 	    @Override
 	    public void fromBytes(ByteBuf buf) {
-	        this.chunkX = buf.readInt();
-	        this.chunkZ = buf.readInt();
-	        this.operation = buf.readByte();
+	        this.x = buf.readInt();
+	        this.z = buf.readInt();
 	    }
 
-	    public static void sendToServer(int x, int z, byte op) {
-//System.out.println(">>>>>> sending packet to server, requesting chunk:("+x+", "+z+"), op:"+op);
-	    	NarutomodMod.PACKET_HANDLER.sendToServer(new PacketCameraChunkRequest(x, z, op));
+	    public static void sendToServer(Entity entity) {
+	    	NarutomodMod.PACKET_HANDLER.sendToServer(new PacketCameraPosition(entity));
 	    }
 	
-	    public static class Handler implements IMessageHandler<PacketCameraChunkRequest, IMessage> {
-	    	private Map<ChunkPos, Set<Integer>> chunkEntityMap = new HashMap<>();
-	    	private static final Method playerChunkMap$getOrCreateEntry;
+	    public static class Handler implements IMessageHandler<PacketCameraPosition, IMessage> {
+			private final Set<ChunkPos> cameraLoadedChunks = new HashSet<>();
+			private final Map<Integer, EntityTrackerEntry> entityTrackers = new HashMap<>();
+			private static final Method playerChunkMap$getOrCreateEntry;
 	    	static {
 	    		try {
 	    			playerChunkMap$getOrCreateEntry = ObfuscationReflectionHelper.findMethod(PlayerChunkMap.class, "func_187302_c", PlayerChunkMapEntry.class, int.class, int.class);
@@ -301,110 +218,71 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	    	}
 	    	
 	    	@Override
-	        public IMessage onMessage(PacketCameraChunkRequest msg, MessageContext ctx) {
+	        public IMessage onMessage(PacketCameraPosition msg, MessageContext ctx) {
 	        	EntityPlayerMP player = ctx.getServerHandler().player;
-                WorldServer world = player.getServerWorld();	
-	            world.addScheduledTask(() -> {
-	            	Chunk chunk = world.getChunkFromChunkCoords(msg.chunkX, msg.chunkZ);
-	            	ChunkPos pos = chunk.getPos();
-//System.out.println("====== server received packet, player:"+player.getName()+", requested chunk:("+msg.chunkX+", "+msg.chunkZ+"), op:"+msg.operation);
-	            	Set<Integer> previousEntityIds = this.chunkEntityMap.getOrDefault(pos, new HashSet<>());
-	            	Set<Integer> currentEntityIds = new HashSet<>();
-	            	if (msg.operation == 0) {
-	            		try {
-							PlayerChunkMapEntry entry = (PlayerChunkMapEntry)playerChunkMap$getOrCreateEntry.invoke(world.getPlayerChunkMap(), pos.x, pos.z);
-	 						entry.addPlayer(player);
-							entry.sendToPlayer(player);
-	            		} catch (ReflectiveOperationException e) {
-							throw new RuntimeException("Failed to create PlayerChunkMapEntry via playerChunkMap$getOrCreateEntry.invoke", e);
-						}
-						for (ClassInheritanceMultiMap<Entity> list : chunk.getEntityLists()) {
-						    for (Entity e : list) {
-							    // 1) Get and send the spawn packet
-							    Packet<?> spawnPkt = FMLNetworkHandler.getEntitySpawningPacket(e);
-							    if (spawnPkt == null) {
-								    if (e instanceof EntityPlayer) {
-								      	spawnPkt = new SPacketSpawnPlayer((EntityPlayer)e);
-								    } else if (e instanceof EntityLivingBase) {
-								        spawnPkt = new SPacketSpawnMob((EntityLivingBase)e);
-								    }
-							    }
-							    if (spawnPkt != null) {
-							        player.connection.sendPacket(spawnPkt);
-							    }
-		                        // properties, equipment slots
-		                        if (e instanceof EntityLivingBase) {
-		                            EntityLivingBase living = (EntityLivingBase) e;
-		                            player.connection.sendPacket(new SPacketEntityProperties(e.getEntityId(), living.getAttributeMap().getAllAttributes()));
-		                            for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-		                                if (!living.getItemStackFromSlot(slot).isEmpty()) {
-		                                    player.connection.sendPacket(new SPacketEntityEquipment(e.getEntityId(), slot, living.getItemStackFromSlot(slot)));
-		                                }
-		                            }
-		                        }
-							    // 2) Send metadata (health, custom flags, etc.)
-							    player.connection.sendPacket(new SPacketEntityMetadata(e.getEntityId(), e.getDataManager(), true));
-		                        // velocity always
-		                        player.connection.sendPacket(new SPacketEntityVelocity(e));
-	                           	currentEntityIds.add(e.getEntityId());
-						    }
-						}
-	            	} else if (msg.operation == 1) {
-						for (ClassInheritanceMultiMap<Entity> list : chunk.getEntityLists()) {
-						    for (Entity e : list) {
-		                        long dx = EntityTracker.getPositionLong(e.posX) - EntityTracker.getPositionLong(e.prevPosX);
-		                        long dy = EntityTracker.getPositionLong(e.posY) - EntityTracker.getPositionLong(e.prevPosY);
-		                        long dz = EntityTracker.getPositionLong(e.posZ) - EntityTracker.getPositionLong(e.prevPosZ);
-		                        int i = MathHelper.floor(e.rotationYaw * 256.0F / 360.0F);
-		                        int j = MathHelper.floor(e.rotationPitch * 256.0F / 360.0F);
-		                        //if (dx != 0L || dy != 0L || dz != 0L || i != MathHelper.floor(e.prevRotationYaw * 256.0F / 360.0F) || j != MathHelper.floor(e.prevRotationPitch * 256.0F / 360.0F)) {
-		                        	Packet<?> pkt = Math.abs(dx) < 32768L && Math.abs(dy) < 32768L && Math.abs(dz) < 32768L
-		                        	 ? new SPacketEntity.S17PacketEntityLookMove(e.getEntityId(), dx, dy, dz, (byte)i, (byte)j, e.onGround)
-			                         : new SPacketEntityTeleport(e);
-		                        	player.connection.sendPacket(pkt);
-		                        //}
-		                        if (e instanceof EntityLivingBase) {
-		                        	int k = MathHelper.floor(e.getRotationYawHead() * 256.0F / 360.0F);
-		                        	if (k != MathHelper.floor(((EntityLivingBase)e).prevRotationYawHead * 256.0F / 360.0F)) {
-		                        		player.connection.sendPacket(new SPacketEntityHeadLook(e, (byte)k));
-		                        	}
-		                        }
-		                        // velocity always
-		                        player.connection.sendPacket(new SPacketEntityVelocity(e));
-	                           	currentEntityIds.add(e.getEntityId());
-						    }
-						}
-	            	} else {
-	            		PlayerChunkMapEntry entry = world.getPlayerChunkMap().getEntry(pos.x, pos.z);
-	            		if (entry != null) {
-	            			entry.removePlayer(player);
-	            		}
-						for (ClassInheritanceMultiMap<Entity> list : chunk.getEntityLists()) {
-						    for (Entity e : list) {
-	                           	currentEntityIds.add(e.getEntityId());
-						    }
-						}
-					}
-					// Determine which entities have been removed
-					Set<Integer> removedEntityIds = new HashSet<>(previousEntityIds);
-					removedEntityIds.removeAll(currentEntityIds);
-					if (msg.operation == 2) {
-						removedEntityIds.addAll(currentEntityIds);
-						currentEntityIds.clear();
-					}
-					// Send destroy packets for removed entities
-					if (!removedEntityIds.isEmpty()) {
-					    int[] idsToDestroy = removedEntityIds.stream().mapToInt(Integer::intValue).toArray();
-					    player.connection.sendPacket(new SPacketDestroyEntities(idsToDestroy));
-					}
-					// Update the record for the next comparison
-					if (!currentEntityIds.isEmpty()) {
-						this.chunkEntityMap.put(pos, currentEntityIds);
-					} else {
-						this.chunkEntityMap.remove(pos);
-					}
+	            player.getServerWorld().addScheduledTask(() -> {
+	            	this.doChunkLoading(player, msg.x, msg.z);
 				});
 	            return null;
+	        }
+
+	        public void doChunkLoading(EntityPlayerMP player, int chunkX, int chunkZ) {
+                WorldServer world = player.getServerWorld();	
+		        Set<ChunkPos> cameraChunks = new HashSet<>();
+			    for (int dx = -CAMERA_RADIUS; dx <= CAMERA_RADIUS; dx++) {
+			        for (int dz = -CAMERA_RADIUS; dz <= CAMERA_RADIUS; dz++) {
+		               	cameraChunks.add(new ChunkPos(chunkX + dx, chunkZ + dz));
+			        }
+			    }
+			    PlayerChunkMap playerchunkmap = world.getPlayerChunkMap();
+			    for (ChunkPos pos : cameraChunks) {
+		           	if (!this.cameraLoadedChunks.contains(pos) && world.isChunkGeneratedAt(pos.x, pos.z)
+		           	 && !playerchunkmap.isPlayerWatchingChunk(player, pos.x, pos.z)) {
+		           		try {
+							PlayerChunkMapEntry entry = (PlayerChunkMapEntry)playerChunkMap$getOrCreateEntry.invoke(world.getPlayerChunkMap(), pos.x, pos.z);
+		 					entry.addPlayer(player);
+							entry.sendToPlayer(player);
+		           		} catch (ReflectiveOperationException e) {
+							throw new RuntimeException("Failed to create PlayerChunkMapEntry via playerChunkMap$getOrCreateEntry.invoke", e);
+						}
+			            this.cameraLoadedChunks.add(pos);
+			        }
+			    }
+			    Set<ChunkPos> toUnload = new HashSet<>(this.cameraLoadedChunks);
+			    toUnload.removeAll(cameraChunks);
+			    for (ChunkPos pos : toUnload) {
+	            	PlayerChunkMapEntry entry = playerchunkmap.getEntry(pos.x, pos.z);
+	            	if (entry != null) {
+	            		entry.removePlayer(player);
+	            	}
+			        this.cameraLoadedChunks.remove(pos);
+			    }
+			    // update camera loaded chunk's entities
+	            Set<Integer> currentEntityIds = new HashSet<>();
+			    for (ChunkPos pos : this.cameraLoadedChunks) {
+			       	if (world.isChunkGeneratedAt(pos.x, pos.z)) {
+						for (ClassInheritanceMultiMap<Entity> list : world.getChunkFromChunkCoords(pos.x, pos.z).getEntityLists()) {
+						    for (Entity e : list) {
+						    	if (!this.entityTrackers.containsKey(e.getEntityId())) {
+		                       		this.entityTrackers.put(e.getEntityId(), new EntityTrackerEntry(e, 1024, 1024, 2, false));
+						    	}
+						    	currentEntityIds.add(e.getEntityId());
+						    }
+						}
+			       	}
+			    }
+				List<EntityPlayer> list = ImmutableList.of(player);
+				Iterator<Map.Entry<Integer, EntityTrackerEntry>> iter = this.entityTrackers.entrySet().iterator();
+				while (iter.hasNext()) {
+					Map.Entry<Integer, EntityTrackerEntry> entry = iter.next();
+					if (currentEntityIds.contains(entry.getKey())) {
+						entry.getValue().updatePlayerList(list);
+					} else {
+						entry.getValue().setMaxRange(-1);
+						entry.getValue().updatePlayerEntity(player);
+						iter.remove();
+					}
+				}
 	        }
 	    }
 	}
@@ -412,7 +290,7 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
-		this.elements.addNetworkMessage(PacketCameraChunkRequest.Handler.class, PacketCameraChunkRequest.class, Side.SERVER);
+		this.elements.addNetworkMessage(PacketCameraPosition.Handler.class, PacketCameraPosition.class, Side.SERVER);
 	}
 
 	public static class Renderer extends EntityRendererRegister {

@@ -218,7 +218,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer cube_r18;
 			private final ModelRenderer leftHand;
 			private final ModelRenderer leftFingers;
-			private final float maxAlpha = 0.6f;
+			private final float maxAlpha = 0.8f;
 			private boolean renderFlame;
 			private final float[][] rightArmPreset = { { -1.0472F, 1.0472F, 0.5236F }, { -1.0472F, -1.0472F, 0.0F }, { -0.9599F, 0.0F, 0.0F } };
 
