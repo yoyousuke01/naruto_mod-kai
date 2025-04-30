@@ -99,7 +99,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCustom extends EntityNinjaMob.Base implements IMob, IRangedAttackMob {
 		private static final DataParameter<Integer> JASHIN_TICKS = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
-		private final DamageSource selfDamage = DamageSource.causeMobDamage(this).setDamageIsAbsolute().setDamageIsAbsolute();
+		private final DamageSource selfDamage = DamageSource.causeMobDamage(this).setDamageBypassesArmor().setDamageIsAbsolute();
 		private final int transitionTime = 60;
 		private int jashinTransitionDirection;
 		private EntityLivingBase curseTarget;

@@ -726,7 +726,14 @@ public class EntityClone extends ElementsNarutomodMod.ModElement {
 		        super(renderManager, new ModelClone(0.0F, false), 0.5F);
 		        this.normalModel = (ModelClone)this.mainModel;
 		        this.addLayer(new BipedArmorLayer(this));
-		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerHeldItem(this));
+		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerHeldItem(this) {
+		        	@Override
+		        	public void doRenderLayer(EntityLivingBase entity, float f1, float f2, float f3, float f4, float f5, float f6, float f7) {
+		        		if (this.livingEntityRenderer.getMainModel() instanceof ModelBiped) {
+		        			super.doRenderLayer(entity, f1, f2, f3, f4, f5, f6, f7);
+		        		}
+		        	}
+		        });
 		        //this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerDeadmau5Head(this));
 		        //this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerCape(this));
 		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerCustomHead(((ModelBiped)this.getMainModel()).bipedHead));

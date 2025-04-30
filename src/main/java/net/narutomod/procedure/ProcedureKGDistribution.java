@@ -2,6 +2,7 @@ package net.narutomod.procedure;
 
 import net.narutomod.item.ItemYooton;
 import net.narutomod.item.ItemSuiton;
+import net.narutomod.item.ItemShoton;
 import net.narutomod.item.ItemShikotsumyaku;
 import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemShakuton;
@@ -91,6 +92,7 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 		double futton_weight = 0;
 		double kekkeitota_weight = 0;
 		double jinchuriki_weight = 0;
+		double shoton_weight = 0;
 		sharingan_weight = (double) 10;
 		byakugan_weight = (double) 10;
 		shikotsumyaku_weight = (double) 10;
@@ -101,11 +103,13 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 		bakuton_weight = (double) 10;
 		ranton_weight = (double) 10;
 		futton_weight = (double) 10;
+		shoton_weight = (double) 10;
 		kekkeitota_weight = (double) 5;
 		jinchuriki_weight = (double) 5;
 		rngbase = (double) ((ModConfig.SPAWN_AS_JINCHURIKI && EntityBijuManager.availableBijus() > 0 ? jinchuriki_weight : 0)
-				+ (((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
-						+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight)) + (kekkeitota_weight)));
+				+ ((((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
+						+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight)) + (shoton_weight))
+						+ (kekkeitota_weight)));
 		if ((((EntityLivingBase) entity).getRNG().nextDouble() <= ((byakugan_weight) / (rngbase)))) {
 			stack = new ItemStack(ItemByakugan.helmet, (int) (1));
 			if ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
@@ -525,14 +529,64 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			stack = new ItemStack(ItemFutton.block, (int) (1));
+		} else if (((ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemRaiton.block)
+				|| ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemFuton.block))
+				&& (((EntityLivingBase) entity).getRNG()
+						.nextDouble() <= (((shoton_weight) / ((rngbase)
+								- ((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
+										+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight))))
+								/ 0.4)))) {
+			if ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+					? ((EntityPlayerMP) entity).getAdvancements()
+							.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+									.getAdvancement(new ResourceLocation("narutomod:shoton_acquired")))
+							.isDone()
+					: false))) {
+				if (entity instanceof EntityPlayerMP) {
+					Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
+							.getAdvancement(new ResourceLocation("narutomod:shoton_acquired"));
+					AdvancementProgress _ap = ((EntityPlayerMP) entity).getAdvancements().getProgress(_adv);
+					if (!_ap.isDone()) {
+						Iterator _iterator = _ap.getRemaningCriteria().iterator();
+						while (_iterator.hasNext()) {
+							String _criterion = (String) _iterator.next();
+							((EntityPlayerMP) entity).getAdvancements().grantCriterion(_adv, _criterion);
+						}
+					}
+				}
+				world.playSound((EntityPlayer) null, x, y, z, (net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
+						.getObject(new ResourceLocation("ui.toast.challenge_complete")), SoundCategory.NEUTRAL, (float) 1, (float) 1);
+			}
+			if ((!((entity instanceof EntityPlayer)
+					? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemRaiton.block, (int) (1)))
+					: false))) {
+				stack = new ItemStack(ItemRaiton.block, (int) (1));
+				((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+				if (entity instanceof EntityPlayer) {
+					ItemStack _setstack = (stack);
+					_setstack.setCount(1);
+					ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+				}
+			}
+			if ((!((entity instanceof EntityPlayer)
+					? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemFuton.block, (int) (1)))
+					: false))) {
+				stack = new ItemStack(ItemFuton.block, (int) (1));
+				((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+				if (entity instanceof EntityPlayer) {
+					ItemStack _setstack = (stack);
+					_setstack.setCount(1);
+					ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+				}
+			}
+			stack = new ItemStack(ItemShoton.block, (int) (1));
 		} else if (((ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemKaton.block)
 				|| (ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemDoton.block)
 						|| ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer) entity, ItemFuton.block)))
-				&& (((EntityLivingBase) entity).getRNG()
-						.nextDouble() <= (((kekkeitota_weight) / ((rngbase)
-								- ((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
-										+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight))))
-								/ 0.6)))) {
+				&& (((EntityLivingBase) entity).getRNG().nextDouble() <= (((kekkeitota_weight) / ((rngbase)
+						- (((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
+								+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight)) + (shoton_weight))))
+						/ 0.6)))) {
 			if (entity instanceof EntityPlayerMP) {
 				Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
 						.getAdvancement(new ResourceLocation("narutomod:kekkei_tota_awakened"));
@@ -583,8 +637,9 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 			stack = new ItemStack(ItemJinton.block, (int) (1));
 		} else {
 			stack = new ItemStack(Blocks.AIR, (int) (1));
-			if (((rngbase) > (((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
-					+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight)) + (kekkeitota_weight)))) {
+			if (((rngbase) > ((((((((((((sharingan_weight) + (byakugan_weight)) + (shikotsumyaku_weight)) + (yooton_weight)) + (shakuton_weight))
+					+ (hyoton_weight)) + (jiton_weight)) + (bakuton_weight)) + (ranton_weight)) + (futton_weight)) + (shoton_weight))
+					+ (kekkeitota_weight)))) {
 				int tails = EntityBijuManager.getRandomAvailableBiju();
 				if (EntityBijuManager.setVesselByTails(entity, tails)) {
 					world.playSound((EntityPlayer) null, x, y, z, (net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY

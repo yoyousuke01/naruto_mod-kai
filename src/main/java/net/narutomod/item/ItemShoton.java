@@ -85,7 +85,8 @@ public class ItemShoton extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
-			if (entity.isCreative() || ProcedureUtils.hasItemInInventory(entity, ItemDoton.block)) {
+			if (entity.isCreative() || (ProcedureUtils.hasItemInInventory(entity, ItemFuton.block) 
+			 && ProcedureUtils.hasItemInInventory(entity, ItemRaiton.block))) {
 				return super.onItemRightClick(world, entity, hand);
 			}
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, entity.getHeldItem(hand));

@@ -2,6 +2,7 @@ package net.narutomod.procedure;
 
 import net.narutomod.item.ItemYooton;
 import net.narutomod.item.ItemSuiton;
+import net.narutomod.item.ItemShoton;
 import net.narutomod.item.ItemShikotsumyaku;
 import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemShakuton;
@@ -274,6 +275,28 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					} else if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 							? ((EntityPlayerMP) entity).getAdvancements()
 									.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+											.getAdvancement(new ResourceLocation("narutomod:shoton_acquired")))
+									.isDone()
+							: false)) {
+						stack = new ItemStack(ItemFuton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+						if (entity instanceof EntityPlayer) {
+							ItemStack _setstack = (stack);
+							_setstack.setCount(1);
+							ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+						}
+						stack = new ItemStack(ItemRaiton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+						if (entity instanceof EntityPlayer) {
+							ItemStack _setstack = (stack);
+							_setstack.setCount(1);
+							ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+						}
+						stack = new ItemStack(ItemShoton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setOwner(stack, (EntityLivingBase) entity);
+					} else if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+							? ((EntityPlayerMP) entity).getAdvancements()
+									.getProgress(((WorldServer) (entity).world).getAdvancementManager()
 											.getAdvancement(new ResourceLocation("narutomod:kekkei_tota_awakened")))
 									.isDone()
 							: false)) {
@@ -435,9 +458,10 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 							&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJiton.block)))
 					&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShakuton.block)
 							&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemBakuton.block))
-							&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJinton.block)
-									&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemFutton.block))
-									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShikotsumyaku.block)
+							&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShikotsumyaku.block)
+									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemFutton.block)
+											&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShoton.block)))
+									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJinton.block)
 											&& !EntityBijuManager.isJinchuriki((EntityPlayer) entity)))))) {
 				if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 					{
@@ -503,12 +527,18 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 																		.getAdvancement(new ResourceLocation("narutomod:jiton_acquired")))
 																.isDone()
 														: false)))
-												&& ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+												&& (((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 														? ((EntityPlayerMP) entity).getAdvancements()
 																.getProgress(((WorldServer) (entity).world).getAdvancementManager()
 																		.getAdvancement(new ResourceLocation("narutomod:futton_acquired")))
 																.isDone()
 														: false))
+														&& (!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+																? ((EntityPlayerMP) entity).getAdvancements()
+																		.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+																				.getAdvancement(new ResourceLocation("narutomod:shoton_acquired")))
+																		.isDone()
+																: false)))
 														&& ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 																? ((EntityPlayerMP) entity).getAdvancements()
 																		.getProgress(

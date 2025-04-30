@@ -227,7 +227,7 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	        }
 
 	        public void doChunkLoading(EntityPlayerMP player, int chunkX, int chunkZ) {
-                WorldServer world = player.getServerWorld();	
+                WorldServer world = player.getServerWorld();
 		        Set<ChunkPos> cameraChunks = new HashSet<>();
 			    for (int dx = -CAMERA_RADIUS; dx <= CAMERA_RADIUS; dx++) {
 			        for (int dz = -CAMERA_RADIUS; dz <= CAMERA_RADIUS; dz++) {

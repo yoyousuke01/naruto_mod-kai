@@ -2,7 +2,7 @@
 
 Jutsus
  - wearing any dojutsu not bound to you consumes 15 chakra / second
- - added Crystal release [crystal armor, crystal prison, divine path, ray of light (add cooldown)]
+ - added Crystal release [crystal armor, crystal prison, divine path, ray of light (add cooldown)] to random KG assignment
  - crystal armor only grants strength when not holding a weapon
  - projectiles now bounce off Flame formation jutsu
  - wood prison won't leave open spaces at the bottom of the cage
