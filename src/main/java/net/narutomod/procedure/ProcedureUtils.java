@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.math.Vec3d;
@@ -965,13 +966,16 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		return getGroundBelow(entity.world, MathHelper.floor(entity.posX), MathHelper.floor(entity.posY), MathHelper.floor(entity.posZ));
 	}
 
-	public static BlockPos getGroundBelow(World world, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
+	public static BlockPos getGroundBelow(World world, BlockPos pos) {
 		for ( ; pos.getY() > 0 && world.getBlockState(pos).getCollisionBoundingBox(world, pos) == null; pos = pos.down()) ;
 		if (pos.getY() > 0) {
 			return pos;
 		}
 		return BlockPos.ORIGIN;
+	}
+
+	public static BlockPos getGroundBelow(World world, int x, int y, int z) {
+		return getGroundBelow(world, new BlockPos(x, y, z));
 	}
 	
 	public static int getTopSolidBlockY(World world, BlockPos pos) {
@@ -1340,6 +1344,25 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
         public int compare(BlockPos p_compare_1_, BlockPos p_compare_2_) {
             double d0 = this.pos.distanceSq(p_compare_1_);
             double d1 = this.pos.distanceSq(p_compare_2_);
+            if (d0 < d1) {
+                return -1;
+            } else {
+                return d0 > d1 ? 1 : 0;
+            }
+        }
+    }
+
+    public static class BlockInfoSorter implements Comparator<Template.BlockInfo> {
+        private final BlockPos pos;
+	
+        public BlockInfoSorter(BlockPos posIn) {
+            this.pos = posIn;
+        }
+	
+    	@Override
+        public int compare(Template.BlockInfo p_compare_1_, Template.BlockInfo p_compare_2_) {
+            double d0 = this.pos.distanceSq(p_compare_1_.pos);
+            double d1 = this.pos.distanceSq(p_compare_2_.pos);
             if (d0 < d1) {
                 return -1;
             } else {

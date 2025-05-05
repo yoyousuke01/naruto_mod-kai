@@ -168,6 +168,18 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		protected void onSetDead() {
+			if (this.world.isRemote) {
+				PacketCameraPosition.sendToServer(this);
+			}
+		}
+
+		@Override
+		public void setDead() {
+			super.setDead();
+			this.onSetDead();
+		}
+
 		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
 		}
@@ -180,24 +192,28 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	public static class PacketCameraPosition implements IMessage {
 	    int x;
 	    int z;
+	    boolean flushAll;
 	
 	    public PacketCameraPosition() {}
 	
 	    public PacketCameraPosition(Entity entity) {
 	    	this.x = entity.chunkCoordX;
 	    	this.z = entity.chunkCoordZ;
+	    	this.flushAll = entity.isDead;
 	    }
 
 	    @Override
 	    public void toBytes(ByteBuf buf) {
 	        buf.writeInt(this.x);
 	        buf.writeInt(this.z);
+	        buf.writeBoolean(this.flushAll);
 	    }
 	
 	    @Override
 	    public void fromBytes(ByteBuf buf) {
 	        this.x = buf.readInt();
 	        this.z = buf.readInt();
+	        this.flushAll = buf.readBoolean();
 	    }
 
 	    public static void sendToServer(Entity entity) {
@@ -221,7 +237,11 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	        public IMessage onMessage(PacketCameraPosition msg, MessageContext ctx) {
 	        	EntityPlayerMP player = ctx.getServerHandler().player;
 	            player.getServerWorld().addScheduledTask(() -> {
-	            	this.doChunkLoading(player, msg.x, msg.z);
+	            	if (msg.flushAll) {
+	            		this.flushChunks(player);
+	            	} else {
+	            		this.doChunkLoading(player, msg.x, msg.z);
+	            	}
 				});
 	            return null;
 	        }
@@ -236,10 +256,10 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 			    }
 			    PlayerChunkMap playerchunkmap = world.getPlayerChunkMap();
 			    for (ChunkPos pos : cameraChunks) {
-		           	if (!this.cameraLoadedChunks.contains(pos) && world.isChunkGeneratedAt(pos.x, pos.z)
-		           	 && !playerchunkmap.isPlayerWatchingChunk(player, pos.x, pos.z)) {
+		           	if (/*!this.cameraLoadedChunks.contains(pos) && world.isChunkGeneratedAt(pos.x, pos.z)
+		           	 &&*/ !playerchunkmap.isPlayerWatchingChunk(player, pos.x, pos.z)) {
 		           		try {
-							PlayerChunkMapEntry entry = (PlayerChunkMapEntry)playerChunkMap$getOrCreateEntry.invoke(world.getPlayerChunkMap(), pos.x, pos.z);
+							PlayerChunkMapEntry entry = (PlayerChunkMapEntry)playerChunkMap$getOrCreateEntry.invoke(playerchunkmap, pos.x, pos.z);
 		 					entry.addPlayer(player);
 							entry.sendToPlayer(player);
 		           		} catch (ReflectiveOperationException e) {
@@ -283,6 +303,22 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 						iter.remove();
 					}
 				}
+	        }
+
+	        public void flushChunks(EntityPlayerMP player) {
+	        	PlayerChunkMap playerchunkmap = player.getServerWorld().getPlayerChunkMap();
+			    for (ChunkPos pos : this.cameraLoadedChunks) {
+	            	PlayerChunkMapEntry entry = playerchunkmap.getEntry(pos.x, pos.z);
+	            	if (entry != null) {
+	            		entry.removePlayer(player);
+	            	}
+			    }
+			    for (EntityTrackerEntry entry : this.entityTrackers.values()) {
+					entry.setMaxRange(-1);
+					entry.updatePlayerEntity(player);
+			    }
+			    this.cameraLoadedChunks.clear();
+			    this.entityTrackers.clear();
 	        }
 	    }
 	}

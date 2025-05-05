@@ -32,6 +32,8 @@ Jutsus
  - biju cloak xp capped to 20,000
  - slightly buffed Vacuum wave damage
  - byakugan zoom/remote view: reworked, reduce client lag, can spy on mobs/players from very far away
+ - fixed earth wall jutsu skipping sections of the wall in water and grass
+ - adding magnet release third eye jutsu (WIP)
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)

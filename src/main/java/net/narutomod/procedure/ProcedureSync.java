@@ -410,7 +410,7 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 			entity.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
 		}
 
-		PositionRotationPacket(ByteBuf buf) {
+		public PositionRotationPacket(ByteBuf buf) {
 			this.posX = buf.readDouble();
 			this.posY = buf.readDouble();
 			this.posZ = buf.readDouble();
@@ -418,7 +418,7 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 			this.rotationPitch = buf.readFloat();
 		}
 
-		void toBytes(ByteBuf buf) {
+		public void toBytes(ByteBuf buf) {
 			buf.writeDouble(this.posX);
 			buf.writeDouble(this.posY);
 			buf.writeDouble(this.posZ);
@@ -444,6 +444,10 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 
 		public static void sendToSelf(EntityPlayerMP entity) {
 			NarutomodMod.PACKET_HANDLER.sendTo(new EntityPositionAndRotation(entity), entity);
+		}
+
+		public static void sendTo(Entity entity, EntityPlayerMP player) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityPositionAndRotation(entity), player);
 		}
 
 		public static void sendToServer(Entity entity) {

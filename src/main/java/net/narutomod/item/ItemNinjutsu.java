@@ -182,7 +182,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 		protected void onSetDead() {
 			this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvent.REGISTRY
 			  .getObject(new ResourceLocation("narutomod:poof")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
-			if (!this.world.isRemote && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this)) {
+			if (!this.world.isRemote) {// && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this)) {
 				BlockPos pos = new BlockPos(this).up();
 				this.world.setBlockState(pos, Blocks.LOG.getDefaultState(), 3);
 				EntityFallingBlock fe = new EntityFallingBlock(this.world,
@@ -196,6 +196,8 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				};
+				fe.motionX = this.motionX;
+				fe.motionZ = this.motionZ;
 				fe.motionY = 0.15d;
 				this.world.spawnEntity(fe);
 			}

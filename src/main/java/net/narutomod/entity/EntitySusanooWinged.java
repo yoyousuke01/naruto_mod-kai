@@ -549,6 +549,8 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer flap6;
 			private final ModelRenderer flap7;
 			private final ModelRenderer flap8;
+			private final ModelRenderer flap9;
+			private final ModelRenderer flap10;
 			private final ModelRenderer leftWing;
 			private final ModelRenderer bone2;
 			private final ModelRenderer leftClaw;
@@ -557,15 +559,17 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer finger3_r2;
 			private final ModelRenderer finger2_r2;
 			private final ModelRenderer thumb_r2;
-			private final ModelRenderer flap9;
-			private final ModelRenderer flap10;
 			private final ModelRenderer flap11;
 			private final ModelRenderer flap12;
 			private final ModelRenderer flap13;
 			private final ModelRenderer flap14;
 			private final ModelRenderer flap15;
 			private final ModelRenderer flap16;
-			private final float modelScale = MODELSCALE;
+			private final ModelRenderer flap17;
+			private final ModelRenderer flap18;
+			private final ModelRenderer flap19;
+			private final ModelRenderer flap20;
+		private final float modelScale = MODELSCALE;
 			private final float maxAlpha = 1.0f;
 			private boolean renderFlame;
 			public float wingSwingProgress;
@@ -1023,7 +1027,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				bone3 = new ModelRenderer(this);
 				bone3.setRotationPoint(0.0F, 0.0F, 1.0F);
 				rightWing.addChild(bone3);
-				setRotationAngle(bone3, -0.2618F, 0.0F, 0.0F);
+				setRotationAngle(bone3, -0.2618F, 0.0F, -0.5236F);
 				bone3.cubeList.add(new ModelBox(bone3, 16, 34, -3.5F, -15.5F, 0.0F, 4, 16, 1, 0.0F, false));
 		
 				rightClaw = new ModelRenderer(this);
@@ -1065,42 +1069,62 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				flap1 = new ModelRenderer(this);
 				flap1.setRotationPoint(-1.5F, -14.5F, 0.5F);
 				bone3.addChild(flap1);
+				setRotationAngle(flap1, 0.0F, 0.0F, 2.4435F);
 				flap1.cubeList.add(new ModelBox(flap1, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, false));
 		
 				flap2 = new ModelRenderer(this);
-				flap2.setRotationPoint(-1.5F, -12.5F, 0.5F);
+				flap2.setRotationPoint(-1.5F, -13.0F, 0.5F);
 				bone3.addChild(flap2);
+				setRotationAngle(flap2, 0.0F, 0.0F, 2.3562F);
 				flap2.cubeList.add(new ModelBox(flap2, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, false));
 		
 				flap3 = new ModelRenderer(this);
-				flap3.setRotationPoint(-1.5F, -10.5F, 0.5F);
+				flap3.setRotationPoint(-1.5F, -11.5F, 0.5F);
 				bone3.addChild(flap3);
+				setRotationAngle(flap3, 0.0F, 0.0F, 2.2689F);
 				flap3.cubeList.add(new ModelBox(flap3, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, false));
 		
 				flap4 = new ModelRenderer(this);
-				flap4.setRotationPoint(-1.5F, -8.5F, 0.5F);
+				flap4.setRotationPoint(-1.5F, -10.0F, 0.5F);
 				bone3.addChild(flap4);
+				setRotationAngle(flap4, 0.0F, 0.0F, 2.1817F);
 				flap4.cubeList.add(new ModelBox(flap4, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, false));
 		
 				flap5 = new ModelRenderer(this);
-				flap5.setRotationPoint(-1.5F, -6.5F, 0.5F);
+				flap5.setRotationPoint(-1.5F, -8.5F, 0.5F);
 				bone3.addChild(flap5);
+				setRotationAngle(flap5, 0.0F, 0.0F, 2.0944F);
 				flap5.cubeList.add(new ModelBox(flap5, 26, 46, -1.0F, -1.0F, -0.5F, 2, 24, 1, 0.2F, false));
 		
 				flap6 = new ModelRenderer(this);
-				flap6.setRotationPoint(-1.5F, -4.5F, 0.5F);
+				flap6.setRotationPoint(-1.5F, -7.0F, 0.5F);
 				bone3.addChild(flap6);
+				setRotationAngle(flap6, 0.0F, 0.0F, 2.0071F);
 				flap6.cubeList.add(new ModelBox(flap6, 26, 46, -1.0F, 0.0F, -0.5F, 2, 20, 1, 0.2F, false));
 		
 				flap7 = new ModelRenderer(this);
-				flap7.setRotationPoint(-1.5F, -2.5F, 0.5F);
+				flap7.setRotationPoint(-1.5F, -5.5F, 0.5F);
 				bone3.addChild(flap7);
+				setRotationAngle(flap7, 0.0F, 0.0F, 1.9199F);
 				flap7.cubeList.add(new ModelBox(flap7, 26, 46, -1.0F, 0.0F, -0.5F, 2, 18, 1, 0.1F, false));
 		
 				flap8 = new ModelRenderer(this);
-				flap8.setRotationPoint(-0.5F, -0.5F, 0.5F);
+				flap8.setRotationPoint(-0.5F, -4.0F, 0.5F);
 				bone3.addChild(flap8);
+				setRotationAngle(flap8, 0.0F, 0.0F, 1.8326F);
 				flap8.cubeList.add(new ModelBox(flap8, 26, 46, -1.0F, 0.0F, -0.5F, 2, 16, 1, 0.1F, false));
+		
+				flap9 = new ModelRenderer(this);
+				flap9.setRotationPoint(-0.5F, -2.5F, 0.5F);
+				bone3.addChild(flap9);
+				setRotationAngle(flap9, 0.0F, 0.0F, 1.7453F);
+				flap9.cubeList.add(new ModelBox(flap9, 26, 46, -1.0F, 0.0F, -0.5F, 2, 14, 1, 0.1F, false));
+		
+				flap10 = new ModelRenderer(this);
+				flap10.setRotationPoint(-0.5F, -1.0F, 0.5F);
+				bone3.addChild(flap10);
+				setRotationAngle(flap10, 0.0F, 0.0F, 1.6581F);
+				flap10.cubeList.add(new ModelBox(flap10, 26, 46, -1.0F, 0.0F, -0.5F, 2, 12, 1, 0.1F, false));
 		
 				leftWing = new ModelRenderer(this);
 				leftWing.setRotationPoint(1.5F, 2.5F, 2.0F);
@@ -1110,7 +1134,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				bone2 = new ModelRenderer(this);
 				bone2.setRotationPoint(0.0F, 0.0F, 1.0F);
 				leftWing.addChild(bone2);
-				setRotationAngle(bone2, -0.2618F, 0.0F, 0.0F);
+				setRotationAngle(bone2, -0.2618F, 0.0F, 0.5236F);
 				bone2.cubeList.add(new ModelBox(bone2, 16, 34, -0.5F, -15.5F, 0.0F, 4, 16, 1, 0.0F, true));
 		
 				leftClaw = new ModelRenderer(this);
@@ -1149,45 +1173,65 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(thumb_r2, -0.0436F, 0.2618F, -0.6109F);
 				thumb_r2.cubeList.add(new ModelBox(thumb_r2, 0, 6, -0.0579F, 0.2F, -1.0F, 1, 1, 2, 0.0F, true));
 		
-				flap9 = new ModelRenderer(this);
-				flap9.setRotationPoint(1.5F, -14.5F, 0.5F);
-				bone2.addChild(flap9);
-				flap9.cubeList.add(new ModelBox(flap9, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
-		
-				flap10 = new ModelRenderer(this);
-				flap10.setRotationPoint(1.5F, -12.5F, 0.5F);
-				bone2.addChild(flap10);
-				flap10.cubeList.add(new ModelBox(flap10, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
-		
 				flap11 = new ModelRenderer(this);
-				flap11.setRotationPoint(1.5F, -10.5F, 0.5F);
+				flap11.setRotationPoint(1.5F, -14.5F, 0.5F);
 				bone2.addChild(flap11);
+				setRotationAngle(flap11, 0.0F, 0.0F, -2.4435F);
 				flap11.cubeList.add(new ModelBox(flap11, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
 		
 				flap12 = new ModelRenderer(this);
-				flap12.setRotationPoint(1.5F, -8.5F, 0.5F);
+				flap12.setRotationPoint(1.5F, -13.0F, 0.5F);
 				bone2.addChild(flap12);
+				setRotationAngle(flap12, 0.0F, 0.0F, -2.3562F);
 				flap12.cubeList.add(new ModelBox(flap12, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
 		
 				flap13 = new ModelRenderer(this);
-				flap13.setRotationPoint(1.5F, -6.5F, 0.5F);
+				flap13.setRotationPoint(1.5F, -11.5F, 0.5F);
 				bone2.addChild(flap13);
-				flap13.cubeList.add(new ModelBox(flap13, 26, 46, -1.0F, -1.0F, -0.5F, 2, 24, 1, 0.2F, true));
+				setRotationAngle(flap13, 0.0F, 0.0F, -2.2689F);
+				flap13.cubeList.add(new ModelBox(flap13, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
 		
 				flap14 = new ModelRenderer(this);
-				flap14.setRotationPoint(1.5F, -4.5F, 0.5F);
+				flap14.setRotationPoint(1.5F, -10.0F, 0.5F);
 				bone2.addChild(flap14);
-				flap14.cubeList.add(new ModelBox(flap14, 26, 46, -1.0F, 0.0F, -0.5F, 2, 20, 1, 0.2F, true));
+				setRotationAngle(flap14, 0.0F, 0.0F, -2.1817F);
+				flap14.cubeList.add(new ModelBox(flap14, 26, 46, -1.0F, 0.0F, -0.5F, 2, 24, 1, 0.2F, true));
 		
 				flap15 = new ModelRenderer(this);
-				flap15.setRotationPoint(1.5F, -2.5F, 0.5F);
+				flap15.setRotationPoint(1.5F, -8.5F, 0.5F);
 				bone2.addChild(flap15);
-				flap15.cubeList.add(new ModelBox(flap15, 26, 46, -1.0F, 0.0F, -0.5F, 2, 18, 1, 0.1F, true));
+				setRotationAngle(flap15, 0.0F, 0.0F, -2.0944F);
+				flap15.cubeList.add(new ModelBox(flap15, 26, 46, -1.0F, -1.0F, -0.5F, 2, 24, 1, 0.2F, true));
 		
 				flap16 = new ModelRenderer(this);
-				flap16.setRotationPoint(0.5F, -0.5F, 0.5F);
+				flap16.setRotationPoint(1.5F, -7.0F, 0.5F);
 				bone2.addChild(flap16);
-				flap16.cubeList.add(new ModelBox(flap16, 26, 46, -1.0F, 0.0F, -0.5F, 2, 16, 1, 0.1F, true));
+				setRotationAngle(flap16, 0.0F, 0.0F, -2.0071F);
+				flap16.cubeList.add(new ModelBox(flap16, 26, 46, -1.0F, 0.0F, -0.5F, 2, 20, 1, 0.2F, true));
+		
+				flap17 = new ModelRenderer(this);
+				flap17.setRotationPoint(1.5F, -5.5F, 0.5F);
+				bone2.addChild(flap17);
+				setRotationAngle(flap17, 0.0F, 0.0F, -1.9199F);
+				flap17.cubeList.add(new ModelBox(flap17, 26, 46, -1.0F, 0.0F, -0.5F, 2, 18, 1, 0.1F, true));
+		
+				flap18 = new ModelRenderer(this);
+				flap18.setRotationPoint(0.5F, -4.0F, 0.5F);
+				bone2.addChild(flap18);
+				setRotationAngle(flap18, 0.0F, 0.0F, -1.8326F);
+				flap18.cubeList.add(new ModelBox(flap18, 26, 46, -1.0F, 0.0F, -0.5F, 2, 16, 1, 0.1F, true));
+		
+				flap19 = new ModelRenderer(this);
+				flap19.setRotationPoint(0.5F, -2.5F, 0.5F);
+				bone2.addChild(flap19);
+				setRotationAngle(flap19, 0.0F, 0.0F, -1.7453F);
+				flap19.cubeList.add(new ModelBox(flap19, 26, 46, -1.0F, 0.0F, -0.5F, 2, 14, 1, 0.1F, true));
+		
+				flap20 = new ModelRenderer(this);
+				flap20.setRotationPoint(0.5F, -1.0F, 0.5F);
+				bone2.addChild(flap20);
+				setRotationAngle(flap20, 0.0F, 0.0F, -1.6581F);
+				flap20.cubeList.add(new ModelBox(flap20, 26, 46, -1.0F, 0.0F, -0.5F, 2, 12, 1, 0.1F, true));
 			}
 	
 			@Override
@@ -1241,7 +1285,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				if (this.wingSwingProgress > 0.0F) {
 					this.rightWing.showModel = true;
 					this.leftWing.showModel = true;
-					this.rightWing.rotateAngleZ = -0.4363F + this.wingSwingProgress * -30.0F * 0.017453292F;
+					this.rightWing.rotateAngleZ = -0.4363F * this.wingSwingProgress;
 					this.flap1.rotateAngleZ = this.wingSwingProgress * 140.0F * 0.017453292F;
 					this.flap2.rotateAngleZ = this.wingSwingProgress * 135.0F * 0.017453292F;
 					this.flap3.rotateAngleZ = this.wingSwingProgress * 130.0F * 0.017453292F;
@@ -1250,15 +1294,19 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 					this.flap6.rotateAngleZ = this.wingSwingProgress * 115.0F * 0.017453292F;
 					this.flap7.rotateAngleZ = this.wingSwingProgress * 110.0F * 0.017453292F;
 					this.flap8.rotateAngleZ = this.wingSwingProgress * 105.0F * 0.017453292F;
-					this.leftWing.rotateAngleZ = 0.4363F + this.wingSwingProgress * 30.0F * 0.017453292F;
-					this.flap9.rotateAngleZ = this.wingSwingProgress * -140.0F * 0.017453292F;
-					this.flap10.rotateAngleZ = this.wingSwingProgress * -135.0F * 0.017453292F;
-					this.flap11.rotateAngleZ = this.wingSwingProgress * -130.0F * 0.017453292F;
-					this.flap12.rotateAngleZ = this.wingSwingProgress * -125.0F * 0.017453292F;
-					this.flap13.rotateAngleZ = this.wingSwingProgress * -120.0F * 0.017453292F;
-					this.flap14.rotateAngleZ = this.wingSwingProgress * -115.0F * 0.017453292F;
-					this.flap15.rotateAngleZ = this.wingSwingProgress * -110.0F * 0.017453292F;
-					this.flap16.rotateAngleZ = this.wingSwingProgress * -105.0F * 0.017453292F;
+					this.flap9.rotateAngleZ = this.wingSwingProgress * 100.0F * 0.017453292F;
+					this.flap10.rotateAngleZ = this.wingSwingProgress * 95.0F * 0.017453292F;
+					this.leftWing.rotateAngleZ = 0.4363F * this.wingSwingProgress;
+					this.flap11.rotateAngleZ = this.wingSwingProgress * -140.0F * 0.017453292F;
+					this.flap12.rotateAngleZ = this.wingSwingProgress * -135.0F * 0.017453292F;
+					this.flap13.rotateAngleZ = this.wingSwingProgress * -130.0F * 0.017453292F;
+					this.flap14.rotateAngleZ = this.wingSwingProgress * -125.0F * 0.017453292F;
+					this.flap15.rotateAngleZ = this.wingSwingProgress * -120.0F * 0.017453292F;
+					this.flap16.rotateAngleZ = this.wingSwingProgress * -115.0F * 0.017453292F;
+					this.flap17.rotateAngleZ = this.wingSwingProgress * -110.0F * 0.017453292F;
+					this.flap18.rotateAngleZ = this.wingSwingProgress * -105.0F * 0.017453292F;
+					this.flap19.rotateAngleZ = this.wingSwingProgress * -100.0F * 0.017453292F;
+					this.flap20.rotateAngleZ = this.wingSwingProgress * -95.0F * 0.017453292F;
 				} else {
 					this.rightWing.showModel = false;
 					this.leftWing.showModel = false;

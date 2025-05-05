@@ -24,8 +24,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
 
-import net.narutomod.item.ItemByakugan;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.entity.EntityAltCamView;
 import net.narutomod.PlayerTracker;
 import net.narutomod.NarutomodMod;
@@ -104,7 +105,8 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 			if (!event.isCancelable() && event.getType() == RenderGameOverlayEvent.ElementType.HELMET) {
 				Minecraft mc = Minecraft.getMinecraft();
 				EntityPlayer player = mc.player;
-				if (player.inventory.armorInventory.get(3).getItem() == ItemByakugan.helmet && byakuganActivated) {
+				Item item = player.inventory.armorInventory.get(3).getItem();
+				if (item instanceof ItemDojutsu.Base && ((ItemDojutsu.Base)item).getType() == ItemDojutsu.Type.BYAKUGAN && byakuganActivated) {
 					int sWidth = event.getResolution().getScaledWidth();
 					int sHeight = event.getResolution().getScaledHeight();
 					int color = 0x1AFFFFFF;

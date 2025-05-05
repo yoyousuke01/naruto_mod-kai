@@ -310,9 +310,10 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (this.curseTarget != null && this.curseTarget.isEntityAlive() && this.jashinTransitionDirection > 0) {
-				this.curseTarget.attackEntityFrom(source.setDamageBypassesArmor(), amount);
+				source = this.selfDamage;
+				this.curseTarget.attackEntityFrom(source, amount);
 			}
-			amount *= source != this.selfDamage && source.isUnblockable() && source.isDamageAbsolute() ? 1.0f : (this.rand.nextFloat() * 0.08f + 0.08f);
+			amount *= source == this.selfDamage ? 0.04f : source.isUnblockable() && source.isDamageAbsolute() ? 1.0f : (this.rand.nextFloat() * 0.08f + 0.08f);
 			return super.attackEntityFrom(source, amount);
 		}
 
