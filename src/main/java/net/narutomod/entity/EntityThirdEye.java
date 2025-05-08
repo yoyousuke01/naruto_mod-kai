@@ -1,9 +1,12 @@
 
 package net.narutomod.entity;
 
+import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemJiton;
 import net.narutomod.NarutomodMod;
+import net.narutomod.Particles;
 import net.narutomod.PlayerInput;
 import net.narutomod.procedure.ProcedureSync;
 
@@ -11,12 +14,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
-
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
@@ -24,19 +32,15 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
-import javax.annotation.Nullable;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.server.SPacketCamera;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.item.ItemStack;
 import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import javax.annotation.Nullable;
+import net.minecraft.nbt.NBTTagCompound;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
@@ -55,29 +59,38 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityAltCamView.EntityCustom implements PlayerInput.Hook.IHandler, ProcedureSync.RenderDistance.IHandler {
 		private static final DataParameter<Integer> VIEWERID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
+		private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final EntityAltCamView.PacketCameraPosition.Handler updater = new EntityAltCamView.PacketCameraPosition.Handler();
 		private PlayerInput.Hook viewerInput = new PlayerInput.Hook();
 		private int clientDummyId;
 		private int serverMainId;
 		private int oldRenderDistance;
+		private ItemJiton.Type sandType = ItemJiton.Type.IRON;
 
 		public EC(World world) {
 			super(world);
 			this.setSize(0.25f, 0.25f);
 			this.isImmuneToFire = false;
 			this.setNoGravity(true);
+			this.noClip = false;
 		}
 
 		public EC(EntityPlayer player) {
 			this(player.world);
 			this.setViewer(player);
-			this.copyLocationAndAnglesFrom(player);
+			this.setLocationAndAngles(player.posX, player.posY + 2.5d, player.posZ, player.rotationYaw, player.rotationPitch);
+		}
+
+		public EC(EntityPlayer player, ItemJiton.Type type) {
+			this(player);
+			this.sandType = type;
 		}
 
 		@Override
 		protected void entityInit() {
 			super.entityInit();
 			this.dataManager.register(VIEWERID, Integer.valueOf(-1));
+			this.dataManager.register(AGE, Integer.valueOf(0));
 		}
 
 		@Override @Nullable
@@ -100,6 +113,16 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 			super.setViewer(viewerPlayer);
 		}
 
+		private int getAge() {
+			return ((Integer)this.getDataManager().get(AGE)).intValue();
+		}
+
+		private void setAge(int age) {
+			if (!this.world.isRemote) {
+				this.getDataManager().set(AGE, Integer.valueOf(age));
+			}
+		}
+
 		@Override
 		protected void onSetDead() {
 			if (!this.world.isRemote) {
@@ -109,6 +132,12 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 					this.updater.flushChunks((EntityPlayerMP)viewer);
 					((EntityPlayerMP)viewer).connection.sendPacket(new SPacketCamera(viewer));
 					ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)viewer, this.oldRenderDistance, null);
+					ProcedureSync.EntityDead.sendToSelf(this.clientDummyId, (EntityPlayerMP)viewer);
+				}
+				for (int i = 0; i < 100; i++) {
+					Particles.spawnParticle(this.world, Particles.Types.FALLING_DUST, this.posX + (this.rand.nextFloat()-0.5f) * this.width,
+					 this.posY + this.height * 0.5f, this.posZ + (this.rand.nextFloat()-0.5f) * this.width,
+					 1, 0, 0, 0, 0, this.rand.nextFloat() * 0.3f - 0.1f, 0, this.sandType.getColor(), 0, 3);
 				}
 			}
 		}
@@ -121,15 +150,23 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 			this.prevRotationPitch = this.rotationPitch;
 			this.prevRotationYaw = this.rotationYaw;
 			if (!this.world.isRemote) {
+				int age = this.getAge();
+				if (this.rand.nextFloat() < 0.5f) {
+					Particles.spawnParticle(this.world, Particles.Types.FALLING_DUST, this.posX + (this.rand.nextFloat()-0.5f) * this.width,
+					 this.posY + this.height * 0.5f, this.posZ + (this.rand.nextFloat()-0.5f) * this.width, 1, 0, 0, 0, 0, 0, 0,
+					 this.sandType.getColor(), 0, 2);
+				}
 				EntityPlayer viewer = this.getViewer();
-				if (viewer instanceof EntityPlayerMP) {
-					if (this.ticksExisted == 1) {
+				if (viewer instanceof EntityPlayerMP && (this.ticksExisted % 20 != 0
+				 || Chakra.pathway(viewer).consume(ItemJiton.THIRDEYE.chakraUsage * MathHelper.sqrt(this.getDistance(viewer)) * 0.02d))) {
+					if (age == 0) {
 						ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)viewer, 6, this);
 						PlayerInput.Hook.copyInputFrom((EntityPlayerMP)viewer, this, true);
 					}
 					this.updater.doChunkLoading((EntityPlayerMP)viewer, this.chunkCoordX, this.chunkCoordZ);
 					if (this.viewerInput.hasNewMovementInput()) {
-						this.viewerInput.handleMovement(this);
+						this.viewerInput.handleMovement(this, 0.7f);
+						this.isAirBorne = true;
 					}
 					if (this.viewerInput.hasNewMouseEvent()) {
 						this.viewerInput.handleMouseEvent(this);
@@ -140,6 +177,7 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 				} else {
 					this.setDead();
 				}
+				this.setAge(++age);
 			} else {
 				this.onEntityUpdate();
 			}
@@ -148,7 +186,7 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void onEntityUpdate() {
-			if (this.serverMainId == 0 && this.clientDummyId == 0) {
+			if (this.serverMainId == 0 && this.clientDummyId == 0 && this.getAge() < 5) {
 				Minecraft mc = Minecraft.getMinecraft();
 				EntityPlayer viewer = this.getViewer();
 				if (mc.player != null && mc.player == viewer) {
@@ -160,6 +198,17 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 					CustomPacket.sendToServer(this.clientDummyId, dummy.serverMainId);
 				}
 			}
+		}
+
+		@Override
+		public boolean canBeCollidedWith() {
+			return !this.isDead;
+		}
+
+		@Override
+		public boolean attackEntityFrom(DamageSource source, float amount) {
+			this.setDead();
+			return true;
 		}
 
 		@Override
@@ -177,6 +226,18 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 			this.oldRenderDistance = oldChunkDistance;
 		}
 
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+			super.readEntityFromNBT(compound);
+			this.sandType = ItemJiton.Type.getTypeFromId(compound.getInteger("sandType"));
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+			super.writeEntityToNBT(compound);
+			compound.setInteger("sandType", this.sandType.getID());
+		}
+
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			private static final String ID_KEY = "ThirdEyeIdKey";
 			@Override
@@ -185,7 +246,7 @@ public class EntityThirdEye extends ElementsNarutomodMod.ModElement {
 				if (entity1 instanceof EC) {
 					entity1.setDead();
 				} else if (entity instanceof EntityPlayer) {
-					entity1 = new EC((EntityPlayer)entity);
+					entity1 = new EC((EntityPlayer)entity, ItemJiton.getSandType(stack));
 					entity.world.spawnEntity(entity1);
 					entity.getEntityData().setInteger(ID_KEY, entity1.getEntityId());
 					return true;

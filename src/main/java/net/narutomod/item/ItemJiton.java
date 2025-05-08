@@ -127,6 +127,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			this.defaultCooldownMap[SANDBULLET.index] = 0;
 			this.defaultCooldownMap[SANDBIND.index] = 0;
 			this.defaultCooldownMap[SANDFLY.index] = 0;
+			this.defaultCooldownMap[THIRDEYE.index] = 0;
 		}
 
 		@Override
@@ -168,7 +169,9 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 				 && this.getCurrentJutsu(itemstack) == SANDBULLET) {
 					EntitySandBullet.updateSwarms(player);
 				}
-				this.enableJutsu(itemstack, GATHERING, getSandType(itemstack) == Type.IRON);
+				if (entity.ticksExisted % 20 == 2) {
+					this.enableJutsu(itemstack, GATHERING, getSandType(itemstack) == Type.IRON);
+				}
 			}
 		}
 

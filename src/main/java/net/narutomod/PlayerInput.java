@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.EnumActionResult;
@@ -46,6 +47,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 //import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.block.state.IBlockState;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
@@ -55,8 +57,6 @@ import org.lwjgl.input.Mouse;
 import javax.annotation.Nullable;
 import java.util.Map;
 import com.google.common.collect.Maps;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PlayerInput extends ElementsNarutomodMod.ModElement {
@@ -143,6 +143,10 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void handleMovement(Entity entity) {
+			this.handleMovement(entity, 0.91f);
+		}
+
+		public void handleMovement(Entity entity, float baseFriction) {
 			this.clearMovementInput();
 			if (entity instanceof EntityPlayerMP) {
 				MovementPacket.sendToClient((EntityPlayerMP)entity, this.strafe, this.forward, 
@@ -156,13 +160,13 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 				if (this.sneak) {
 					entity.motionY -= 0.01d;
 				}
-				float f6 = 0.91F;
+				float f6 = baseFriction;
 				BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(entity.posX, entity.getEntityBoundingBox().minY - 1.0D, entity.posZ);
 				if (entity.onGround) {
 					IBlockState underState = entity.world.getBlockState(pos.setPos(entity.posX, entity.getEntityBoundingBox().minY - 1.0D, entity.posZ));
 					f6 = underState.getBlock().getSlipperiness(underState, entity.world, pos, entity) * 0.91F;
 				}
-				float f7 = 0.16277136F / (f6 * f6 * f6);
+				float f7 = 0.1F / (f6 * f6 * f6);
 				float f8 = entity instanceof EntityLivingBase ? entity.onGround ? ((EntityLivingBase)entity).getAIMoveSpeed() * f7 : ((EntityLivingBase)entity).jumpMovementFactor : 0.2f;
 				entity.moveRelative(this.strafe, 0f, this.forward, f8 * 0.6f);
 				entity.move(net.minecraft.entity.MoverType.SELF, entity.motionX, entity.motionY, entity.motionZ);

@@ -256,12 +256,10 @@ public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 			    }
 			    PlayerChunkMap playerchunkmap = world.getPlayerChunkMap();
 			    for (ChunkPos pos : cameraChunks) {
-		           	if (/*!this.cameraLoadedChunks.contains(pos) && world.isChunkGeneratedAt(pos.x, pos.z)
-		           	 &&*/ !playerchunkmap.isPlayerWatchingChunk(player, pos.x, pos.z)) {
+		           	if (!world.isChunkGeneratedAt(pos.x, pos.z) || !playerchunkmap.isPlayerWatchingChunk(player, pos.x, pos.z)) {
 		           		try {
 							PlayerChunkMapEntry entry = (PlayerChunkMapEntry)playerChunkMap$getOrCreateEntry.invoke(playerchunkmap, pos.x, pos.z);
 		 					entry.addPlayer(player);
-							entry.sendToPlayer(player);
 		           		} catch (ReflectiveOperationException e) {
 							throw new RuntimeException("Failed to create PlayerChunkMapEntry via playerChunkMap$getOrCreateEntry.invoke", e);
 						}

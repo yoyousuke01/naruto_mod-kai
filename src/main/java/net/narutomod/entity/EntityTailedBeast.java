@@ -612,7 +612,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 
 		public boolean couldBreakBlocks() {
-			return this.world.getGameRules().getBoolean("mobGriefing");
+			return net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this);
 		}
 
 		@Override
@@ -638,7 +638,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void travel(float ti, float tj, float tk) {
-			if (this.isBeingRidden() && this.canBeSteered()) {
+			if (this.isBeingRidden() && this.canPassengerSteer()) {
 				Entity entity = this.getControllingPassenger();
 				this.rotationYaw = entity.rotationYaw;
 				this.prevRotationYaw = this.rotationYaw;
