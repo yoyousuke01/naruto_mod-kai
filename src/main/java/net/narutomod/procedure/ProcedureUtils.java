@@ -2,9 +2,13 @@ package net.narutomod.procedure;
 
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TextComponentString;
@@ -44,6 +48,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.SoundType;
@@ -451,6 +456,69 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		}
 		attacker.setLastAttackedEntity(entityIn);
 		return flag;
+	}
+
+	public static Explosion createExplosionWithDamageSource(World worldIn, Entity entityIn, DamageSource source, double x, double y, double z, float size, boolean flaming, boolean damagesTerrain) {
+		class ExplosionHook {
+			final DamageSource source;
+			final float size;
+			
+			ExplosionHook(@Nullable DamageSource damagesource, float sizeIn) {
+				this.source = damagesource != null ? damagesource.setDifficultyScaled().setExplosion() : null;
+				this.size = sizeIn;
+			}
+
+			@SubscribeEvent
+			public void onDetonate(ExplosionEvent.Detonate event) {
+				if (this.source != null) {
+					World world = event.getWorld();
+					Explosion explosion = event.getExplosion();
+					Vec3d vec = explosion.getPosition();
+					float f3 = this.size * 2;
+					for (Entity entity : event.getAffectedEntities()) {
+						if (!entity.isImmuneToExplosions()) {
+							double d12 = entity.getDistance(vec.x, vec.y, vec.z) / (double)f3;
+							if (d12 <= 1.0D) {
+								double d5 = entity.posX - vec.x;
+								double d7 = entity.posY + (double)entity.getEyeHeight() - vec.y;
+								double d9 = entity.posZ - vec.z;
+								double d13 = (double)MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
+								if (d13 != 0.0D) {
+									d5 = d5 / d13;
+									d7 = d7 / d13;
+									d9 = d9 / d13;
+									double d14 = (double)world.getBlockDensity(vec, entity.getEntityBoundingBox());
+									double d10 = (1.0D - d12) * d14;
+									entity.attackEntityFrom(this.source, (float)((int)((d10 * d10 + d10) / 2.0D * 7.0D * (double)f3 + 1.0D)));
+									double d11 = d10;
+									if (entity instanceof EntityLivingBase) {
+										d11 = EnchantmentProtection.getBlastDamageReduction((EntityLivingBase)entity, d10);
+									}
+									entity.motionX += d5 * d11;
+									entity.motionY += d7 * d11;
+									entity.motionZ += d9 * d11;
+									if (entity instanceof EntityPlayer) {
+										EntityPlayer entityplayer = (EntityPlayer)entity;
+										if (!entityplayer.isSpectator() && (!entityplayer.isCreative() || !entityplayer.capabilities.isFlying)) {
+											explosion.getPlayerKnockbackMap().put(entityplayer, new Vec3d(d5 * d10, d7 * d10, d9 * d10));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				event.getAffectedEntities().clear();
+				MinecraftForge.EVENT_BUS.unregister(this);
+			}
+		}
+		
+		MinecraftForge.EVENT_BUS.register(new ExplosionHook(source, size));
+		return worldIn.newExplosion(entityIn, x, y, z, size, flaming, damagesTerrain);
+	}
+
+	public static Explosion createJutsuExplosion(World worldIn, Entity entityIn, double x, double y, double z, float size, boolean flaming, boolean damagesTerrain) {
+		return createExplosionWithDamageSource(worldIn, entityIn, ItemJutsu.causeJutsuDamage(entityIn, null), x, y, z, size, flaming, damagesTerrain);
 	}
 
 	public static Vec3d getMotion(Entity entity) {

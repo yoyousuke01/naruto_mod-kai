@@ -54,13 +54,13 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(WIDTH, HEIGHT);
-			this.setExplosionSize(12.0f);
+			this.setExplosionSize(14.0f);
 		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(WIDTH, HEIGHT);
-			this.setExplosionSize(12.0f);
+			this.setExplosionSize(14.0f);
 		}
 
 		@Override
@@ -159,14 +159,14 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-	    @Override
+	    /*@Override
 	    public boolean attackEntityAsMob(Entity entityIn) {
 	    	if (super.attackEntityAsMob(entityIn)) {
 	    		entityIn.hurtResistantTime = 10;
 		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 50f + this.rand.nextFloat() * 10f);
 	    	}
 	    	return false;
-	    }
+	    }*/
 
 	    @Override
 	    public void onUpdate() {

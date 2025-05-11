@@ -167,7 +167,7 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 					f6 = underState.getBlock().getSlipperiness(underState, entity.world, pos, entity) * 0.91F;
 				}
 				float f7 = 0.1F / (f6 * f6 * f6);
-				float f8 = entity instanceof EntityLivingBase ? entity.onGround ? ((EntityLivingBase)entity).getAIMoveSpeed() * f7 : ((EntityLivingBase)entity).jumpMovementFactor : 0.2f;
+				float f8 = entity instanceof EntityLivingBase ? entity.onGround ? (float)ProcedureUtils.getModifiedSpeed((EntityLivingBase)entity) * f7 : ((EntityLivingBase)entity).jumpMovementFactor : 0.2f;
 				entity.moveRelative(this.strafe, 0f, this.forward, f8 * 0.6f);
 				entity.move(net.minecraft.entity.MoverType.SELF, entity.motionX, entity.motionY, entity.motionZ);
 				if (!entity.hasNoGravity()) {

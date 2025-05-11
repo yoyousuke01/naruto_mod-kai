@@ -162,8 +162,13 @@ public class EntityC4 extends ElementsNarutomodMod.ModElement {
 					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katsu")), SoundCategory.NEUTRAL, 1f, 1f);
 				}
 		    	ProcedureAoeCommand.set(this, 0d, this.blastRadius).exclude(summoner).effect(PotionInstantDamage.potion, this.damageTicks / 20, this.damagePerTick - 1, false);
-				Particles.spawnParticle(this.world, Particles.Types.EXPANDING_SPHERE, this.posX, this.posY, this.posZ, 1,
-				 0d, 0d, 0d, 0d, 0d, 0d, (int)(this.blastRadius * 10f), 10, 0x3080ffff);
+				Particles.Renderer particles = new Particles.Renderer(this.world, 128d);
+				for (int i = 1, j = 50; i <= j; i++) {
+					int a = (int)(112f * (1f - (float)i / j)) + 0x10;
+					particles.spawnParticles(Particles.Types.EXPANDING_SPHERE, this.posX, this.posY, this.posZ, 1,
+					 0d, 0d, 0d, 0d, 0d, 0d, (int)(this.blastRadius * i / j * 10f), 20, 0x0080ffff | (a << 24));
+				}
+				particles.send();
 	    		this.setDead();
 			}
 		}

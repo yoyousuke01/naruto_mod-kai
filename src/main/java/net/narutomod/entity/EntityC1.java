@@ -47,13 +47,13 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(0.4F, 0.8F);
-			this.setExplosionSize(5.0f);
+			this.setExplosionSize(4.5f);
 		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(0.4F, 0.8F);
-			this.setExplosionSize(5.0f);
+			this.setExplosionSize(4.5f);
 		}
 
 		@Override
@@ -63,14 +63,14 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(1.2D);
 		}
 
-	    @Override
+	    /*@Override
 	    public boolean attackEntityAsMob(Entity entityIn) {
 	    	if (super.attackEntityAsMob(entityIn)) {
 		    	entityIn.hurtResistantTime = 10;
 		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 8f + this.rand.nextFloat() * 4f);
 	    	}
 	    	return false;
-	    }
+	    }*/
 	}
 
 	@Override

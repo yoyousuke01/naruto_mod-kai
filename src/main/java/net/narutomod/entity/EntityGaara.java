@@ -54,7 +54,7 @@ public class EntityGaara extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(World world) {
 			super(world, 120, 7000d);
 			this.setSize(0.6f, 1.8f);
-			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false, this.playerTargetSelectorAkatsuki));
+			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false, this.playerTargetSelector));
 		}
 
 		@Override

@@ -238,7 +238,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		protected float damageMultiplier() {
 			float f0 = 1.0f;
 			EntityLivingBase realUser = this.summoner;
-			if (realUser instanceof EntityKageBunshin.EC) {
+			if (realUser instanceof EntityKageBunshin.EC) {
 				realUser = ((EntityKageBunshin.EC)realUser).getSummoner();
 			}
 			if (realUser instanceof EntityPlayer) {
@@ -398,6 +398,19 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (this.summoner == null || this.ticksExisted > this.duration || !this.canUse())) {
 				this.setDead();
 			}
+		}
+
+		@Override
+		protected float damageMultiplier() {
+			float f0 = 1.0f;
+			EntityLivingBase realUser = this.summoner;
+			if (realUser instanceof EntityKageBunshin.EC) {
+				realUser = ((EntityKageBunshin.EC)realUser).getSummoner();
+			}
+			if (realUser instanceof EntityPlayer) {
+				f0 = MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)realUser) / 40f, 1f, 6f);
+			}
+			return f0;
 		}
 	}
 

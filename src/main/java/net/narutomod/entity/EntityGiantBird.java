@@ -106,7 +106,7 @@ public class EntityGiantBird extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.7D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.7D);
 		}

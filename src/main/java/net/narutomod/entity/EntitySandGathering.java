@@ -4,7 +4,7 @@ package net.narutomod.entity;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemJiton;
 import net.narutomod.item.ItemGourd;
-import net.narutomod.procedure.ProcedureAoeCommand;
+//import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -156,10 +156,12 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 				if (this.motionX != 0d || this.motionY != 0d || this.motionZ != 0d) {
 					RayTraceResult result = this.forwardsRaycast(true);
 					if (!this.world.isRemote && result != null) {
-						this.world.createExplosion(this.summoner, result.hitVec.x, result.hitVec.y, result.hitVec.z, SCALE * 0.8f,
-						 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.summoner));
-						ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0d, SCALE * 0.6f)
-						 .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), SCALE * 4f);
+						//this.world.createExplosion(this.summoner, result.hitVec.x, result.hitVec.y, result.hitVec.z, SCALE * 0.8f,
+						// net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.summoner));
+						//ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0d, SCALE * 0.6f)
+						// .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), SCALE * 4f);
+						ProcedureUtils.createJutsuExplosion(this.world, this.summoner, result.hitVec.x, result.hitVec.y, result.hitVec.z,
+						 SCALE, false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.summoner));
 						this.accelX = 0.0d;
 						this.accelY = 0.0d;
 						this.accelZ = 0.0d;

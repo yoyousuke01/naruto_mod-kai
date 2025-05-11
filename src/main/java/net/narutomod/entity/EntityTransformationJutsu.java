@@ -109,6 +109,7 @@ public class EntityTransformationJutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (this.user instanceof EntityPlayer && this.user.isEntityAlive()
+			 && !this.user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
 			 && (this.ticksExisted % 20 > 0 || Chakra.pathway(this.user).consume(this.chakraBurnPerSec))) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.ticksExisted == 1) {

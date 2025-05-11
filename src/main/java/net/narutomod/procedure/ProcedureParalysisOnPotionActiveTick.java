@@ -41,20 +41,16 @@ public class ProcedureParalysisOnPotionActiveTick extends ElementsNarutomodMod.M
 		Entity entity = (Entity) dependencies.get("entity");
 		int amplifier = (int) dependencies.get("amplifier");
 		World world = (World) dependencies.get("world");
-		if (((amplifier) == 1)) {
-			entity.getEntityData().setInteger("FearEffect", 2);
-		} else if (((amplifier) >= 2)) {
-			if ((Math.random() <= (0.4 + (0.05 * ((amplifier) - 1))))) {
-				EntityLightningArc.spawnAsParticle(entity.world, entity.posX + (Math.random() - 0.5d) * 0.4d, entity.posY + Math.random() * 1.3d,
-						entity.posZ + (Math.random() - 0.5d) * 0.4d, 0.3d * Math.min(amplifier - 1, 12), 0d, 0.15d, 0d);
-			}
-		}
 		if (entity instanceof EntityPlayer) {
 			((EntityPlayer) entity).capabilities.isFlying = (false);
 			((EntityPlayer) entity).sendPlayerAbilities();
 		}
 		int remainingTicks = ((EntityLivingBase) entity).getActivePotionEffect(PotionParalysis.potion).getDuration();
 		if (((amplifier) >= 2)) {
+			if ((Math.random() <= (0.4 + (0.05 * ((amplifier) - 1))))) {
+				EntityLightningArc.spawnAsParticle(entity.world, entity.posX + (Math.random() - 0.5d) * 0.4d, entity.posY + Math.random() * 1.3d,
+						entity.posZ + (Math.random() - 0.5d) * 0.4d, 0.3d * Math.min(amplifier - 1, 12), 0d, 0.15d, 0d);
+			}
 			UUID uuid = UUID.fromString("c69af92a-b96d-49b7-a396-9b3b0d77edd5");
 			IAttributeInstance iattributeinstance = ((EntityLivingBase) entity).getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
 			iattributeinstance.removeModifier(uuid);
@@ -64,21 +60,28 @@ public class ProcedureParalysisOnPotionActiveTick extends ElementsNarutomodMod.M
 			}
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity)
-						.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 2, (int) -remainingTicks / 10, (false), (false)));
+						.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 5, (int) -remainingTicks / 10, (false), (false)));
 		} else {
 			if (entity instanceof EntityLivingBase) {
 				entity.rotationYaw = ((EntityLivingBase) entity).rotationYawHead = ((EntityLivingBase) entity).renderYawOffset;
 				entity.rotationPitch = 0;
 			}
-			if ((world.isAirBlock(new BlockPos((int) Math.floor((entity.posX)), (int) ((entity.posY) - 0.1), (int) Math.floor((entity.posZ)))))) {
-				entity.motionX = 0;
-				entity.motionY = ((entity.motionY) - 0.1);
-				entity.motionZ = 0;
-				entity.setPositionAndUpdate(entity.prevPosX, entity.posY + entity.motionY, entity.prevPosZ);
-			} else if ((entity instanceof EntityLiving)) {
-				ProcedureOnLivingUpdate.disableAIfor((EntityLiving) entity, remainingTicks);
+			if (((amplifier) == 0)) {
+				if ((world.isAirBlock(new BlockPos((int) Math.floor((entity.posX)), (int) ((entity.posY) - 0.1), (int) Math.floor((entity.posZ)))))) {
+					entity.motionX = 0;
+					entity.motionY = ((entity.motionY) - 0.1);
+					entity.motionZ = 0;
+					entity.setPositionAndUpdate(entity.prevPosX, entity.posY + entity.motionY, entity.prevPosZ);
+				} else if ((entity instanceof EntityLiving)) {
+					ProcedureOnLivingUpdate.disableAIfor((EntityLiving) entity, remainingTicks);
+				} else {
+					entity.setPositionAndUpdate(entity.prevPosX, entity.prevPosY, entity.prevPosZ);
+				}
 			} else {
-				entity.setPositionAndUpdate(entity.prevPosX, entity.prevPosY, entity.prevPosZ);
+				entity.getEntityData().setInteger("FearEffect", 3);
+				if ((entity instanceof EntityLiving)) {
+					ProcedureOnLivingUpdate.disableAIfor((EntityLiving) entity, remainingTicks);
+				}
 			}
 		}
 	}

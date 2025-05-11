@@ -294,10 +294,12 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 
 	    @Override
 	    public boolean attackEntityAsMob(Entity entityIn) {
-	    	EntityLivingBase owner = this.getOwner();
 	    	if (!this.world.isRemote) {
-		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
-			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+	    		EntityLivingBase owner = this.getOwner();
+		    	//this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			    // this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+			    ProcedureUtils.createJutsuExplosion(this.world, owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
 	    		this.setDead();
 	    		return true;
 	    	}
@@ -315,8 +317,11 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void onDeathUpdate() {
 			if (!this.world.isRemote) {
-		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
-			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+				EntityLivingBase owner = this.getOwner();
+		    	//this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			    // this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+			    ProcedureUtils.createJutsuExplosion(this.world, owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
 			}
     		this.setDead();
 		}

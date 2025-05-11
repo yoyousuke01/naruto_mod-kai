@@ -5,7 +5,6 @@ import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Particles;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemJiton;
-import net.narutomod.potion.PotionParalysis;
 import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureSync;

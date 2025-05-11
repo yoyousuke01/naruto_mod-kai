@@ -58,7 +58,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.potion.PotionAmaterasuFlame;
-import net.narutomod.potion.PotionParalysis;
 import net.narutomod.entity.EntitySusanooClothed;
 import net.narutomod.entity.EntityCrow;
 import net.narutomod.procedure.ProcedureUtils;
