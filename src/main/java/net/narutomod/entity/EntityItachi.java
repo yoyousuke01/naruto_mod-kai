@@ -425,7 +425,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					@Override
 					public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
 						super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-						if (((EntityCustom)entityIn).blockingTicks > 0) {
+						if (entityIn instanceof EntityCustom && ((EntityCustom)entityIn).blockingTicks > 0) {
 							setRotationAngle(bipedRightArm, -1.2217F, -0.7854F, 0.0F);
 						}
 					}

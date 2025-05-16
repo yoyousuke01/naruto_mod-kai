@@ -13,6 +13,8 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
+import net.minecraft.item.ItemStack;
+import net.minecraft.entity.Entity;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemNinjaArmorKumo extends ElementsNarutomodMod.ModElement {
@@ -44,8 +46,9 @@ public class ItemNinjaArmorKumo extends ElementsNarutomodMod.ModElement {
 				}
 				@SideOnly(Side.CLIENT)
 				@Override
-				public void setSlotVisible() {
+				public void setSlotVisible(ItemStack stack, Entity entity, EntityEquipmentSlot slot) {
 					this.model.bipedHeadwear.showModel = false;
+					((ItemNinjaArmor.ModelNinjaArmor)this.model).headwear.showModel = !stack.hasTagCompound() || !stack.getTagCompound().getBoolean("noHeadClothe");
 				}
 			}
 		}.setUnlocalizedName("ninja_armor_kumohelmet").setRegistryName("ninja_armor_kumohelmet").setCreativeTab(TabModTab.tab));
@@ -65,6 +68,13 @@ public class ItemNinjaArmorKumo extends ElementsNarutomodMod.ModElement {
 					model1.shirtLeftArm.showModel = false;
 					this.model = model1;
 					this.texture = "narutomod:textures/kumoarmor.png";
+				}
+				@SideOnly(Side.CLIENT)
+				@Override
+				public void setSlotVisible(ItemStack stack, Entity entity, EntityEquipmentSlot slot) {
+					boolean flag = stack.hasTagCompound() && stack.getTagCompound().getBoolean("noArmGuards");
+					((ItemNinjaArmor.ModelNinjaArmor)this.model).rightArmVestLayer.showModel = !flag;
+					((ItemNinjaArmor.ModelNinjaArmor)this.model).leftArmVestLayer.showModel = !flag;
 				}
 			}
 		}.setUnlocalizedName("ninja_armor_kumobody").setRegistryName("ninja_armor_kumobody").setCreativeTab(TabModTab.tab));

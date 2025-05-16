@@ -395,7 +395,7 @@ public class BlockAmaterasuBlock extends ElementsNarutomodMod.ModElement {
 				worldIn.setBlockToAir(pos);
 				return;
 			}
-			if (!worldIn.getGameRules().getBoolean("doFireTick")) {
+			if (!worldIn.getGameRules().getBoolean("doFireTick") || !worldIn.getGameRules().getBoolean("mobGriefing")) {
 				return;
 			}
 			this.tryCatchFire(worldIn, pos, pos.east(), 500, rand, i, EnumFacing.WEST);

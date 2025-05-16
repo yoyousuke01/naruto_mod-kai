@@ -2,8 +2,8 @@
 package net.narutomod.entity;
 
 import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.item.ItemNinjaArmorIwa;
-import net.narutomod.item.ItemKunai;
+import net.narutomod.item.ItemCleaver;
+import net.narutomod.item.ItemNinjaArmorKumo;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,20 +36,21 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 
 import javax.annotation.Nullable;
+import net.minecraft.nbt.NBTTagCompound;
 
 @ElementsNarutomodMod.ModElement.Tag
-public class EntityNinjaIwa extends ElementsNarutomodMod.ModElement {
-	public static final int ENTITYID = 305;
-	public static final int ENTITYID_RANGED = 306;
+public class EntityDarui extends ElementsNarutomodMod.ModElement {
+	public static final int ENTITYID = 520;
+	public static final int ENTITYID_RANGED = 521;
 
-	public EntityNinjaIwa(ElementsNarutomodMod instance) {
-		super(instance, 625);
+	public EntityDarui(ElementsNarutomodMod instance) {
+		super(instance, 936);
 	}
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-				.id(new ResourceLocation("narutomod", "ninja_iwa"), ENTITYID).name("ninja_iwa").tracker(64, 3, true).egg(-6737152, -6710887).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class).id(new ResourceLocation("narutomod", "darui"), ENTITYID)
+				.name("darui").tracker(64, 3, true).egg(-7509928, -16764007).build());
 	}
 
 	public static class EntityCustom extends EntityNinjaMob.Base {
@@ -61,10 +62,12 @@ public class EntityNinjaIwa extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata) {
-			this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ItemNinjaArmorIwa.helmet));
-			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ItemNinjaArmorIwa.body));
-			this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ItemNinjaArmorIwa.legs));
-			this.setItemToInventory(new ItemStack(ItemKunai.block), 0);
+			ItemStack stack = new ItemStack(ItemNinjaArmorKumo.body);
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setBoolean("noArmGuards", true);
+			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
+			this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ItemNinjaArmorKumo.legs));
+			this.setItemToInventory(new ItemStack(ItemCleaver.block), 0);
 			return super.onInitialSpawn(difficulty, livingdata);
 		}
 
@@ -130,10 +133,10 @@ public class EntityNinjaIwa extends ElementsNarutomodMod.ModElement {
 
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends EntityNinjaMob.RenderBase<EntityCustom> {
-			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/ninja_iwa.png");
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/darui.png");
 
 			public RenderCustom(RenderManager renderManagerIn) {
-				super(renderManagerIn, new ModelIwaNinja());
+				super(renderManagerIn, new ModelDarui());
 			}
 
 			@Override
@@ -154,42 +157,38 @@ public class EntityNinjaIwa extends ElementsNarutomodMod.ModElement {
 		}
 
 		@SideOnly(Side.CLIENT)
-		public class ModelIwaNinja extends EntityNinjaMob.ModelNinja {
-			public ModelIwaNinja() {
-				super();
-
+		public class ModelDarui extends EntityNinjaMob.ModelNinja {
+			public ModelDarui() {
+				textureWidth = 64;
+				textureHeight = 64;
+		
 				bipedHead = new ModelRenderer(this);
 				bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHead.cubeList.add(new ModelBox(bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F, false));
-		
+				
 				bipedHeadwear = new ModelRenderer(this);
 				bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bipedHeadwear.cubeList.add(new ModelBox(bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.4F, false));
+				bipedHeadwear.cubeList.add(new ModelBox(bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.3F, false));
 		
 				bipedBody = new ModelRenderer(this);
 				bipedBody.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 16, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F, false));
-				bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 32, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.25F, false));
 		
 				bipedRightArm = new ModelRenderer(this);
 				bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
 				bipedRightArm.cubeList.add(new ModelBox(bipedRightArm, 40, 16, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
-				bipedRightArm.cubeList.add(new ModelBox(bipedRightArm, 40, 32, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, false));
 		
 				bipedLeftArm = new ModelRenderer(this);
 				bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 40, 16, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, true));
-				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 40, 32, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, true));
+				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 32, 48, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
 		
 				bipedRightLeg = new ModelRenderer(this);
 				bipedRightLeg.setRotationPoint(-1.9F, 12.0F, 0.0F);
 				bipedRightLeg.cubeList.add(new ModelBox(bipedRightLeg, 0, 16, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, false));
-				bipedRightLeg.cubeList.add(new ModelBox(bipedRightLeg, 0, 32, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
-				
+		
 				bipedLeftLeg = new ModelRenderer(this);
 				bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
-				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 16, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, true));				
-				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, true));
+				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 16, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.0F, false));
 			}
 		}
 	}

@@ -151,9 +151,8 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 					 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
 				}
-				EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * 0.3d, 
-				  this.posY + this.rand.nextDouble() * 1.3d, this.posZ + this.rand.nextGaussian() * 0.3d,
-				  0.5d, 0d, 0.15d, 0d);
+				this.world.spawnEntity(new EntityLightningArc.Base(this.world, new Vec3d(this.posX + this.rand.nextGaussian() * 0.3d, 
+				  this.posY + this.rand.nextDouble() * 1.3d, this.posZ + this.rand.nextGaussian() * 0.3d), 0.6d, 0d, 0.15d, 0d, 0xc00000ff, 0, 0.01f, 0.1f));
 				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY, this.posZ,
 				  20, 0.3d, 0.0d, 0.3d, 0d, 0.5d, 0d, 0x2080D0FF, 50, 5, 0xF0, this.summoner.getEntityId());
 				if (this.summoner.swingProgressInt == 1 && this.summoner instanceof EntityPlayer) {

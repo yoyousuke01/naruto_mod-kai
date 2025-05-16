@@ -65,6 +65,7 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathNavigateSwimmer;
 
 import net.narutomod.item.ItemOnBody;
+import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.potion.PotionFeatherFalling;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
@@ -91,8 +92,9 @@ import java.util.stream.Collectors;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
-	public static final List<Class <? extends Base>> TeamKonoha = Arrays.asList(EntityTenten.EntityCustom.class, EntitySakuraHaruno.EntityCustom.class, EntityIrukaSensei.EntityCustom.class, EntityMightGuy.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamKonoha = Arrays.asList(EntityTenten.EntityCustom.class, EntitySakuraHaruno.EntityCustom.class, EntityIrukaSensei.EntityCustom.class, EntityMightGuy.EntityCustom.class, EntityKakashi.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamZabuza = Arrays.asList(EntityZabuzaMomochi.EntityCustom.class, EntityHaku.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamSuna = Arrays.asList(EntityGaara.EntityCustom.class, EntityKankuro.EntityCustom.class, EntityTemari.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamPain = Arrays.asList(EntityPainDeva.EntityCustom.class, EntityPainAsura.EntityCustom.class, EntityPainAnimal.EntityCustom.class, EntityPainHuman.EntityCustom.class, EntityPainNaraka.EntityCustom.class, EntityPainPreta.EntityCustom.class, EntityNagato.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamAkatsukiMembers = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityHidan.EntityCustom.class, EntityKakuzu.EntityCustom.class, EntityKonan.EntityCustom.class, EntityZetsu.EntityCustom.class, EntityObito.EntityTobi.class);
 	public static final List<Class <? extends Base>> TeamAkatsuki = Stream.concat(TeamPain.stream(), TeamAkatsukiMembers.stream()).collect(Collectors.toList());
@@ -377,6 +379,18 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			return ProcedureUtils.attackEntityAsMob(this, entityIn);
+		}
+
+		@Override
+		public boolean attackEntityFrom(DamageSource source, float amount) {
+			if (!this.world.isRemote && !this.isAIDisabled() && source.getTrueSource() instanceof EntityLivingBase
+			 && this.getRevengeTarget() == null && this.getAttackTarget() == null) {
+				Entity clone = ItemNinjutsu.EntityReplacementClone.Jutsu.createJutsu(this, source.getTrueSource());
+				clone.attackEntityFrom(source, amount);
+				this.setRevengeTarget((EntityLivingBase)source.getTrueSource());
+				return false;
+			}
+			return super.attackEntityFrom(source, amount);
 		}
 
 		protected void decrementAnimations() {

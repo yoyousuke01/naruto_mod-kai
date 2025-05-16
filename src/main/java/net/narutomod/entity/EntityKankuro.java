@@ -2,29 +2,27 @@
 package net.narutomod.entity;
 
 import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.item.ItemNinjaArmorSuna;
+import net.narutomod.item.*;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
 import net.minecraft.world.World;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.ai.EntityAIWatchClosest2;
 import net.minecraft.entity.IEntityLivingData;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
@@ -32,8 +30,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.village.MerchantRecipeList;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.init.Biomes;
+import net.minecraft.init.Items;
 
+import java.util.Map;
 import javax.annotation.Nullable;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityKankuro extends ElementsNarutomodMod.ModElement {
@@ -50,11 +54,15 @@ public class EntityKankuro extends ElementsNarutomodMod.ModElement {
 				.name("kankuro").tracker(64, 3, true).egg(-16777216, -3355444).build());
 	}
 
-	public static class EntityCustom extends EntityNinjaMob.Base {
+	@Override
+	public void init(FMLInitializationEvent event) {
+		EntityRegistry.addSpawn(EntityCustom.class, 5, 1, 1, EnumCreatureType.AMBIENT, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.MUTATED_DESERT);
+	}
+
+	public static class EntityCustom extends EntityNinjaMerchant.Base {
 		public EntityCustom(World world) {
-			super(world, 120, 7000d);
+			super(world, 80);
 			this.setSize(0.6f, 1.8f);
-			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false, this.playerTargetSelector));
 		}
 
 		@Override
@@ -64,29 +72,45 @@ public class EntityKankuro extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public Map<EntityNinjaMerchant.TradeLevel, MerchantRecipeList> getTrades() {
+			Map<EntityNinjaMerchant.TradeLevel, MerchantRecipeList> trades = Maps.newHashMap();
+
+			MerchantRecipeList commonTrades = new MerchantRecipeList();
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemSmokeBomb.block, 8), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 4), ItemStack.EMPTY, new ItemStack(ItemPoisonbomb.block, 8), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemSenbon.block, 16), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 4), ItemStack.EMPTY, new ItemStack(ItemPoisonSenbon.block, 16), 0, 1));
+			MerchantRecipeList uncommonTrades = new MerchantRecipeList();
+			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 20), ItemStack.EMPTY, new ItemStack(ItemScrollPuppet.block, 1), 0, 1));
+			MerchantRecipeList rareTrades = new MerchantRecipeList();
+			rareTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 45), ItemStack.EMPTY, new ItemStack(ItemScrollKarasu.block, 1), 0, 1));
+			rareTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 45), ItemStack.EMPTY, new ItemStack(ItemScrollSanshouo.block, 1), 0, 1));
+
+			trades.put(EntityNinjaMerchant.TradeLevel.COMMON, commonTrades);
+			trades.put(EntityNinjaMerchant.TradeLevel.UNCOMMON, uncommonTrades);
+			trades.put(EntityNinjaMerchant.TradeLevel.RARE, rareTrades);
+			return trades;
+		}
+
+		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(16D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}
 
 		@Override
 		protected void initEntityAI() {
 			super.initEntityAI();
-			this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
-			this.tasks.addTask(0, new EntityAISwimming(this));
-			this.tasks.addTask(2, new EntityNinjaMob.AILeapAtTarget(this, 1.0F));
-			this.tasks.addTask(4, new EntityAIAttackMelee(this, 1.2d, true));
-			this.tasks.addTask(5, new EntityAIWatchClosest2(this, EntityPlayer.class, 32.0F, 1.0F));
-			this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityNinjaMob.Base.class, 24.0F) {
+			this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityMob.class, 10, false, false, (p)-> {
+				return p instanceof EntityZombie|| p instanceof EntityCreeper || p instanceof AbstractSkeleton;
+			}) {
 				@Override
 				public boolean shouldExecute() {
-					return super.shouldExecute() && !this.entity.isOnSameTeam(this.closestEntity);
+					return EntityCustom.this.hasHome() && super.shouldExecute();
 				}
 			});
-			this.tasks.addTask(7, new EntityAIWander(this, 0.5d));
-			this.tasks.addTask(8, new EntityAILookIdle(this));
 		}
 
 		@Override
@@ -96,16 +120,9 @@ public class EntityKankuro extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
-			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()
-			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000);
-			 //&& this.rand.nextInt(5) == 0;
+			return super.getCanSpawnHere() 
+			 && this.world.getEntitiesWithinAABB(EntityCustom.class, this.getEntityBoundingBox().grow(128d, 16d, 128d)).isEmpty();
 		}
-
-		//@Override
-		//public boolean isOnSameTeam(Entity entityIn) {
-		//	return super.isOnSameTeam(entityIn) || EntityNinjaMob.TeamAkatsuki.contains(entityIn.getClass());
-		//}
 	}
 
 	@Override

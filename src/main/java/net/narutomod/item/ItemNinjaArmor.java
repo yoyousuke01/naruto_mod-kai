@@ -156,14 +156,12 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 				headwear.addChild(cube_r1);
 				setRotationAngle(cube_r1, 0.0F, 0.0F, -0.7854F);
 				cube_r1.cubeList.add(new ModelBox(cube_r1, 28, 0, -2.0F, -1.975F, -0.975F, 3, 3, 2, 0.3F, false));
-			} else if (type == Type.SUNA || type == Type.IWA || type == Type.KUMO) {
+			} else if (type == Type.SUNA || type == Type.IWA || type == Type.KUMO || type == Type.KONOHA) {
 				bipedHead.addChild(headwear);
 				headwear.cubeList.add(new ModelBox(headwear, 0, 48, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.26F, false));
 			} else if (type == Type.SOUND5) {
-				ModelRenderer sound5Head = new ModelRenderer(this);
-				sound5Head.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bipedHead.addChild(sound5Head);
-				sound5Head.cubeList.add(new ModelBox(sound5Head, 32, 5, -4.0F, -8.0F, -4.0F, 8, 3, 8, 0.15F, false));
+				bipedHead.addChild(headwear);
+				headwear.cubeList.add(new ModelBox(headwear, 32, 5, -4.0F, -8.0F, -4.0F, 8, 3, 8, 0.15F, false));
 			} else {
 				headwear.showModel = false;
 			}
@@ -224,7 +222,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 					break;
 				case KUMO:
 					vest.addChild(vestGroup);
-					vestGroup.cubeList.add(new ModelBox(vestGroup, 40, 9, -4.0F, 12.0F, -2.0F, 8, 3, 4, 0.4F, true));
+					vestGroup.cubeList.add(new ModelBox(vestGroup, 40, 9, -4.0F, 12.0F, -2.0F, 8, 3, 4, 0.34F, true));
 					break;
 				case SAMURAI:
 					vest.addChild(vestGroup);

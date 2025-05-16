@@ -247,6 +247,13 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 				return stack.hasTagCompound() ? stack.getTagCompound().hasKey(JUTSULASTUSEKEY) : false;
 			}
 
+			public static EntityReplacementClone createJutsu(EntityLivingBase entity, Entity attacker) {
+				ProcedureOnLivingUpdate.setUntargetable(entity, 5);
+				EntityReplacementClone clone = new EntityReplacementClone(entity, attacker);
+				entity.world.spawnEntity(clone);
+				return clone;
+			}
+
 			public static class Hook {
 				@SubscribeEvent
 				public void onAttacked(LivingHurtEvent event) {
@@ -261,9 +268,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 							 && Chakra.pathway(entity).consume(REPLACEMENT.chakraUsage)) {
 								event.setCanceled(true);
 								stack.getTagCompound().setLong(JUTSULASTUSEKEY, l);
-								ProcedureOnLivingUpdate.setUntargetable(entity, 5);
-								EntityReplacementClone clone = new EntityReplacementClone(entity, attacker);
-								entity.world.spawnEntity(clone);
+								EntityReplacementClone clone = createJutsu(entity, attacker);
 								clone.attackEntityFrom(event.getSource(), event.getAmount());
 							}
 						}
