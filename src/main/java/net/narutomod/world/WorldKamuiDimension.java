@@ -82,7 +82,7 @@ public class WorldKamuiDimension extends ElementsNarutomodMod.ModElement {
 	public static class BlockEventHook {
 		@SubscribeEvent
 		public void onBlockEvent(BlockEvent event) {
-			if (event.getWorld().provider instanceof WorldProviderMod) {
+			if (event.getWorld().provider instanceof WorldProviderMod && event.isCancelable()) {
 				event.setCanceled(true);
 			}
 		}
@@ -93,6 +93,7 @@ public class WorldKamuiDimension extends ElementsNarutomodMod.ModElement {
 		public void init() {
 			this.biomeProvider = new BiomeProviderCustom(this.world.getSeed());
 			this.nether = NETHER_TYPE;
+			this.world.getGameRules().setOrCreateGameRule("mobGriefing", "false");
 		}
 
 		@Override

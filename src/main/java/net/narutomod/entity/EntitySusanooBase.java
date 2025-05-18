@@ -100,6 +100,11 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.dataManager.register(FLAME_COLOR, Integer.valueOf(0x202C183D));
 	}
 
+	@Deprecated @Nullable
+	public EntityLivingBase getOwnerPlayer() {
+		return this.getSummoner();
+	}
+	
 	@Override @Nullable
 	public EntityLivingBase getSummoner() {
 		Entity entity = this.world.getEntityByID(((Integer)this.dataManager.get(OWNER_ID)).intValue());

@@ -160,7 +160,6 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}
@@ -309,14 +308,16 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
-			if (this.curseTarget != null && this.curseTarget.isEntityAlive() && this.jashinTransitionDirection > 0) {
-				source = this.selfDamage;
-				this.curseTarget.attackEntityFrom(source, amount);
+			if (!this. world.isRemote) {
+				if (this.curseTarget != null && this.curseTarget.isEntityAlive() && this.jashinTransitionDirection > 0) {
+					source = this.selfDamage;
+					this.curseTarget.attackEntityFrom(source, amount);
+				}
+				amount *= source == this.selfDamage ? 0.04f : source.isUnblockable() && source.isDamageAbsolute() ? 1.0f : (this.rand.nextFloat() * 0.08f + 0.08f);
 			}
-			amount *= source == this.selfDamage ? 0.04f : source.isUnblockable() && source.isDamageAbsolute() ? 1.0f : (this.rand.nextFloat() * 0.08f + 0.08f);
 			return super.attackEntityFrom(source, amount);
 		}
-
+		
 		@Override
 		public void onLivingUpdate() {
 			super.onLivingUpdate();

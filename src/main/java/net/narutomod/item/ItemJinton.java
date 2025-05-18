@@ -343,7 +343,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			}
 			for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, bb)) {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
-				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
+				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.03d;
 				attackEntityWithJutsu(this, this.shootingEntity, entity, 
 				 entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
