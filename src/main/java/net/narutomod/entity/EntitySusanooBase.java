@@ -24,15 +24,12 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.item.ItemStack;
+import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
-import net.narutomod.item.ItemTotsukaSword;
-import net.narutomod.item.ItemChokuto;
-import net.narutomod.item.ItemShuriken;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSusanoo;
 import net.narutomod.PlayerTracker;
@@ -430,8 +427,9 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
     protected void showHeldWeapons() {
 		EntityLivingBase owner = this.getSummoner();
 		if (!this.world.isRemote && owner != null) {
-			this.setShowSword(owner.getHeldItemMainhand().getItem() == ItemChokuto.block);
-			if (owner.getHeldItemMainhand().getItem() == ItemShuriken.block) {
+			ItemStack stack = owner.getHeldItemMainhand();
+			this.setShowSword(stack.getItem() == ItemChokuto.block || stack.getItem() == Items.IRON_SWORD || stack.getItem() == ItemKunai.block || stack.getItem() == ItemAnbuSword.block);
+			if (stack.getItem() == ItemShuriken.block) {
 				this.createBullet((float)this.getEntityData().getDouble("entityModelScale") * 0.5f);
 			} else {
 				this.killBullet();

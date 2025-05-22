@@ -74,6 +74,8 @@ Entities:
  - White zetsu: improved mimic ability, can transform into mobs, takes opponents chakra
  - all ninja NPCs will always negate first unprovoked attack with replacement jutsu, then aggro the attacker
  - Kankuro & Temari can spawn in desert villages and trade with players
+ - susanoo: user holding chokuto, kunai, anbu sword or iron sword will activate the susanoo sword
+ - removed Darui temporarily
  
 General:
  - added config option to disable auto kekkeigenkai assignment

@@ -1,5 +1,5 @@
 
-package net.narutomod.entity;
+/*package net.narutomod.entity;
 
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.item.ItemCleaver;
@@ -34,9 +34,9 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
-import net.minecraft.nbt.NBTTagCompound;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityDarui extends ElementsNarutomodMod.ModElement {
@@ -193,3 +193,4 @@ public class EntityDarui extends ElementsNarutomodMod.ModElement {
 		}
 	}
 }
+*/

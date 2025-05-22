@@ -30,6 +30,8 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.Minecraft;
@@ -58,6 +60,7 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:hiramekarei_sword")
 	public static final Item block = null;
 	public static final int ENTITYID = 292;
+	private static final String CUSTOM_MODEL_KEY = "CustomRenderedModel";
 
 	public ItemHiramekareiSword(ElementsNarutomodMod instance) {
 		super(instance, 615);
@@ -74,7 +77,23 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:hiramekarei", "inventory"));
+		//ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:hiramekarei_wrapped", "inventory"));
+		class MeshDef implements ItemMeshDefinition {
+			final ModelResourceLocation[] resources = {
+		   	    new ModelResourceLocation("narutomod:hiramekarei", "inventory"),
+		   	    new ModelResourceLocation("narutomod:hiramekarei_wrapped", "inventory")
+			};
+	        @Override
+	        public ModelResourceLocation getModelLocation(ItemStack stack) {
+	            if (stack.hasTagCompound() && stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+	                return this.resources[0];
+	            }
+	            return this.resources[1];
+	        }
+	    }
+	    MeshDef meshDef = new MeshDef();
+   	    ModelBakery.registerItemVariants(block, meshDef.resources);
+	    ModelLoader.setCustomMeshDefinition(block, meshDef);
 	}
 
 	public static class RangedItem extends Item implements ItemOnBody.Interface {
@@ -133,12 +152,27 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
-			EntityEffects effectentity = this.getEntity(world, itemstack);
+		public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			if (isSelected) {
+				if (!stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+					stack.getTagCompound().setBoolean(CUSTOM_MODEL_KEY, true);
+					worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
+					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:movement")),
+					 net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 0.8f);
+				}
+			} else if (stack.getTagCompound().hasKey(CUSTOM_MODEL_KEY)) {
+				stack.getTagCompound().removeTag(CUSTOM_MODEL_KEY);
+				worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
+				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:movement")),
+				 net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 1.6f);
+			}
+			EntityEffects effectentity = this.getEntity(worldIn, stack);
 			if (effectentity == null || !effectentity.isEntityAlive()) {
-				if (itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("EffectEntityActive")) {
-					itemstack.getTagCompound().removeTag("EffectEntityActive");
+				if (stack.hasTagCompound() && stack.getTagCompound().hasKey("EffectEntityActive")) {
+					stack.getTagCompound().removeTag("EffectEntityActive");
 				}
 			}
 		}

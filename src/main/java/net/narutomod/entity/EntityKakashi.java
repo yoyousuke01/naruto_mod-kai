@@ -159,6 +159,7 @@ public class EntityKakashi extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone2;
 			private final ModelRenderer bone3;
 			private final ModelRenderer bone4;
+			private final ModelRenderer bone11;
 			private final ModelRenderer bone5;
 			private final ModelRenderer bone6;
 			private final ModelRenderer bone7;
@@ -204,6 +205,12 @@ public class EntityKakashi extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(bone4, 0.0873F, -0.1745F, -0.0175F);
 				bone4.cubeList.add(new ModelBox(bone4, 24, 0, 0.0F, -4.0F, 0.0F, 10, 6, 0, 0.0F, false));
 		
+				bone11 = new ModelRenderer(this);
+				bone11.setRotationPoint(-4.0F, -6.0F, -4.0F);
+				hair.addChild(bone11);
+				setRotationAngle(bone11, 0.2618F, 0.0F, 0.0F);
+				bone11.cubeList.add(new ModelBox(bone11, 24, 0, 0.0F, -4.0F, 0.0F, 10, 6, 0, 0.0F, false));
+
 				bone5 = new ModelRenderer(this);
 				bone5.setRotationPoint(-4.0F, -6.0F, -4.0F);
 				hair.addChild(bone5);

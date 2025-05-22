@@ -262,8 +262,19 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			//System.out.println(">>> got here. " + this);
 			this.village = this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 32);
+			/*if (this.village == null || this.rand.nextInt(10) != 0) {
+				return false;
+			} else {
+				List<Base> list = this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 10d, 96d));
+				if (list.size() < 2) {
+					if (!list.isEmpty() && !this.isOnSameTeam(list.get(0)) {
+						return false;
+					}
+					return true;
+				}
+				return false;
+			}*/
 			if (this.village == null
 					|| this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 10d, 96d)).size() >= 2
 					|| this.rand.nextInt(10) != 0) {
