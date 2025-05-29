@@ -48,7 +48,7 @@ public class EntityPuppetKarasu extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends EntityPuppet.Base implements IRangedAttackMob {
 		private static final DataParameter<Boolean> MOUTH_OPEN = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
 		private static final DataParameter<Boolean> KNIVES_OUT = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
-		public static final float MAXHEALTH = 100.0f;
+		public static final float MAXHEALTH = 200.0f;
 		private static final Vec3d offsetToOwner = new Vec3d(1.6d, 0.5d, 3.0d);
 		private int meleeTime;
 		
@@ -155,7 +155,7 @@ public class EntityPuppetKarasu extends ElementsNarutomodMod.ModElement {
 				entityarrow.shoot(vec.x, vec.y, vec.z, 2f, 0f);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(false);
-				entityarrow.setDamage(5);
+				entityarrow.setDamage(8);
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.snowman.shoot")), 1f, 1f / (this.rand.nextFloat() * 0.5f + 1f) + (1f / 2));
 				this.world.spawnEntity(entityarrow);
 			} else {

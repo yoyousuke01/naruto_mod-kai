@@ -80,7 +80,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum SAGEMODE = new ItemJutsu.JutsuEnum(0, "tooltip.senjutsu.sagemode", 'S', 10d, new SageMode());
 	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.SageModeVariant());
 	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(2, "tooltip.senjutsu.rasenshuriken", 'S', ItemFuton.RASENSHURIKEN.chakraUsage, new EntityRasenshuriken.EC.SageModeVairant());
-	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 5000d, new EntityBuddha1000.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 40000d, new EntityBuddha1000.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 3000d, new EntitySnake8Heads.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GAMARINSHO = new ItemJutsu.JutsuEnum(5, "gamarinsho", 'S', 3000d, new EntityGamarinsho.EC.Jutsu());
 	private static final Random RAND = new Random();

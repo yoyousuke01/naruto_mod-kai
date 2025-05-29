@@ -107,7 +107,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20.0f + scale);
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5.0f + scale);
 				            }
 						}
 					}
@@ -120,7 +120,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 				if (power >= 1.0F) {
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
 					if (entity instanceof EntityPlayer) {
-						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 200));
+						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 240));
 					}
 					return true;
 				}

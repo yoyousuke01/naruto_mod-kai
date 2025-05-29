@@ -93,7 +93,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> POSE = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private static final DataParameter<Boolean> ROBE_OFF = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
 		private static final DataParameter<Boolean> AKATSUKI = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
-		public static final float MAXHEALTH = 240.0f;
+		public static final float MAXHEALTH = 300.0f;
 		private int poseProgressEnd = 14;
 		private int poseProgress = -1;
 		private Object model;
@@ -185,10 +185,10 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(30D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MAXHEALTH);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(16.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(25.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(6.0D);
 		}
 

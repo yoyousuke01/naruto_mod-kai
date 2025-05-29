@@ -1,52 +1,48 @@
 
 package net.narutomod.potion;
 
+import net.narutomod.procedure.ProcedureAirPunch;
+import net.narutomod.Particles;
+import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.Chakra;
+
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 import net.minecraft.world.World;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.util.EntityDamageSource;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.Potion;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.Potion;
 import net.minecraft.block.Block;
-
-import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.procedure.ProcedureAirPunch;
-import net.narutomod.Chakra;
-import net.narutomod.Particles;
-import net.narutomod.ElementsNarutomodMod;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:chakra_enhanced_strength")
 	public static final Potion potion = null;
 	public static boolean shouldShowInHUD = true;
-
 	public PotionChakraEnhancedStrength(ElementsNarutomodMod instance) {
 		super(instance, 529);
 	}
@@ -55,7 +51,6 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 	public void initElements() {
 		elements.potions.add(() -> new PotionCustom());
 	}
-
 	public static class PotionCustom extends Potion {
 		private final ResourceLocation potionIcon;
 		public PotionCustom() {
@@ -64,8 +59,10 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 			setRegistryName("chakra_enhanced_strength");
 			setPotionName("effect.chakra_enhanced_strength");
 			potionIcon = new ResourceLocation("narutomod:textures/strength.png");
-			//this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_SPEED, "97405670-df28-4a45-bf9a-7aba911051a6", 0.1d, 2);
-			//this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_DAMAGE, "6fec22d7-dbdf-4928-a4d5-00dea8b96939", 1d, 0);
+			// this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_SPEED,
+			// "97405670-df28-4a45-bf9a-7aba911051a6", 0.1d, 2);
+			// this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_DAMAGE,
+			// "6fec22d7-dbdf-4928-a4d5-00dea8b96939", 1d, 0);
 		}
 
 		@Override
@@ -108,7 +105,6 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 	public class EntityHook {
 		public class Punch extends ProcedureAirPunch {
 			private final boolean griefing;
-
 			public Punch(World world) {
 				this.blockDropChance = 0.1F;
 				this.griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
@@ -120,26 +116,25 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 				Vec3d vec1 = player.getPositionVector().addVector(0d, 1.2d, 0d).add(vec);
 				Vec3d vec2 = vec.scale(this.getRange(0));
 				double d = MathHelper.atan2(this.getFarRadius(0), this.getRange(0));
-				for (int i = 0; i < (int)(this.getRange(0) * 50); i++) {
-					Vec3d vec3 = vec2.scale((this.rand.nextDouble() * 0.05d) + 0.2d)
-					 .rotatePitch((float)(this.rand.nextGaussian() * d))
-					 .rotateYaw((float)(this.rand.nextGaussian() * d));
-					Particles.spawnParticle(player.world, Particles.Types.SMOKE, vec1.x, vec1.y, vec1.z,
-					 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z, 0x20ffffff, (int)this.getRange(0) * 2 + this.rand.nextInt(21), 12);
+				for (int i = 0; i < (int) (this.getRange(0) * 50); i++) {
+					Vec3d vec3 = vec2.scale((this.rand.nextDouble() * 0.05d) + 0.2d).rotatePitch((float) (this.rand.nextGaussian() * d))
+							.rotateYaw((float) (this.rand.nextGaussian() * d));
+					Particles.spawnParticle(player.world, Particles.Types.SMOKE, vec1.x, vec1.y, vec1.z, 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z,
+							0x20ffffff, (int) this.getRange(0) * 2 + this.rand.nextInt(21), 12);
 				}
-				for (int i = 1, j = (int)(this.getRange(0) * 2.5d); i <= j; i++) {
+				for (int i = 1, j = (int) (this.getRange(0) * 2.5d); i <= j; i++) {
 					Vec3d vec3 = vec2.scale(-0.0012d * i);
-					Particles.spawnParticle(player.world, Particles.Types.SONIC_BOOM, vec1.x, vec1.y, vec1.z,
-					 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z, 0x00ffffff | ((int)((1f-(float)i/j)*0x40)<<24), i,
-					 (int)(5f * (1f + ((float)i/j) * 0.5f)));
+					Particles.spawnParticle(player.world, Particles.Types.SONIC_BOOM, vec1.x, vec1.y, vec1.z, 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z,
+							0x00ffffff | ((int) ((1f - (float) i / j) * 0x40) << 24), i, (int) (5f * (1f + ((float) i / j) * 0.5f)));
 				}
 			}
 
 			@Override
 			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				if (this.griefing && player.world.getBlockState(pos).isFullBlock()
-				 && player.world.getBlockState(pos.up()).getCollisionBoundingBox(player.world, pos.up()) == Block.NULL_AABB) {
-					EntityFallingBlock entity = new EntityFallingBlock(player.world, 0.5d+pos.getX(), pos.getY(), 0.5d+pos.getZ(), player.world.getBlockState(pos));
+						&& player.world.getBlockState(pos.up()).getCollisionBoundingBox(player.world, pos.up()) == Block.NULL_AABB) {
+					EntityFallingBlock entity = new EntityFallingBlock(player.world, 0.5d + pos.getX(), pos.getY(), 0.5d + pos.getZ(),
+							player.world.getBlockState(pos));
 					entity.motionY = 0.45d;
 					player.world.spawnEntity(entity);
 				}
@@ -148,12 +143,11 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 
 			@Override
 			protected float getBreakChance(BlockPos pos, Entity player, double range) {
-				return player instanceof EntityLivingBase && ((EntityLivingBase)player).getActivePotionEffect(potion).getIsAmbient()
-				 ? 1.0F - (float)((Math.sqrt(player.getDistanceSqToCenter(pos)) - 4.0D) / range)
-				 : 0.0F;
+				return player instanceof EntityLivingBase && ((EntityLivingBase) player).getActivePotionEffect(potion).getIsAmbient()
+						? 1.0F - (float) ((Math.sqrt(player.getDistanceSqToCenter(pos)) - 4.0D) / range)
+						: 0.0F;
 			}
 		}
-
 		@SubscribeEvent
 		public void onLivingHurt(LivingHurtEvent event) {
 			if (event.getSource().getImmediateSource() instanceof EntityLivingBase && !event.getSource().isExplosion()
@@ -161,7 +155,7 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getImmediateSource();
 				if (attacker.isPotionActive(potion)) {
 					int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
-					if (Chakra.pathway(attacker).consume((double)amplifier)) {
+					if (Chakra.pathway(attacker).consume((0.15d *(double)amplifier))) {
 						EntityLivingBase target = event.getEntityLiving();
 						target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
 						  SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
@@ -220,7 +214,6 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 			}
 		}
 	}
-
 	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EntityHook());

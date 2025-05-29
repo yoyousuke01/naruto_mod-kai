@@ -35,7 +35,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:inton")
 	public static final Item block = null;
 	public static final int ENTITYID = 172;
-	public static final ItemJutsu.JutsuEnum GENJUTSU = new ItemJutsu.JutsuEnum(0, "genjutsu", 'B', 300d, new Genjutsu());
+	public static final ItemJutsu.JutsuEnum GENJUTSU = new ItemJutsu.JutsuEnum(0, "genjutsu", 'B', 1000d, new Genjutsu());
 	public static final ItemJutsu.JutsuEnum MBTRANSFER = new ItemJutsu.JutsuEnum(1, "mind_transfer", 'C', 300d, new EntityMindTransfer.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SHADOW_IMITATION = new ItemJutsu.JutsuEnum(2, "shadow_imitation", 'B', 50d, new EntityShadowImitation.EC.Jutsu());
 
@@ -69,7 +69,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 		private final int cooldown = 12000;
 
 		public Genjutsu() {
-			this(30.0d, 400);
+			this(20.0d, 300);
 		}
 
 		public Genjutsu(double range, int durationIn) {

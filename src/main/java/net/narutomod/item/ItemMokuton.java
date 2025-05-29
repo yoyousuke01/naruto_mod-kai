@@ -70,7 +70,7 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum WOODBURIAL = new ItemJutsu.JutsuEnum(0, "wood_burial", 'S', 100d, new EntityWoodBurial.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODPRISON = new ItemJutsu.JutsuEnum(1, "wood_prison", 'S', 50d, new EntityWoodPrison.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODHOUSE = new ItemJutsu.JutsuEnum(2, "tooltip.mokuton.rightclick2", 'S', 100d, new JutsuHouse());
-	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 1000d, new EntityWoodGolem.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 2000d, new EntityWoodGolem.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 50d, new EntityWoodArm.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 50d, new EntityWoodCutting.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum FOREST = new ItemJutsu.JutsuEnum(6, "wood_forest", 'S', 800, 20d, new EntityWoodForest.EC.Jutsu());

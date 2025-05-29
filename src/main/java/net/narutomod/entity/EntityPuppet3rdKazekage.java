@@ -55,7 +55,7 @@ public class EntityPuppet3rdKazekage extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCustom extends EntityPuppet.Base {
 		private static final DataParameter<Boolean> MOUTH_OPEN = EntityDataManager.<Boolean>createKey(EntityCustom.class, DataSerializers.BOOLEAN);
-		public static final float MAXHEALTH = 160.0f;
+		public static final float MAXHEALTH = 400.0f;
 		private static final Vec3d offsetToOwner = new Vec3d(-1.4d, 0.5d, 3.0d);
 
 		public EntityCustom(World worldIn) {
@@ -97,7 +97,7 @@ public class EntityPuppet3rdKazekage extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MAXHEALTH);
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(14D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20D);
 		}
 
 		@Override

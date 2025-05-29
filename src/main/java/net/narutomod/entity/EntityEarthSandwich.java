@@ -155,7 +155,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								entity.attackEntityFrom(DamageSource.IN_WALL, age > this.growTime ? 0.8f : (f * f * 0.25f));
+								entity.attackEntityFrom(DamageSource.IN_WALL, age > this.growTime ? 0.3f : (f * f * 0.05f));
 							}
 						} else if (!entity.isEntityAlive() || !entity.getEntityBoundingBox().intersects(this.getEntityBoundingBox())) {
 							iter.remove();
@@ -167,7 +167,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 600) {
+				if (age > 400) {
 					this.setDead();
 				}
 			}

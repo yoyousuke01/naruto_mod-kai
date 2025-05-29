@@ -37,9 +37,9 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 			float yaw = entity.rotationYaw * 0.017453292F;
 			float pitch = entity.rotationPitch * -0.017453292F;
 			double d0 = Math.min(Math.cos(pitch) / 0.7071d, 1.0d);
-			entity.motionX += -Math.sin(yaw) * d0 * speed * 3.5d;
-			entity.motionZ += Math.cos(yaw) * d0 * speed * 3.5d;
-			entity.motionY = Math.max(motionY * Math.sin(pitch) * 3.0d, 0.42d);
+			entity.motionX += -Math.sin(yaw) * d0 * speed * 3.0d;
+			entity.motionZ += Math.cos(yaw) * d0 * speed * 3.0d;
+			entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.5d, 0.42d);
 		}
 		entity.addExhaustion(1.0f);
 	}

@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,15 +44,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.client.renderer.entity.RenderBiped;
+import net.minecraft.client.model.ModelBox;
+import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.model.ModelBox;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -814,9 +817,15 @@ public class EntityClone extends ElementsNarutomodMod.ModElement {
 	
 		    @Override
 		    protected void preRenderCallback(T entity, float partialTickTime) {
-		        if (entity.getSummoner() instanceof AbstractClientPlayer) {
+		    	EntityLivingBase summoner = entity.getSummoner();
+		        if (summoner instanceof AbstractClientPlayer) {
 			        float f = 0.9375F;
 			        GlStateManager.scale(f, f, f);
+		        } else if (summoner != null) {
+		        	Render renderer = this.renderManager.getEntityRenderObject(summoner);
+		        	if (renderer instanceof RenderLivingBase) {
+		        		ProcedureUtils.invokeMethodByParameters(renderer, summoner, partialTickTime);
+		        	}
 		        }
 		        float f = entity.getScale();
 		        if (f != 1.0f) {

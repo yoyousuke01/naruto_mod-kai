@@ -27,7 +27,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 30f;
+	private static final float BASE_DAMAGE = 15f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);
@@ -120,7 +120,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					if (entity instanceof EntityPlayer) {
-						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 120));
+						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 200));
 					}
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
 					return true;
@@ -132,6 +132,14 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 			public float getPowerupDelay() {
 				return 150.0f;
 			}
+
+
+			@Override
+			public float getMaxPower() {
+				return 50.0f;
+			}
+
+
 		}
 	}
 }

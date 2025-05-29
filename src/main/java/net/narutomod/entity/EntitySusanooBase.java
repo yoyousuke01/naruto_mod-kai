@@ -261,7 +261,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		}
 	}
 
-	@Override
+	/*@Override
 	protected void addPassenger(Entity passenger) {
 		if (passenger.getRidingEntity() != this) {
 			throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
@@ -286,7 +286,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 			((List<Entity>)obj).add(passenger);
 		}
-	}
+	}*/
 
 	@Override
 	public double getMountedYOffset() {
