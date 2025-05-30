@@ -394,7 +394,9 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 						clones.add((EC)e);
 					}
 				}
-				for (EC e : clones) {
+				if (clones.isEmpty()) {
+					entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAXHEALTH);
+				} else for (EC e : clones) {
 					e.setDead();
 				}
 				entity.getEntityData().removeTag(ID_KEY);
@@ -451,6 +453,7 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 		public void onDeath(LivingDeathEvent event) {
 			EntityLivingBase entity = event.getEntityLiving();
 			if (entity instanceof EntityPlayer) {
+//System.out.println(">>>>>> isPlayerClone:"+isPlayerClone((EntityPlayer)entity));
 				if (isPlayerClone((EntityPlayer)entity)) {
 					event.setCanceled(true);
 					this.revertClone(entity);
@@ -476,7 +479,6 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 		@SubscribeEvent
 		public void onPlayerSleep(PlayerSleepInBedEvent event) {
 			EntityPlayer entity = event.getEntityPlayer();
-//System.out.println("isPlayerClone:"+isPlayerClone(entity));
 			if (!entity.world.isRemote && isPlayerClone(entity)) {
 				event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
 				ProcedureUtils.sendStatusMessage(entity, "You are a clone, you can't sleep.", false);

@@ -155,10 +155,10 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void updateAITasks() {
-			//if (this.ticksExisted == 40) {
-			//	this.takeOffRobe(true);
-			//}
-			//if (this.ticksExisted == 100) {
+			if (this.ticksExisted == 40) {
+				this.takeOffRobe(true);
+			}
+			//if (this.ticksExisted == 200) {
 			//	this.takeOffRobe(false);
 			//}
 			super.updateAITasks();
@@ -180,7 +180,7 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 				super.damageEntity(damageSrc, damageAmount);
 				return;
 			}
-			super.damageEntity(damageSrc, damageAmount * 0.2f);
+			super.damageEntity(damageSrc, damageAmount * 0.1f);
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -294,7 +294,7 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer maskFire;
 			private final ModelRenderer maskLightning;
 			private final ModelRenderer backThreads;
-			private final ModelRenderer[][] backThread = new ModelRenderer[50][12];
+			private final ModelRenderer[][] backThread = new ModelRenderer[50][14];
 			private final ModelRenderer rightForeArm;
 			private final ModelRenderer[] rightArmThread = new ModelRenderer[4];
 			private final ModelRenderer[][] rightArmString = new ModelRenderer[6][6];
@@ -333,7 +333,7 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 				jaw = new ModelRenderer(this);
 				jaw.setRotationPoint(0.0F, 0.0F, -2.0F);
 				bipedHead.addChild(jaw);
-				jaw.cubeList.add(new ModelBox(jaw, 52, 16, -1.5F, -1.0F, -2.0F, 3, 1, 2, 0.0F, false));
+				jaw.cubeList.add(new ModelBox(jaw, 30, 51, -3.0F, -1.0F, -2.0F, 6, 1, 2, 0.0F, false));
 
 				mouthThreads = new ModelRenderer(this);
 				mouthThreads.setRotationPoint(0.0F, -0.75F, -0.5F);
@@ -343,7 +343,7 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 					for (int j = 0; j < mouthThread[i].length; j++) {
 						mouthThread[i][j] = new ModelRenderer(this);
 						if (j == 0) {
-							mouthThread[i][j].setRotationPoint(0.0F, -0.1F, 0.0F);
+							mouthThread[i][j].setRotationPoint((this.rand.nextFloat()-0.5F) * 4F, -0.1F, 0.0F);
 							mouthThreads.addChild(mouthThread[i][j]);
 							setRotationAngle(mouthThread[i][j], (this.rand.nextFloat()-0.5F) * 0.1309F, (this.rand.nextFloat()-0.5F) * 1.0472F, 0.0F);
 						} else {
@@ -388,24 +388,45 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 				bipedBody.addChild(backThreads);
 				for (int i = 0; i < backThread.length; i++) {
 					for (int j = 0; j < backThread[i].length; j++) {
+						float f1 = 3.0F / backThread[i].length * j;
 						backThread[i][j] = new ModelRenderer(this);
 						if (j == 0) {
-							float rotateX = (this.rand.nextFloat()-0.5F) * 1.5708F - 0.6109F;
-							float rotateY = (this.rand.nextFloat()-0.5F) * 2.618F;
+							float rotateX = (this.rand.nextFloat()-0.5F) * 2.0944F;
+							float rotateY = (this.rand.nextFloat()-0.5F) * 2.0944F;
+							float rotateZ = rotateY;
+							if (i == 0) {
+								rotateX = 1.0472F;
+								rotateY = 0.2618F;
+								rotateZ = 0.6981F;
+							} else if (i == 1) {
+								rotateX = 1.0472F;
+								rotateY = -0.2618F;
+								rotateZ = -0.6981F;
+							}
 							float f = MathHelper.sqrt(rotateX * rotateX + rotateY * rotateY);
 							backThread[i][j].setRotationPoint(0.0F, 4.0F, f * 1.2F);
 							backThreads.addChild(backThread[i][j]);
-							setRotationAngle(backThread[i][j], rotateX, rotateY, 0.0F);
+							setRotationAngle(backThread[i][j], rotateX, rotateY, rotateZ);
 						} else {
-							backThread[i][j].setRotationPoint(0.0F, 0.0F, 3.0F);
+							backThread[i][j].setRotationPoint(0.0F, 0.0F, 7.0F - 2.0F * f1);
 							backThread[i][j-1].addChild(backThread[i][j]);
 							setRotationAngle(backThread[i][j], 0.0873F, 0.0F, 0.0F);
 						}
-						backThread[i][j].cubeList.add(new ModelBox(backThread[i][j], 40, 41, -3.0F, -3.0F, 0.0F, 6, 6, 4, 0.0F, false));
-						backThread[i][j].cubeList.add(new ModelBox(backThread[i][j], 40, 41, -3.0F, -3.0F, 0.0F, 6, 6, 4, -1.0F, true));
+						backThread[i][j].cubeList.add(new ModelBox(backThread[i][j], 36, 41, -3.0F, -3.0F, -f1, 6, 6, 8, -f1, false));
 						backHairSway[i][j] = (0.0873F + this.rand.nextFloat() * 0.0873F) * (j % 2 == 0 ? -1.0F : 1.0F);
 					}
 				}
+				ModelRenderer maskFire2 = new ModelRenderer(this);
+				maskFire2.setRotationPoint(-0.1F, -1.6F, 1.9F);
+				backThread[0][2].addChild(maskFire2);
+				setRotationAngle(maskFire2, -1.5708F, 0.0F, -3.1416F);
+				maskFire2.cubeList.add(new ModelBox(maskFire2, 14, 50, -3.5F, -3.5F, 1.0F, 7, 7, 0, -0.5F, false));
+
+				ModelRenderer maskWind2 = new ModelRenderer(this);
+				maskWind2.setRotationPoint(-0.1F, -1.6F, 1.9F);
+				backThread[1][2].addChild(maskWind2);
+				setRotationAngle(maskWind2, -1.5708F, 0.0F, -3.1416F);
+				maskWind2.cubeList.add(new ModelBox(maskWind2, 0, 50, -3.5F, -3.5F, 1.0F, 7, 7, 0, -0.5F, false));
 
 				bipedRightArm = new ModelRenderer(this);
 				bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);

@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "GUI": 73,
+    "DIMENSION": 13,
     "ENTITY": 523,
-    "DIMENSION": 13
+    "GUI": 73
   },
   "mod_elements": [
     {
@@ -8048,6 +8048,21 @@
         "1": 523
       },
       "registry_name": "chojuro"
+    },
+    {
+      "name": "NinjaArmorTaki",
+      "type": "armor",
+      "sortid": 938,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "ninja_armor_taki",
+      "metadata": {
+        "eh": true,
+        "el": false,
+        "eb": false,
+        "ec": false
+      }
     }
   ],
   "variable_elements": [
@@ -9194,6 +9209,7 @@
       "entity.tailed_beast.name": "Tailed Beast",
       "item.scroll_lightning_panther.name": "Lightning Release: Black Panther",
       "item.clothes_raikagehelmet.name": "Raikage Hat",
+      "item.ninja_armor_takihelmet.name": "Forehead Protector (Takigakure)",
       "entity.jinchuriki_clone.name": "Tailed Beast Cloak",
       "tipped_arrow.effect.reach": "Arrow of Reach",
       "item.byakurinnesharinganhelmet.name": "Fake Rinne Sharingan",
@@ -9513,6 +9529,7 @@
       "entity.tensei_baku_gold.name": "Golden Wheel Rebirth Blast",
       "subtitles.makyohyosho": "",
       "item.kusanagi_sword.name": "Kusanagi Sword",
+      "item.ninja_armor_takiboots.name": "Ninja Armor Taki Boots",
       "item.scroll_healing.name": "Medical Ninjutsu - Healing jutsu",
       "item.scroll_multi_clone.name": "Multi Shadow Clone jutsu",
       "tooltip.shikotsumyaku.dancecamellia": "Camellia Dance",
@@ -9557,6 +9574,7 @@
       "entity.specialeffect.name": "Special Effect",
       "item.tenseiganbody.name": "Tenseigan Chakra",
       "item.scroll_flame_formation.name": "Fire Release: Uchiha Flame Formation",
+      "item.ninja_armor_takilegs.name": "Ninja Armor Taki Leggings",
       "item.dojutsu.name": "Dojutsu",
       "item.steam_armorhelmet.name": "Steam Armor Hat",
       "entity.three_tails.name": "Isobu",
@@ -9945,6 +9963,7 @@
       "item.samurai_armorbody.name": "Samurai Armor",
       "advancements.jiton_acquired.descr": "Magnet Release is a nature transformation kekkei genkai, a combination of wind and earth. Magnet Release users generate a magnetic force which they apply to other substances for various purposes.",
       "item.scythe_madara.name": "Scythe Madara",
+      "item.ninja_armor_takibody.name": "Ninja Armor Taki Body",
       "tooltip.kusanagi.description": "The Kusanagi sword of Japanese legend.",
       "item.mangekyosharinganhelmet.name": "Mangekyo Sharingan - Amaterasu",
       "key.mcreator.specialjutsu1": "Jutsu 1",

@@ -638,7 +638,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void travel(float ti, float tj, float tk) {
-			if (this.isBeingRidden() && this.canPassengerSteer()) {
+			if (this.isBeingRidden() && this.canBeSteered()) {
 				Entity entity = this.getControllingPassenger();
 				this.rotationYaw = entity.rotationYaw;
 				this.prevRotationYaw = this.rotationYaw;

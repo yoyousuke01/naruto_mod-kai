@@ -308,6 +308,10 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 				this.moveSand(this.getTargetPosition(entity), this.getTargetPosition(entity), 2);
 				if (entity instanceof EntityLivingBase) {
 					ProcedureUtils.pushEntity(this.getSummoner(), entity, 5d, 1.5f);
+				} else {
+					entity.motionX *= -0.1d;
+					entity.motionZ *= -0.1d;
+					entity.isAirBorne = true;
 				}
 			}
 			return super.attackEntityFrom(source, amount);
@@ -315,7 +319,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 
 		private void moveSand(Vec3d from, Vec3d to, int count) {
 			if (!this.world.isRemote) {
-				this.sandTargets.add(new SwarmTarget(this.world, count, from, to, 0.95f, this.color));
+				this.sandTargets.add(new SwarmTarget(this.world, count, from, to, 0.95f, 0.02f, 1.5f, this.color));
 			}
 		}
 

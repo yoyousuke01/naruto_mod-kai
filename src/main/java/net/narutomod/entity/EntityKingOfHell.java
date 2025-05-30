@@ -33,12 +33,15 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.item.ItemStack;
 
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Chakra;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
@@ -51,6 +54,20 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
 				.id(new ResourceLocation("narutomod", "kingofhell"), ENTITYID).name("kingofhell").tracker(64, 1, true).build());
+	}
+
+	@Nullable
+	public static EntityCustom getKingOfHellEntity(WorldServer world, ItemStack stack) {
+		if (stack.getItem() instanceof ItemRinnegan.Base) {
+			UUID entity_id = ProcedureUtils.getUniqueId(stack, "KoH_id");
+			if (entity_id != null) {
+				Entity entity = world.getEntityFromUuid(entity_id);
+				if (entity instanceof EntityCustom) {
+					return (EntityCustom)entity;
+				}
+			}
+		}
+		return null;
 	}
 
 	public static class EntityCustom extends EntityShieldBase {
@@ -133,8 +150,10 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 
 		public void setHealingEntity(EntityLivingBase entity) {
 			this.healingPlayer = entity;
-			this.toggleArmSwing();
-			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")), 1.0F, 1.0F);
+			if (!this.isSwingInProgress && this.swingProgressInt == 0) {
+				this.toggleArmSwing();
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")), 1.0F, 1.0F);
+			}
 		}
 
 		@Override
@@ -202,14 +221,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-
-		private void rejuvenateSummoningPlayer() {
-			if (!this.isSwingInProgress && this.swingProgressInt == 0) {
-				this.healingPlayer = this.getSummoner();
-				this.toggleArmSwing();
-			}
-		}
-
+
 		@Override
 		public void onEntityUpdate() {
 			int age = this.getAge() + 1;
@@ -231,7 +243,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 						if (summoner.getHealth() <= 0.0F) {
 							this.setHealth(0.0F);
 						} else if (summoner.getHealth() < 4.0F) {
-							this.rejuvenateSummoningPlayer();
+							this.setHealingEntity(summoner);
 						}
 					}
 				}

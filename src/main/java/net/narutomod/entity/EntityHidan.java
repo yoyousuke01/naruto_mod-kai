@@ -308,7 +308,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
-			if (!this. world.isRemote) {
+			if (!this.world.isRemote) {
 				if (this.curseTarget != null && this.curseTarget.isEntityAlive() && this.jashinTransitionDirection > 0) {
 					source = this.selfDamage;
 					this.curseTarget.attackEntityFrom(source, amount);
