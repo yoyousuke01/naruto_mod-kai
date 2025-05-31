@@ -1,19 +1,5 @@
 package net.narutomod.item;
 
-import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.potion.PotionReach;
-import net.narutomod.entity.EntityWindBlade;
-import net.narutomod.entity.EntityVacuumWave;
-import net.narutomod.entity.EntityRendererRegister;
-import net.narutomod.entity.EntityRasenshuriken;
-import net.narutomod.entity.EntityFutonVacuum;
-import net.narutomod.entity.EntityFutonGreatBreakthrough;
-import net.narutomod.entity.EntityChakraFlow;
-import net.narutomod.creativetab.TabModTab;
-import net.narutomod.PlayerTracker;
-import net.narutomod.Particles;
-import net.narutomod.ElementsNarutomodMod;
-
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -29,18 +15,15 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
-import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.init.MobEffects;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
@@ -59,13 +42,12 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 132;
 	public static final int ENTITY2ID = 10132;
 	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 20d, new ChakraFlow.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1000d,
-			new EntityRasenshuriken.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1000d, new EntityRasenshuriken.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 20d, new EntityFutonVacuum.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 20d,
-			new EntityFutonGreatBreakthrough.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 20d, new EntityFutonGreatBreakthrough.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 40d, new EntityWindBlade.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 30d, new EntityVacuumWave.EC.Jutsu());
+
 	public ItemFuton(ElementsNarutomodMod instance) {
 		super(instance, 376);
 	}
@@ -74,7 +56,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		elements.items.add(() -> new RangedItem(CHAKRAFLOW, RASENSHURIKEN, VACUUMS, BIGBLOW, WINDBLADE, VACWAVE));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(ChakraFlow.class)
-				.id(new ResourceLocation("narutomod", "futonchakraflow"), ENTITYID).name("futonchakraflow").tracker(64, 1, true).build());
+		  .id(new ResourceLocation("narutomod", "futonchakraflow"), ENTITYID).name("futonchakraflow").tracker(64, 1, true).build());
 	}
 
 	@Override
@@ -84,18 +66,19 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isJutsuEnabled(@Nullable ItemStack stack, ItemJutsu.JutsuEnum jutsu) {
-		return stack != null && stack.getItem() == block && ((RangedItem) stack.getItem()).isJutsuEnabled(stack, jutsu);
+		return stack != null && stack.getItem() == block && ((RangedItem)stack.getItem()).isJutsuEnabled(stack, jutsu);
 	}
+
 	public static class RangedItem extends ItemJutsu.Base {
-		// private static final UUID REACH_MODIFIER =
-		// UUID.fromString("d86019c3-98a6-46c6-b81c-eadb3e1f15e9");
+		//private static final UUID REACH_MODIFIER = UUID.fromString("d86019c3-98a6-46c6-b81c-eadb3e1f15e9");
+
 		public RangedItem(ItemJutsu.JutsuEnum... list) {
 			super(ItemJutsu.JutsuEnum.Type.FUTON, list);
 			this.setUnlocalizedName("futon");
 			this.setRegistryName("futon");
 			this.setCreativeTab(TabModTab.tab);
-			// this.defaultCooldownMap[RASENSHURIKEN.index] = 0;
-			// this.defaultCooldownMap[CHAKRAFLOW.index] = 0;
+			//this.defaultCooldownMap[RASENSHURIKEN.index] = 0;
+			//this.defaultCooldownMap[CHAKRAFLOW.index] = 0;
 		}
 
 		@Override
@@ -118,6 +101,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 
 	public static class ChakraFlow extends EntityChakraFlow.Base implements ItemJutsu.IJutsu {
 		private boolean holdingWeapon;
+
 		public ChakraFlow(World world) {
 			super(world);
 		}
@@ -125,7 +109,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		public ChakraFlow(EntityLivingBase user, ItemStack itemstack) {
 			super(user);
 			if (itemstack.getItem() == block) {
-				float f = ((RangedItem) itemstack.getItem()).getCurrentJutsuXpModifier(itemstack, user);
+				float f = ((RangedItem)itemstack.getItem()).getCurrentJutsuXpModifier(itemstack, user);
 				if (f > 0.0f) {
 					f = 1.0f / f;
 					if (user instanceof EntityPlayer) {
@@ -177,7 +161,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					entity1.setDead();
 					stack.getTagCompound().removeTag(ID_KEY);
 					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-						((EntityPlayer) entity).sendStatusMessage(new TextComponentString("Off"), true);
+						((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Off"), true);
 					}
 					return false;
 				} else {
@@ -194,7 +178,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					entity.world.spawnEntity(entity1);
 					stack.getTagCompound().setInteger(ID_KEY, entity1.getEntityId());
 					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-						((EntityPlayer) entity).sendStatusMessage(new TextComponentString("On"), true);
+						((EntityPlayer)entity).sendStatusMessage(new TextComponentString("On"), true);
 					}
 					return true;
 				}
@@ -218,7 +202,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			@Nullable
 			public ItemJutsu.IJutsuCallback.JutsuData getData(EntityLivingBase entity) {
 				if (entity instanceof EntityPlayer) {
-					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, block);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
 					if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey(ID_KEY)) {
 						Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
 						return entity1 instanceof ChakraFlow ? new JutsuData(entity1, stack) : null;
@@ -228,22 +212,24 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			}
 		}
 	}
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
 	}
+
 	public static class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(ChakraFlow.class, renderManager -> new RenderChakraFlow(renderManager));
 		}
+
 		@SideOnly(Side.CLIENT)
 		public class RenderChakraFlow extends EntityChakraFlow.RenderCustom<ChakraFlow> {
 			public RenderChakraFlow(RenderManager renderManagerIn) {
 				super(renderManagerIn);
 			}
-
 			@Override
 			protected void spawnParticles(EntityLivingBase user, Vec3d startvec, Vec3d endvec, float partialTicks) {
 				Vec3d vec = endvec.subtract(startvec).scale(0.6d);

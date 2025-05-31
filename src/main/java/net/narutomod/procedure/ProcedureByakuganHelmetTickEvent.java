@@ -55,9 +55,12 @@ public class ProcedureByakuganHelmetTickEvent extends ElementsNarutomodMod.ModEl
 		}
 		if (entity.getEntityData().getBoolean("byakugan_activated")) {
 			float fov = (float) entity.getEntityData().getDouble("byakugan_fov");
-			if (fov < 1.0F || fov > 110.0F) {
+			if (fov > 110.0F) {
 				entity.getEntityData().setDouble("byakugan_fov", 110.0D);
 				OverlayByakuganView.sendCustomData(entity, true, 110.0F);
+			} else if (fov < 1.0F) {
+				entity.getEntityData().setDouble("byakugan_fov", 1.0D);
+				OverlayByakuganView.sendCustomData(entity, true, 1.0F);
 			}
 			if (entity instanceof EntityPlayer && entity.ticksExisted % 10 == 0) {
 				Chakra.pathway((EntityPlayer)entity).consume(ItemByakugan.getByakuganChakraUsage((EntityLivingBase)entity));

@@ -38,7 +38,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.potion.PotionParalysis;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
 

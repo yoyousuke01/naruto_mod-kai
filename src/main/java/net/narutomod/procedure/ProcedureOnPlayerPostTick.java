@@ -2,6 +2,7 @@ package net.narutomod.procedure;
 
 import net.narutomod.item.ItemYooton;
 import net.narutomod.item.ItemSuiton;
+import net.narutomod.item.ItemShoton;
 import net.narutomod.item.ItemShikotsumyaku;
 import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemShakuton;
@@ -31,7 +32,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.WorldServer;
@@ -57,7 +57,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 	public ProcedureOnPlayerPostTick(ElementsNarutomodMod instance) {
 		super(instance, 154);
 	}
-	private static final String GIVEKG = "giveKG";
+	
 	public static void executeProcedure(Map<String, Object> dependencies) {
 		if (dependencies.get("entity") == null) {
 			System.err.println("Failed to load dependency entity for procedure OnPlayerPostTick!");
@@ -88,8 +88,6 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 		double rand = 0;
 		double rngbase = 0;
 		boolean achievedMedical = false;
-		boolean giveKG = true;
-		giveKG = (boolean) entity.world.getGameRules().getBoolean("giveKG");
 		if (((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) >= 10)
 				&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) > 0))) {
 			if (((!(world.isRemote)) && (!(entity.getEntityData().getBoolean((NarutomodModVariables.FirstGotNinjutsu)))))) {
@@ -277,6 +275,28 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					} else if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 							? ((EntityPlayerMP) entity).getAdvancements()
 									.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+											.getAdvancement(new ResourceLocation("narutomod:shoton_acquired")))
+									.isDone()
+							: false)) {
+						stack = new ItemStack(ItemFuton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+						if (entity instanceof EntityPlayer) {
+							ItemStack _setstack = (stack);
+							_setstack.setCount(1);
+							ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+						}
+						stack = new ItemStack(ItemRaiton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+						if (entity instanceof EntityPlayer) {
+							ItemStack _setstack = (stack);
+							_setstack.setCount(1);
+							ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+						}
+						stack = new ItemStack(ItemShoton.block, (int) (1));
+						((ItemJutsu.Base) stack.getItem()).setOwner(stack, (EntityLivingBase) entity);
+					} else if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+							? ((EntityPlayerMP) entity).getAdvancements()
+									.getProgress(((WorldServer) (entity).world).getAdvancementManager()
 											.getAdvancement(new ResourceLocation("narutomod:kekkei_tota_awakened")))
 									.isDone()
 							: false)) {
@@ -438,9 +458,10 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 							&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJiton.block)))
 					&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShakuton.block)
 							&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemBakuton.block))
-							&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJinton.block)
-									&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemFutton.block))
-									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShikotsumyaku.block)
+							&& ((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShikotsumyaku.block)
+									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemFutton.block)
+											&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemShoton.block)))
+									&& (!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemJinton.block)
 											&& !EntityBijuManager.isJinchuriki((EntityPlayer) entity)))))) {
 				if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 					{
@@ -506,12 +527,18 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 																		.getAdvancement(new ResourceLocation("narutomod:jiton_acquired")))
 																.isDone()
 														: false)))
-												&& ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+												&& (((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 														? ((EntityPlayerMP) entity).getAdvancements()
 																.getProgress(((WorldServer) (entity).world).getAdvancementManager()
 																		.getAdvancement(new ResourceLocation("narutomod:futton_acquired")))
 																.isDone()
 														: false))
+														&& (!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
+																? ((EntityPlayerMP) entity).getAdvancements()
+																		.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+																				.getAdvancement(new ResourceLocation("narutomod:shoton_acquired")))
+																		.isDone()
+																: false)))
 														&& ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 																? ((EntityPlayerMP) entity).getAdvancements()
 																		.getProgress(
@@ -575,15 +602,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 			this.executeProcedure(dependencies);
 		}
 	}
-	public class RegisterGamerule {
-		@SubscribeEvent
-		public void onWorldLoad(WorldEvent.Load event) {
-			World world = event.getWorld();
-			if (!world.isRemote && !world.getGameRules().hasRule(GIVEKG)) {
-				world.getGameRules().addGameRule(GIVEKG, "true", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
-			}
-		}
-	}
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);

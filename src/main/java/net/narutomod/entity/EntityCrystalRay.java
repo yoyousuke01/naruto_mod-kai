@@ -4,6 +4,7 @@ package net.narutomod.entity;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Particles;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemShoton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -133,6 +134,10 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 				EntityLivingBase user = this.getSummoner();
 				if (user != null) {
 					user.getEntityData().removeTag(ENTITYID_KEY);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(user, ItemShoton.block);
+					if (stack != null) {
+						ItemJutsu.setJutsuCooldown(stack, user, ItemShoton.RAY, 1800);
+					}
 				}
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
 				 0.8f, this.rand.nextFloat() * 0.4f + 0.9f);
@@ -254,9 +259,10 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 						if (this.hitTrace.typeOfHit != RayTraceResult.Type.MISS) {
 							ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 3d)
 							 .exclude(this.shootingEntity).resetHurtResistanceTime()
-							 .damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), this.power * this.damageMultiplier);
+							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.power * this.damageMultiplier);
 							this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
-							 5.0f + this.damageMultiplier, true, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
+							 5.0f + this.damageMultiplier, this.rand.nextInt(4) == 0,
+							 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 						}
 					}
 				}
@@ -394,6 +400,26 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		public static Vec3d computeEulerYUp(Vec3d A, Vec3d B, Vec3d C) {
+		    // 1) Edge vectors
+		    Vec3d AB = B.subtract(A);
+		    Vec3d AC = C.subtract(A);
+		    // 2) Plane normal
+		    Vec3d normal = AB.crossProduct(AC).normalize();
+		    // 3) Forward axis
+		    Vec3d forward = AB.normalize();
+		    // 4) Yaw & Pitch (Y-up)
+		    double yaw = MathHelper.atan2(forward.x, forward.z);   
+		    double pitch = MathHelper.atan2(-forward.y, Math.sqrt(forward.x*forward.x + forward.z*forward.z));
+		    // 5) Roll about forward axis
+		    Vec3d worldUp = new Vec3d(0, 1, 0);
+		    Vec3d uRef    = worldUp.subtract(forward.scale(worldUp.dotProduct(forward))).normalize();
+		    Vec3d uTarget = normal.subtract(forward.scale(normal.dotProduct(forward))).normalize();
+		    double roll = MathHelper.atan2(forward.dotProduct(uRef.crossProduct(uTarget)), uRef.dotProduct(uTarget));
+		    double d = 180d / Math.PI;
+		    return new Vec3d(yaw * d, pitch * d, roll * d);
+		}
+
 		@SideOnly(Side.CLIENT)
 		public class RenderBeam extends Render<EntityBeam> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/laser_blue.png");
@@ -417,13 +443,17 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 				float f = age * 0.02F;
 				float max_l = bullet.prevBeamLength + (bullet.getBeamLength() - bullet.prevBeamLength) * pt;
 				yaw = ProcedureUtils.interpolateRotation(bullet.prevRotationYaw, bullet.rotationYaw, pt);
-				float pitch = 90.0F - bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * pt;
+				float pitch = -bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * pt;
 				this.bindEntityTexture(bullet);
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y, z);
 				GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-    			GlStateManager.rotate(age * 180.0F, 0.0F, 1.0F, 0.0F);
+//Vec3d viewerVec = new Vec3d(this.renderManager.viewerPosX, this.renderManager.viewerPosY, this.renderManager.viewerPosZ);
+//Vec3d from = new Vec3d(x, y, z).add(viewerVec);
+//Vec3d to = Vec3d.fromPitchYaw(pitch, -yaw).add(from);
+//System.out.println(">>>>>> yaw="+yaw+", pitch="+pitch+", from computeEulerAngles:"+computeEulerYUp(from, to, viewerVec));
+    			GlStateManager.rotate(age * 180.0F, 0.0F, 0.0F, 1.0F);
 				GlStateManager.enableBlend();
 				GlStateManager.disableCull();
 				GlStateManager.shadeModel(0x1D01);
@@ -438,8 +468,8 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
 				bufferbuilder.pos(-beamRadius * 0.5F, 0, 0).tex(0, f5).color(1.0f, 1.0f, 1.0f, 0.95f).endVertex();
 				bufferbuilder.pos(beamRadius * 0.5F, 0, 0).tex(1, f5).color(1.0f, 1.0f, 1.0f, 0.95f).endVertex();
-				bufferbuilder.pos(beamRadius * 0.5F * f11, max_l, 0).tex(1, f6).color(1.0f, 1.0f, 1.0f, 0.98f).endVertex();
-				bufferbuilder.pos(-beamRadius * 0.5F * f11, max_l, 0).tex(0, f6).color(1.0f, 1.0f, 1.0f, 0.98f).endVertex();
+				bufferbuilder.pos(beamRadius * 0.5F * f11, 0, max_l).tex(1, f6).color(1.0f, 1.0f, 1.0f, 0.98f).endVertex();
+				bufferbuilder.pos(-beamRadius * 0.5F * f11, 0, max_l).tex(0, f6).color(1.0f, 1.0f, 1.0f, 0.98f).endVertex();
 				tessellator.draw();
 				GlStateManager.enableLighting();
 				GlStateManager.enableCull();

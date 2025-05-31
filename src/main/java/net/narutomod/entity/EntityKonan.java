@@ -9,7 +9,7 @@ import net.narutomod.Particles;
 import net.narutomod.item.ItemAkatsukiRobe;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.procedure.ProcedureAoeCommand;
+//import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -140,7 +140,6 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.6D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
@@ -356,9 +355,9 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 		    	this.exploded = true;
 		    	EntityLivingBase summoner = this.getSummoner();
 		    	boolean grief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner);
-				this.world.newExplosion(summoner, this.posX, this.posY, this.posZ, 8f, grief, grief);
-		    	ProcedureAoeCommand.set(this, 0d, 8d)
-		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 25f + this.rand.nextFloat() * 10f);
+				ProcedureUtils.createJutsuExplosion(this.world, summoner, this.posX, this.posY, this.posZ, 10f, grief, grief);
+		    	//ProcedureAoeCommand.set(this, 0d, 8d)
+		    	// .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 25f + this.rand.nextFloat() * 10f);
 	    		this.setDead();
 	    	}
 		}

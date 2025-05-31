@@ -58,7 +58,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.potion.PotionAmaterasuFlame;
-import net.narutomod.potion.PotionParalysis;
 import net.narutomod.entity.EntitySusanooClothed;
 import net.narutomod.entity.EntityCrow;
 import net.narutomod.procedure.ProcedureUtils;
@@ -164,7 +163,6 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}
@@ -426,7 +424,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					@Override
 					public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
 						super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-						if (((EntityCustom)entityIn).blockingTicks > 0) {
+						if (entityIn instanceof EntityCustom && ((EntityCustom)entityIn).blockingTicks > 0) {
 							setRotationAngle(bipedRightArm, -1.2217F, -0.7854F, 0.0F);
 						}
 					}

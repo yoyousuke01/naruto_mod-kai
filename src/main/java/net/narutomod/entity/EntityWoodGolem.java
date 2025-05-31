@@ -155,11 +155,12 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 (net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
-					entity.world.spawnEntity(new EC(entity, ItemMokuton.GOLEM.chakraUsage * 0.1d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					 if (entity instanceof EntityPlayer) {
 					 	ItemJutsu.setCurrentJutsuCooldown(stack, entity, 7200);
 					 }
+					entity.world.spawnEntity(new EC(entity, ItemMokuton.GOLEM.chakraUsage * 0.05d *
+					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					return true;
 				}
 				return false;

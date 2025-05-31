@@ -11,8 +11,11 @@ import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 
+import java.util.UUID;
 import java.util.Map;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -69,6 +72,10 @@ public class ProcedureOnEntitySpawn extends ElementsNarutomodMod.ModElement {
 		}
 		if ((entity instanceof EntityPlayerMP)) {
 			ProcedureOnLivingUpdate.setNoClip(entity, false);
+		}
+		if (entity instanceof EntityLivingBase) {
+			((EntityLivingBase) entity).getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+					.removeModifier(UUID.fromString("c69af92a-b96d-49b7-a396-9b3b0d77edd5"));
 		}
 	}
 

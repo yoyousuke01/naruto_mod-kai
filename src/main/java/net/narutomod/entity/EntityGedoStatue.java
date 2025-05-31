@@ -44,7 +44,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.nbt.NBTTagCompound;
-
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemTenseigan;
@@ -182,7 +181,6 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 			this.setLocationAndAngles(vec.x, ProcedureUtils.getTopSolidBlockY(this.world, new BlockPos(vec)), vec.z, summonerIn.rotationYaw, 0f);
 			this.lifeSpan = creativeSit ? Integer.MAX_VALUE - 1 : 400;
 		}
-
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
 			return ItemJutsu.JutsuEnum.Type.YOTON;
@@ -194,7 +192,7 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 			this.getDataManager().register(SIT, Boolean.valueOf(false));
 			this.getDataManager().register(SEALED9, Boolean.valueOf(false));
 		}
-
+		
 		public boolean isSitting() {
 			return ((Boolean)this.getDataManager().get(SIT)).booleanValue();
 		}
@@ -260,7 +258,6 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 		protected float getSoundVolume() {
 			return 10.0F;
 		}
-
 		public int getLifeSpan() {
 			return this.lifeSpan;
 		}
@@ -1088,7 +1085,7 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-	
+
 		// Made with Blockbench 4.0.3
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports

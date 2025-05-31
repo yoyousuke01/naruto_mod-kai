@@ -250,8 +250,10 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 						float yaw = entity.getYaw();
 						float pitch = entity.getPitch();
 						float f = ProcedureUtils.interpolateRotation(target.prevRenderYawOffset, target.renderYawOffset, pt);
-						vec = vec.rotateYaw(-(f - relYaw) * (float)Math.PI / 180F);
-						vec = new Vec3d(target.lastTickPosX + (target.posX - target.lastTickPosX) * pt + vec.x, target.lastTickPosY + (target.posY - target.lastTickPosY) * pt + vec.y, target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * pt + vec.z);
+						vec = vec.rotateYaw(-(f - relYaw) * (float)Math.PI / 180F)
+						 .addVector(target.lastTickPosX + (target.posX - target.lastTickPosX) * pt,
+						            target.lastTickPosY + (target.posY - target.lastTickPosY) * pt,
+						            target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * pt);
 						x = vec.x - this.renderManager.viewerPosX;
 						y = vec.y - this.renderManager.viewerPosY;
 						z = vec.z - this.renderManager.viewerPosZ;

@@ -32,6 +32,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.item.ItemJutsu;
@@ -487,6 +488,7 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 			if (clone != null) {
 				clone.setDead();
 				entity.isDead = false;
+				ProcedureOnLivingUpdate.setUntargetable(entity, 5);
 				if (entity.getEntityData().hasKey("HealthB4Kill")) {
 					entity.setHealth(entity.getHealth() + entity.getEntityData().getFloat("HealthB4Kill"));
 					entity.getEntityData().removeTag("HealthB4Kill");

@@ -72,7 +72,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 		private Village village;
 		private int recipeResetTime;
 		private boolean hasTraded;
-		private int level;
+		private int tradeLevel;
 		protected EntityNinjaMob.AILeapAtTarget leapAI = new EntityNinjaMob.AILeapAtTarget(this, 1.0F);
 
 		public Base(World worldIn, int level) {
@@ -108,7 +108,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 		@Override
 		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 			compound.setBoolean("hasTraded", this.hasTraded);
-			compound.setInteger("level", this.level);
+			compound.setInteger("level", this.tradeLevel);
 
 			NBTTagCompound tradesTag = new NBTTagCompound();
 
@@ -125,7 +125,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 			super.readFromNBT(compound);
 
 			this.hasTraded = compound.getBoolean("hasTraded");
-			this.level = compound.getInteger("level");
+			this.tradeLevel = compound.getInteger("level");
 
 			NBTTagCompound tradesTag = compound.getCompoundTag("trades");
 
@@ -180,7 +180,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 		@Nullable
 		public MerchantRecipeList getRecipes(EntityPlayer player) {
 			MerchantRecipeList recipes = this.trades.entrySet().stream()
-					.filter(entry -> entry.getKey().ordinal() <= this.level)
+					.filter(entry -> entry.getKey().ordinal() <= this.tradeLevel)
 					.flatMap(entry -> entry.getValue().stream())
 					.collect(Collectors.toCollection(MerchantRecipeList::new));
 			return recipes.isEmpty() ? null : recipes;
@@ -210,7 +210,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 				this.livingSoundTime = -this.getTalkInterval();
 				this.playSound(stack.isEmpty() ? SoundEvents.ENTITY_VILLAGER_NO : SoundEvents.ENTITY_VILLAGER_YES, this.getSoundVolume(), this.getSoundPitch());
 				this.hasTraded = true;
-				this.level++;
+				this.tradeLevel++;
 			}
 		}
 
@@ -262,8 +262,19 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			//System.out.println(">>> got here. " + this);
 			this.village = this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 32);
+			/*if (this.village == null || this.rand.nextInt(10) != 0) {
+				return false;
+			} else {
+				List<Base> list = this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 10d, 96d));
+				if (list.size() < 2) {
+					if (!list.isEmpty() && !this.isOnSameTeam(list.get(0)) {
+						return false;
+					}
+					return true;
+				}
+				return false;
+			}*/
 			if (this.village == null
 					|| this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 10d, 96d)).size() >= 2
 					|| this.rand.nextInt(10) != 0) {

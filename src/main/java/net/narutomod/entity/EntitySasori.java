@@ -84,8 +84,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "sasori"), ENTITYID)
-.name("sasori").tracker(64, 3, true).egg(-16777216, -65485).build());
+		 .id(new ResourceLocation("narutomod", "sasori"), ENTITYID).name("sasori").tracker(64, 3, true).egg(-16777216, -65485).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCore.class)
 		 .id(new ResourceLocation("narutomod", "sasori_core"), ENTITYID_RANGED).name("sasori_core").tracker(64, 3, true).build());
 	}
@@ -169,7 +168,6 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 		protected boolean isRobeOff() {
 			return this.getRobeOffTicks() >= 0;
 		}
-
 		private void setBreakingTicks(int ticks) {
 			this.dataManager.set(BREAKING_TICKS, Integer.valueOf(ticks));
 			if (ticks < 0) {

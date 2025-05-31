@@ -113,6 +113,12 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	public static void setJutsuCooldown(ItemStack stack, EntityLivingBase entity, JutsuEnum jutsuIn, long cd) {
+		if (stack.getItem() instanceof Base) {
+			((Base)stack.getItem()).setJutsuCooldown(stack, jutsuIn, (long)((double)cd * ((Base)stack.getItem()).getModifier(stack, entity)));
+		}
+	}
+
 	public static void logBattleXP(EntityPlayer player) {
 		ItemStack stack = player.getHeldItemMainhand();
 		if (!(stack.getItem() instanceof Base)) {
@@ -136,7 +142,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static ItemJutsu.JutsuEnum getCurrentJutsu(ItemStack stack) {
+	public static JutsuEnum getCurrentJutsu(ItemStack stack) {
 		return stack.getItem() instanceof Base ? ((Base)stack.getItem()).getCurrentJutsu(stack) : null;
 	}
 
@@ -431,10 +437,41 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			return this.jutsuList.get(this.getCurrentJutsuIndex(stack));
 		}
 
+		public List<JutsuEnum> getActivatedJutsus(ItemStack stack) {
+			List<JutsuEnum> list = Lists.newArrayList();
+			for (JutsuEnum je : this.jutsuList) {
+				if (je.jutsu.isActivated(stack)) {
+					list.add(je);
+				}
+			}
+			return list;
+		}
+
+		private boolean canUseJutsu(ItemStack stack, int index, @Nullable EntityLivingBase entity) {
+			return (entity != null && this.isOwner(stack, entity) && this.isJutsuEnabled(stack, index)) ||
+			       (entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative());
+		}
+
+		protected boolean canUseJutsu(ItemStack stack, JutsuEnum jutsuIn, @Nullable EntityLivingBase entity) {
+			return this.jutsuList.contains(jutsuIn) && this.canUseJutsu(stack, jutsuIn.index, entity);
+		}
+		
+		protected boolean canUseCurrentJutsu(ItemStack stack, @Nullable EntityLivingBase entity) {
+			return this.canUseJutsu(stack, this.getCurrentJutsuIndex(stack), entity);
+		}
+
+		protected int getCurrentJutsuIndex(ItemStack stack) {
+			return stack.hasTagCompound() ? stack.getTagCompound().getInteger(JUTSU_INDEX_KEY) : 0;
+		}
+
+		protected JutsuEnum getCurrentJutsu(ItemStack stack) {
+			return this.jutsuList.get(this.getCurrentJutsuIndex(stack));
+		}
+
 		private void setCurrentJutsu(ItemStack stack, int index) {
 			stack.getTagCompound().setInteger(JUTSU_INDEX_KEY, index);
 		}
-	
+
 		public void setCurrentJutsu(ItemStack stack, JutsuEnum jutsuIn) {
 			if (this.jutsuList.contains(jutsuIn)) {
 				this.setCurrentJutsu(stack, jutsuIn.index);
@@ -541,6 +578,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+
 		public static void switchNextJutsu(ItemStack stack, EntityLivingBase entity) {
 			if (stack.getItem() instanceof Base) {
 				((Base)stack.getItem()).setNextJutsu(stack, entity);
@@ -790,4 +828,3 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 }
-

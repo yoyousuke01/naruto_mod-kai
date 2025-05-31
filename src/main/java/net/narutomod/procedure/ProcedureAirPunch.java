@@ -14,7 +14,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.entity.item.EntityFallingBlock;
 
 import net.narutomod.Particles;
 

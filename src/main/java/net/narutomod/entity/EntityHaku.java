@@ -71,7 +71,7 @@ public class EntityHaku extends ElementsNarutomodMod.ModElement {
 		private final ItemStack senbon = new ItemStack(ItemIceSenbon.block, 1);
 
 		public EntityCustom(World worldIn) {
-			super(worldIn, 80, 4000d);
+			super(worldIn, 80, 5000d);
 			this.setSize(0.525f, 1.75f);
 			this.isImmuneToFire = true;
 		}
@@ -123,7 +123,6 @@ public class EntityHaku extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(40D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}

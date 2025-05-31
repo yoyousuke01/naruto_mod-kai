@@ -2,7 +2,6 @@ package net.narutomod.procedure;
 
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemMangekyoSharinganObito;
-import net.narutomod.gui.overlay.OverlayByakuganView;
 import net.narutomod.PlayerTracker;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -74,7 +73,6 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 				&& ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY).getTagCompound()
 						.getBoolean("sharingan_blinded"))) {
 			if ((entity.getEntityData().getBoolean("kamui_teleport"))) {
-				OverlayByakuganView.sendCustomData(entity, false, 70);
 				entity.getEntityData().setBoolean("kamui_teleport", (false));
 			}
 			return;
@@ -83,7 +81,6 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 		chakraAmount = (double) Chakra.pathway((EntityPlayer) entity).getAmount();
 		if ((!(entity.isSneaking()))) {
 			if ((entity.getEntityData().getBoolean("kamui_teleport"))) {
-				OverlayByakuganView.sendCustomData(entity, false, 70);
 				entity.getEntityData().setBoolean("kamui_teleport", (false));
 				timer = (double) (-1);
 			}
@@ -141,7 +138,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 						entity.getEntityData().setBoolean("kamui_teleport", (true));
 						if ((f1)) {
 							fov = (double) (70 - (Math.log((distance)) * 15));
-							OverlayByakuganView.sendCustomData(entity, false, (float) fov);
+							ProcedureRenderView.setFOV(entity, 5, (float) fov);
 						}
 						if ((((timer) % 60) == 1)) {
 							world.playSound((EntityPlayer) null, x, y, z, (net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
@@ -154,7 +151,6 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					}
 				} else if ((entity.getEntityData().getBoolean("kamui_teleport"))) {
 					entity.getEntityData().setBoolean("kamui_teleport", (false));
-					OverlayByakuganView.sendCustomData(entity, false, 70);
 					if ((f3)) {
 						t.entityHit = entity;
 					}

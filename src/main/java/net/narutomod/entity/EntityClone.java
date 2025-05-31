@@ -7,8 +7,7 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -110,7 +109,6 @@ public class EntityClone extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 		}
 	}
-	
 	public static abstract class _Base extends EntityCreature implements EntitySummonAnimal.ISummon {
 		private static final DataParameter<Integer> SUMMONER_ID = EntityDataManager.<Integer>createKey(_Base.class, DataSerializers.VARINT);
 		private static final DataParameter<Float> MODEL_SCALE = EntityDataManager.<Float>createKey(_Base.class, DataSerializers.FLOAT);
@@ -224,7 +222,7 @@ public class EntityClone extends ElementsNarutomodMod.ModElement {
 		public float getRenderSizeModifier() {
 			return this.getScale();
 		}
-		
+
 		@Override
 		public EnumCreatureAttribute getCreatureAttribute() {
 			return EnumCreatureAttribute.UNDEFINED;
@@ -727,7 +725,14 @@ public class EntityClone extends ElementsNarutomodMod.ModElement {
 		        super(renderManager, new ModelClone(0.0F, false), 0.5F);
 		        this.normalModel = (ModelClone)this.mainModel;
 		        this.addLayer(new BipedArmorLayer(this));
-		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerHeldItem(this));
+		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerHeldItem(this) {
+		        	@Override
+		        	public void doRenderLayer(EntityLivingBase entity, float f1, float f2, float f3, float f4, float f5, float f6, float f7) {
+		        		if (this.livingEntityRenderer.getMainModel() instanceof ModelBiped) {
+		        			super.doRenderLayer(entity, f1, f2, f3, f4, f5, f6, f7);
+		        		}
+		        	}
+		        });
 		        //this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerDeadmau5Head(this));
 		        //this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerCape(this));
 		        this.addLayer(new net.minecraft.client.renderer.entity.layers.LayerCustomHead(((ModelBiped)this.getMainModel()).bipedHead));

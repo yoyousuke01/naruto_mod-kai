@@ -1,3 +1,4 @@
+
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -96,7 +97,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
-			EntityLivingBase owner = this.getOwnerPlayer();
+			EntityLivingBase owner = this.getSummoner();
 			if (owner != null && owner.swingProgressInt == -1) {
 				this.swingArm(EnumHand.MAIN_HAND);
 			}
@@ -117,9 +118,9 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void collideWithEntity(Entity entity) {
-			if (!this.world.isRemote && this.getOwnerPlayer() != null
-			 && this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharingan.helmet
-			 && entity instanceof EntityLivingBase && !entity.equals(this.getOwnerPlayer()))
+			if (!this.world.isRemote && this.getSummoner() != null
+			 && this.getSummoner().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharingan.helmet
+			 && entity instanceof EntityLivingBase && !entity.equals(this.getSummoner()))
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 200, 0, false, false));
 			super.collideWithEntity(entity);
 		}
@@ -218,7 +219,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer cube_r18;
 			private final ModelRenderer leftHand;
 			private final ModelRenderer leftFingers;
-			private final float maxAlpha = 0.6f;
+			private final float maxAlpha = 0.8f;
 			private boolean renderFlame;
 			private final float[][] rightArmPreset = { { -1.0472F, 1.0472F, 0.5236F }, { -1.0472F, -1.0472F, 0.0F }, { -0.9599F, 0.0F, 0.0F } };
 
@@ -366,8 +367,8 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 
 				bipedBody = new ModelRenderer(this);
 				bipedBody.setRotationPoint(0.0F, -8.0F, 0.0F);
-				bipedBody.cubeList.add(new ModelBox(bipedBody, 0, 50, -16.0F, 0.0F, -14.0F, 32, 24, 27, 0.0F, true));
-				bipedBody.cubeList.add(new ModelBox(bipedBody, 0, 0, -13.0F, 18.0F, -11.0F, 26, 18, 22, 0.0F, false));
+				bipedBody.cubeList.add(new ModelBox(bipedBody, 0, 50, -16.0F, 0.0F, -14.0F, 32, 24, 27, 0.0F, true));
+				bipedBody.cubeList.add(new ModelBox(bipedBody, 0, 0, -13.0F, 19.0F, -11.0F, 26, 18, 22, 0.0F, false));
 
 				bipedRightArm = new ModelRenderer(this);
 				bipedRightArm.setRotationPoint(-17.0F, -7.0F, -1.0F);				

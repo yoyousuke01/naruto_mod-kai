@@ -89,6 +89,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		private int ticksSinceLastSwing;
 		private int savedTicksSinceLastSwing;
 		private Entity target;
+		private Vec3d weaponArc;
 
 		public EC(World a) {
 			super(a);
@@ -115,16 +116,24 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		}
 
 		public EntityLivingBase getOwner() {
-			if (!this.world.isRemote) {
-				return this.summoner;
+			if (this.summoner == null) {
+				Entity entity = this.world.getEntityByID(((Integer) this.getDataManager().get(OWNER_ID)).intValue());
+				this.summoner = entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
 			}
-			Entity entity = this.world.getEntityByID(((Integer) this.getDataManager().get(OWNER_ID)).intValue());
-			return entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
+			return this.summoner;
 		}
 
 		protected void setOwner(EntityLivingBase entity) {
 			this.getDataManager().set(OWNER_ID, Integer.valueOf(entity.getEntityId()));
 			this.summoner = entity;
+		}
+
+		@Override
+		public void notifyDataManagerChange(DataParameter<?> key) {
+			super.notifyDataManagerChange(key);
+			if (OWNER_ID.equals(key) && this.world.isRemote) {
+				this.summoner = null;
+			}
 		}
 
 		private float getGrowth() {
@@ -163,30 +172,30 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			boolean flag = this.isHoldingWeapon(EnumHand.MAIN_HAND);
-			if (!this.world.isRemote && this.summoner != null
-			 && flag != !this.summoner.getEntityData().getBoolean(NarutomodModVariables.forceBowPose)) {
-				ProcedureSync.EntityNBTTag.setAndSync(this.summoner, NarutomodModVariables.forceBowPose, !flag);
-			}
-			if (this.summoner != null) {
-				this.summoner.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 2, 6, false, false));
+			if (!this.world.isRemote && this.summoner != null) {
+				if (flag != !this.summoner.getEntityData().getBoolean(NarutomodModVariables.forceBowPose)) {
+					ProcedureSync.EntityNBTTag.setAndSync(this.summoner, NarutomodModVariables.forceBowPose, !flag);
+				}
 				this.setPositionToSummoner();
-				if (this.ticksExisted % 20 == 0 && !Chakra.pathway(this.summoner).consume(this.chakraBurn)) {
-					this.setDead();
+				if (this.ticksExisted % 20 == 1) {
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
+					if (!Chakra.pathway(this.summoner).consume(this.chakraBurn)) {
+						this.setDead();
+					}
 				}
 			}
 			float f = this.getGrowth();
 			if (this.rand.nextFloat() <= f * 0.3f) {
-				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 				  f * 0.5f, this.rand.nextFloat() * 2.0f + 1.0f);
 			}
-			if (this.ticksExisted > this.growTime / 2) {
+			if (!this.world.isRemote && this.ticksExisted > this.growTime / 2) {
 				BlockPos pos = this.getPosition();
 				if (this.world.isAirBlock(pos)) {
-					//ProcedureLightSourceSetBlock.execute(this.world, pos.getX(), pos.getY(), pos.getZ());
 					new net.narutomod.event.EventSetBlocks(this.world, ImmutableMap.of(pos, BlockLightSource.block.getDefaultState()), 0, 2, false, false);
 				}
 			}
-			if (this.summoner != null && this.ticksExisted > this.growTime) {
+			if (!this.world.isRemote && this.summoner != null && this.ticksExisted > this.growTime) {
 				boolean flag2 = this.summoner instanceof EntityLiving && ((EntityLiving)this.summoner).getAttackTarget() != null;
 				if (flag2 || (this.summoner instanceof EntityPlayer && this.summoner.swingProgressInt == 1)) {
 					this.target = (flag2 ? new RayTraceResult(((EntityLiving)this.summoner).getAttackTarget())
@@ -206,6 +215,17 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						EntityLightningArc.onStruck(this.target,
 						 ItemJutsu.causeJutsuDamage(this, this.summoner), damage * this.damageMultiplier());
 						this.target = null;
+					}
+				}
+			}
+			if (this.world.isRemote && this.handPos != null) {
+				if (flag && this.weaponArc != null) {
+					EntityLightningArc.spawnAsParticle(this.world, this.handPos.x, this.handPos.y, this.handPos.z, 0.01d, this.weaponArc.x, this.weaponArc.y, this.weaponArc.z);
+				} else {
+					for (int i = 0; i < 20; i++) {
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.handPos.x, this.handPos.y, this.handPos.z, 1, 0d, 0d, 0d, 0d, 0d, 0d,
+								0x20FFFFFF, 5 + this.rand.nextInt(55), 5, 0xF0, -1, 0);
+						EntityLightningArc.spawnAsParticle(this.world, this.handPos.x, this.handPos.y, this.handPos.z, this.getGrowth(), 0d, 0d, 0d, 0xc00000ff, 1);
 					}
 				}
 			}
@@ -238,7 +258,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		protected float damageMultiplier() {
 			float f0 = 1.0f;
 			EntityLivingBase realUser = this.summoner;
-			if (realUser instanceof EntityKageBunshin.EC) {
+			if (realUser instanceof EntityKageBunshin.EC) {
 				realUser = ((EntityKageBunshin.EC)realUser).getSummoner();
 			}
 			if (realUser instanceof EntityPlayer) {
@@ -399,6 +419,19 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 		}
+
+		@Override
+		protected float damageMultiplier() {
+			float f0 = 1.0f;
+			EntityLivingBase realUser = this.summoner;
+			if (realUser instanceof EntityKageBunshin.EC) {
+				realUser = ((EntityKageBunshin.EC)realUser).getSummoner();
+			}
+			if (realUser instanceof EntityPlayer) {
+				f0 = MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)realUser) / 40f, 1f, 6f);
+			}
+			return f0;
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -445,36 +478,19 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					EnumHandSide mainhandside = user.getPrimaryHand();
 					Vec3d mainarmAngles = mainhandside == EnumHandSide.RIGHT ? rightarmAngles : leftarmAngles;
 					Vec3d offarmAngles = mainhandside == EnumHandSide.RIGHT ? leftarmAngles : rightarmAngles;
-					boolean flag1 = entity.isHoldingWeapon(EnumHand.MAIN_HAND);
-					boolean flag2 = entity.isHoldingWeapon(EnumHand.OFF_HAND);
-					if (!flag1) {
+					if (!entity.isHoldingWeapon(EnumHand.MAIN_HAND)) {
 						mainarmAngles = this.forceRightArmBowPose(mainarmAngles, user, partialTicks);
-						Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.7d, 0d), mainarmAngles, user, mainhandside, partialTicks);
-						Particles.spawnParticle(entity.world, Particles.Types.SMOKE, vec0.x, vec0.y, vec0.z, 1, 0d, 0d, 0d, 0d, 0d, 0d,
-								0x20FFFFFF, 5 + user.getRNG().nextInt(55), 5, 0xF0, -1, 0);
-						if (!(entity instanceof Spear)) {
-							EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, entity.getGrowth(), 0d, 0d, 0d, 0xc00000ff, 1);
-						}
+						entity.handPos = this.transform3rdPerson(new Vec3d(0d, -0.7d, 0d), mainarmAngles, user, mainhandside, partialTicks);
 						if (viewer.equals(user)) {
-							ProcedureSync.CPacketVec3d.sendToServer(entity, vec0);
+							ProcedureSync.CPacketVec3d.sendToServer(entity, entity.handPos);
 						}
 					} else {
-						if (flag1 && entity.world.rand.nextFloat() <= 0.01f) {
-							Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 0.2d), mainarmAngles, user, mainhandside, partialTicks);
-							Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 1.6d), mainarmAngles, user, mainhandside, partialTicks)
-									.subtract(vec0).scale(0.2);
-							vec0 = vec0.add(vec1);
-							EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
-							if (viewer.equals(user)) {
-								ProcedureSync.CPacketVec3d.sendToServer(entity, vec0);
-							}
-						}
-						if (flag2 && entity.world.rand.nextFloat() <= 0.01f) {
-							Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 0.2d), offarmAngles, user, mainhandside.opposite(), partialTicks);
-							Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 1.6d), offarmAngles, user, mainhandside.opposite(), partialTicks)
-									.subtract(vec0).scale(0.2);
-							vec0 = vec0.add(vec1);
-							EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
+						entity.handPos = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 0.2d), mainarmAngles, user, mainhandside, partialTicks);
+						entity.weaponArc = this.transform3rdPerson(new Vec3d(0d, -0.6875d, 1.6d), mainarmAngles, user, mainhandside, partialTicks)
+								.subtract(entity.handPos).scale(0.2);
+						entity.handPos = entity.handPos.add(entity.weaponArc);
+						if (viewer.equals(user)) {
+							ProcedureSync.CPacketVec3d.sendToServer(entity, entity.handPos);
 						}
 					}
 				}

@@ -33,7 +33,7 @@ import net.minecraft.potion.PotionEffect;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.procedure.ProcedureAoeCommand;
+//import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -170,10 +170,12 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 		    	this.dead = true;
 		    	this.exploded = true;
 		    	EntityLivingBase summoner = this.getSummoner();
-				this.world.createExplosion(summoner, this.posX, this.posY, this.posZ, 8f,
-		    	 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
-		    	ProcedureAoeCommand.set(this, 0d, 8d)
-		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 45f + this.rand.nextFloat() * 10f);
+				//this.world.createExplosion(summoner, this.posX, this.posY, this.posZ, 8f,
+		    	// net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
+		    	//ProcedureAoeCommand.set(this, 0d, 8d)
+		    	// .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 45f + this.rand.nextFloat() * 10f);
+			    ProcedureUtils.createJutsuExplosion(this.world, summoner, this.posX, this.posY, this.posZ, 10f,
+			     false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
 	    		this.setDead();
 	    	}
 		}

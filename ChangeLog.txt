@@ -2,7 +2,7 @@
 
 Jutsus
  - wearing any dojutsu not bound to you consumes 15 chakra / second
- - added Crystal release [crystal armor, crystal prison, divine path, ray of light (add cooldown)]
+ - added Crystal release [crystal armor, crystal prison, divine path, ray of light (add cooldown)] to random KG assignment
  - crystal armor only grants strength when not holding a weapon
  - projectiles now bounce off Flame formation jutsu
  - wood prison won't leave open spaces at the bottom of the cage
@@ -31,6 +31,10 @@ Jutsus
  - added wood release deep forest emergence (AOE jutsu)
  - biju cloak xp capped to 20,000
  - slightly buffed Vacuum wave damage
+ - byakugan zoom/remote view: reworked, reduce client lag, can spy on mobs/players from far away
+ - fixed earth wall jutsu skipping sections of the wall in water and grass
+ - added magnet release third eye jutsu: spy on mobs/players from very far away
+ - rasenshuriken only sage mode or 6-path variant can be thrown; will hurt user if not thrown; now takes target's chakra
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)
@@ -45,6 +49,7 @@ Items:
  - cap bone armor thorns damage to max 60
  - fixed blockable swords can attack while blocking
  - buffed anbu sword damage slightly
+ - added 3 more anbu masks
  
 Entities:
  - improved giant dog summon model
@@ -67,6 +72,10 @@ Entities:
  - adding Obito/Tobi (WIP: Tobi runs away from attackers and calls for help from nearby akatsuki members, both uses kamui intangibiity)
  - adding Nagato's mech walker, players can ride it if puppet jutsu learned
  - White zetsu: improved mimic ability, can transform into mobs, takes opponents chakra
+ - all ninja NPCs will always negate first unprovoked attack with replacement jutsu, then aggro the attacker
+ - Kankuro & Temari can spawn in desert villages and trade with players
+ - susanoo: user holding chokuto, kunai, anbu sword or iron sword will activate the susanoo sword
+ - removed Darui temporarily
  
 General:
  - added config option to disable auto kekkeigenkai assignment
@@ -76,6 +85,8 @@ General:
  - moved dojutsu keybind actions into its respective classes (addon makers can override)
  - changed chakra regeneration potion effect from flat 5% to base on amplifier
  - fixed kamui dimension bug showing overworld entities
+ - fixed SHIFT+jumping on water always causing the player to sink
+ - fixed bugs reported in my discord (see #bug-report-main-mod channel)
 
 0.3.1-beta ================================================================================
 

@@ -122,6 +122,9 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 					 ImmutableMap.of(pos, Blocks.LEAVES.getStateFromMeta(0)), 0, this.lifespan - this.ticksExisted, false, false);
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
+					if (this.ticksExisted > 50) {
+						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null).setDamageBypassesArmor(), 10.0f);
+					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}
 			} else if (!this.world.isRemote) {
@@ -155,6 +158,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 					if (entity instanceof EntityPlayer) {
 						((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 3800);
 					}
+					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 300);
 					return true;
 				}
 				return false;

@@ -66,7 +66,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.vecmath.Vector4d;
-import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import com.google.common.collect.Maps;
 import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
@@ -112,6 +112,11 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	@Nullable
+	public static Vector4d getMarkerPosition(UUID ownerUuid, UUID targetUuid) {
+		return serverMarkerMap.containsKey(ownerUuid) ? serverMarkerMap.get(ownerUuid).get(targetUuid) : null;
+	}
+
 	private static void removeAllMarkersFrom(EntityPlayerMP owner) {
 		if (serverMarkerMap.containsKey(owner.getUniqueID())) {
 			serverMarkerMap.remove(owner.getUniqueID());
@@ -132,7 +137,10 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> OFFSET_Z = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> OFFSET_YAW = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> OFFSET_PITCH = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
+		private static final DataParameter<Float> OFFSET_RELYAW = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
+		private static final DataParameter<Boolean> HIDE_MARK = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
 		private UUID userUuid;
+		private boolean targetIsPlayer;
 
 		public EC(World world) {
 			super(world);
@@ -154,8 +162,9 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			if (res.entityHit != null) {
 				this.setTargetUuid(res.entityHit.getUniqueID());
 				float yaw = res.entityHit instanceof EntityLivingBase ? ((EntityLivingBase)res.entityHit).renderYawOffset : res.entityHit.rotationYaw;
-				this.setOffsets(res.hitVec.x - res.entityHit.posX, res.hitVec.y - res.entityHit.posY, res.hitVec.z - res.entityHit.posZ,
-				 MathHelper.wrapDegrees(this.rotationYaw - yaw), this.rotationPitch);
+				Vec3d vec = res.hitVec.subtract(res.entityHit.getPositionVector());
+				this.setOffsets(vec.x, vec.y, vec.z, yaw, this.rotationYaw - yaw, this.rotationPitch);
+				this.targetIsPlayer = res.entityHit instanceof EntityPlayer;
 			}
 		}
 
@@ -172,6 +181,8 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			this.dataManager.register(OFFSET_Z, Float.valueOf(0.0f));
 			this.dataManager.register(OFFSET_YAW, Float.valueOf(0.0f));
 			this.dataManager.register(OFFSET_PITCH, Float.valueOf(0.0f));
+			this.dataManager.register(OFFSET_RELYAW, Float.valueOf(0.0f));
+			this.dataManager.register(HIDE_MARK, Boolean.valueOf(false));
 		}
 
 		private void setTargetUuid(@Nullable UUID uuid) {
@@ -189,12 +200,13 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			return uuid != null ? ProcedureUtils.getEntityFromUUID(this.world, uuid) : null;
 		}
 
-		private void setOffsets(double x, double y, double z, float yaw, float pitch) {
+		private void setOffsets(double x, double y, double z, float relyaw, float yaw, float pitch) {
 			this.dataManager.set(OFFSET_X, Float.valueOf((float)x));
 			this.dataManager.set(OFFSET_Y, Float.valueOf((float)y));
 			this.dataManager.set(OFFSET_Z, Float.valueOf((float)z));
 			this.dataManager.set(OFFSET_YAW, Float.valueOf(yaw));
 			this.dataManager.set(OFFSET_PITCH, Float.valueOf(pitch));
+			this.dataManager.set(OFFSET_RELYAW, Float.valueOf(relyaw));
 		}
 
 		private Vec3d getOffsetVec() {
@@ -203,9 +215,20 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			                  ((Float)this.getDataManager().get(OFFSET_Z)).floatValue() );
 		}
 
-		private Vector2f getOffsetRotations() {
-			return new Vector2f(((Float)this.getDataManager().get(OFFSET_YAW)).floatValue(), 
-			                    ((Float)this.getDataManager().get(OFFSET_PITCH)).floatValue() );
+		private Vector3f getOffsetRotations() {
+			return new Vector3f(((Float)this.getDataManager().get(OFFSET_YAW)).floatValue(),
+				                ((Float)this.getDataManager().get(OFFSET_PITCH)).floatValue(), 
+			                    ((Float)this.getDataManager().get(OFFSET_RELYAW)).floatValue() );
+		}
+
+		protected boolean isMarkHidden() {
+			return ((Boolean)this.getDataManager().get(HIDE_MARK)).booleanValue();
+		}
+
+		public void hideMark(boolean hide) {
+			if (!this.world.isRemote) {
+				this.getDataManager().set(HIDE_MARK, Boolean.valueOf(hide));
+			}
 		}
 
 		@Override
@@ -230,16 +253,24 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 					} else {
 						Entity target = ((WorldServer)this.world).getEntityFromUuid(targetUuid);
 						if (target != null) {
-							if (target.isEntityAlive()) {
+							if (!target.isEntityAlive()) {
+								this.setDead();
+							} else if (this.posX != target.posX || this.posY != target.posY || this.posZ != target.posZ) {
 								this.setPosition(target.posX, target.posY, target.posZ);
 								update = true;
-							} else {
+							}
+						} else if (!this.targetIsPlayer) {
+							if (this.ticksExisted > 10) {
 								this.setDead();
 							}
+						} else if (getMarkerPosition(this.userUuid, this.getUniqueID()) != null) {
+							updateServerMarkerMap(this.userUuid, this.getUniqueID(), null);
+							this.hideMark(true);
 						}
 					}
 					if (update) {
 						updateServerMarkerMap(this.userUuid, this.getUniqueID(), new Vector4d(this.posX, this.posY, this.posZ, this.dimension));
+						this.hideMark(false);
 					}
 				}
 			}
@@ -253,8 +284,9 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			if (compound.hasUniqueId("targetUuid")) {
 				this.setTargetUuid(compound.getUniqueId("targetUuid"));
 				this.setOffsets(compound.getFloat("offsetX"), compound.getFloat("offsetY"), compound.getFloat("offsetZ"),
-				 compound.getFloat("offsetYaw"), compound.getFloat("offsetPitch"));
+				 compound.getFloat("offsetRelYaw"), compound.getFloat("offsetYaw"), compound.getFloat("offsetPitch"));
 			}
+			this.targetIsPlayer = compound.getBoolean("targetIsPlayer");
 		}
 
 		@Override
@@ -266,13 +298,15 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			if (uuid != null) {
 				compound.setUniqueId("targetUuid", uuid);
 				Vec3d vec = this.getOffsetVec();
-				Vector2f vec2 = this.getOffsetRotations();
+				Vector3f vec2 = this.getOffsetRotations();
 				compound.setFloat("offsetX", (float)vec.x);
 				compound.setFloat("offsetY", (float)vec.y);
 				compound.setFloat("offsetZ", (float)vec.z);
+				compound.setFloat("offsetRelYaw", vec2.z);
 				compound.setFloat("offsetYaw", vec2.x);
 				compound.setFloat("offsetPitch", vec2.y);
 			}
+			compound.setBoolean("targetIsPlayer", this.targetIsPlayer);
 		}
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
@@ -411,19 +445,22 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				if (entity.isMarkHidden()) {
+					return;
+				}
 				Entity target = entity.getTarget();
 				if (!this.renderManager.renderViewEntity.equals(target) || this.renderManager.options.thirdPersonView != 0) {
 					float f = partialTicks + entity.ticksExisted;
 					float entityPitch = entity.rotationPitch;
 					if (target instanceof EntityLivingBase) {
 						EntityLivingBase living = (EntityLivingBase)target;
-						Vector2f vec2 = entity.getOffsetRotations();
-						float targetYaw = ProcedureUtils.interpolateRotation(living.prevRenderYawOffset, living.renderYawOffset, partialTicks);
-						Vec3d vec = entity.getOffsetVec().rotateYaw(-targetYaw * 0.0174533F);
+						Vector3f vec2 = entity.getOffsetRotations();
+						float renderyawoffset = ProcedureUtils.interpolateRotation(living.prevRenderYawOffset, living.renderYawOffset, partialTicks);
+						Vec3d vec = entity.getOffsetVec().rotateYaw(-(renderyawoffset - vec2.z) * 0.0174533F);
 						x = target.lastTickPosX + (target.posX - target.lastTickPosX) * partialTicks + vec.x - this.renderManager.viewerPosX;
 						y = target.lastTickPosY + (target.posY - target.lastTickPosY) * partialTicks + vec.y - this.renderManager.viewerPosY;
 						z = target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * partialTicks + vec.z - this.renderManager.viewerPosZ;
-						entityYaw = targetYaw + vec2.x;
+						entityYaw = renderyawoffset + vec2.x;
 						entityPitch = vec2.y;
 					}
 					this.bindEntityTexture(entity);
@@ -574,14 +611,14 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 								 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")),
 								 net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
 								EntityLivingBase entity = mc.world.findNearestEntityWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(0.1d), player);
-								player.setPosition(vec.x, vec.y, vec.z);
-								ProcedureSync.EntityPositionAndRotation.sendToServer(player);
 								if (entity != null) {
 									ProcedureOnLivingUpdate.setUntargetable(entity, 5);
-									entity.setPosition(vec.x, vec.y, vec.z);
+									entity.setPosition(vec.x + entity.posX - player.posX, vec.y + entity.posY - player.posY, vec.z + entity.posZ - player.posZ);
 									ProcedureSync.EntityPositionAndRotation.sendToServer(entity);
 									chakraUsage *= 2;
 								}
+								player.setPosition(vec.x, vec.y, vec.z);
+								ProcedureSync.EntityPositionAndRotation.sendToServer(player);
 								Chakra.PathwayPlayer.ConsumeMessage.sendToServer(chakraUsage);
 							} else {
 								chakra.warningDisplay();

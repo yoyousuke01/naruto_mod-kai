@@ -255,6 +255,14 @@ public class EntityToad extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		@Override
+		public boolean attackEntityFrom(DamageSource source, float amount) {
+			if (source == DamageSource.FALL) {
+				return false;
+			}
+			return super.attackEntityFrom(source, amount);
+		}
+
 		protected boolean getMouthOpen() {
 			return ((Boolean)this.getDataManager().get(MOUTH_OPEN)).booleanValue();
 		}
@@ -609,7 +617,8 @@ public class EntityToad extends ElementsNarutomodMod.ModElement {
 			head.addChild(jaw);
 			setRotationAngle(jaw, 0.0873F, 0.0F, 0.0F);
 			jaw.cubeList.add(new ModelBox(jaw, 0, 33, -4.5F, -0.0901F, -4.8784F, 9, 2, 8, 0.0F, false));
-		
+	
+	
 			body = new ModelRenderer(this);
 			body.setRotationPoint(0.0F, 11.58F, -5.464F);
 			

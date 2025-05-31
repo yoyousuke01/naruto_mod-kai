@@ -72,10 +72,20 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				super(renderManagerIn);
 			}
 			@Override
+			public boolean shouldRender(EC livingEntity, net.minecraft.client.renderer.culling.ICamera camera, double camX, double camY, double camZ) {
+				return true;
+			}
+			@Override
 			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				Particles.spawnParticle(entity.world, Particles.Types.SUSPENDED,
-				 x + this.renderManager.viewerPosX, y + this.renderManager.viewerPosY+0.1d, z + this.renderManager.viewerPosZ,
-				 10, 0.1d, 0.1d, 0.1d, 0d, 0d, 0d, entity.getColor(), 15, 5);
+				Vec3d vec = new Vec3d(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ);
+				float lastPt = partialTicks > entity.lastPartialTicks ? entity.lastPartialTicks : 0f;
+				for (int i = 1; i <= 10; i++) {
+					float f = lastPt + (partialTicks - lastPt) * i * 0.1f;
+					Vec3d vec1 = entity.getPositionVector().subtract(vec).scale(f).add(vec);
+					Particles.spawnParticle(entity.world, Particles.Types.SAND, vec1.x, vec1.y, vec1.z,
+					 1, 0, 0, 0, entity.motionX, entity.motionY, entity.motionZ, entity.getColor(), 8, 5, 0);
+				}
+				entity.lastPartialTicks = partialTicks;
 			}
 			@Override
 			protected ResourceLocation getEntityTexture(EC entity) {
@@ -88,6 +98,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> COLOR = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private int delay;
 		private final List<Entity> ignoreEntities = Lists.newArrayList();
+		private float lastPartialTicks;
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -129,13 +140,21 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (this.ticksAlive >= this.delay && this.shootingEntity != null) {
-				Vec3d vec = this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null
-				 ? ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionEyes(1f).subtract(this.getPositionVector())
-				 : this.shootingEntity.getLookVec();
+				Vec3d vec;
+				if (this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null) {
+					vec = ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionEyes(1f).subtract(this.getPositionVector());
+				} else {
+					RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 64d);
+					if (rtr != null) {
+						vec = rtr.hitVec.subtract(this.getPositionVector());
+					} else {
+						vec = this.shootingEntity.getLookVec();
+					}
+				}
 				this.shoot(vec.x, vec.y, vec.z, 1.2f, 0.1f);
 			}
 			super.onUpdate();
-			if (this.ticksAlive > this.delay + 80) {
+			if (this.ticksAlive > this.delay + 80 && !this.world.isRemote) {
 				this.setDead();
 			}
 		}
@@ -145,8 +164,8 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (result.entityHit == null || !this.ignoreEntities.contains(result.entityHit))) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY
 				 .getObject(new ResourceLocation("narutomod:bullet_impact")), 1f, 0.4f + this.rand.nextFloat() * 0.6f);
-				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 3f,
-				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
+				//this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 3f,
+				//  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				if (result.entityHit instanceof EntityLivingBase) {
 					result.entityHit.hurtResistantTime = 10;
 					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), 15f);

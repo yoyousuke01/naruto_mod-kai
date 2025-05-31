@@ -161,7 +161,6 @@ public class EntityObito extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(12.0D);
 		}
@@ -188,7 +187,8 @@ public class EntityObito extends ElementsNarutomodMod.ModElement {
 				}
 				@Override
 				public boolean shouldContinueExecuting() {
-					return super.shouldContinueExecuting() && EntityCustom.this.getDistance(EntityCustom.this.getAttackTarget()) < 6d;
+					return super.shouldContinueExecuting() && EntityCustom.this.getDistance(EntityCustom.this.getAttackTarget()) < 6d
+					 && EntityCustom.this.rand.nextFloat() > 0.01f;
 				}
 			});
 			this.tasks.addTask(4, new EntityAIAttackRanged(this, 1.0d, 20, 20f) {

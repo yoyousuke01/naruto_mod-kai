@@ -226,9 +226,14 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
+			int ticksAlive = this.getTicksAlive();
 			super.onUpdate();
 			if (!this.world.isRemote) {
 				EntityLivingBase summoner = this.getSummoner();
+				if (this.chakraBurn > 0.0d && this.ticksExisted % 20 == 19
+				 && summoner != null && (!this.isSageModeActive(summoner) || !Chakra.pathway(summoner).consume(this.chakraBurn))) {
+					this.setDead();
+				}
 				Entity controller = this.getControllingPassenger();
 				if (controller != null && controller.equals(summoner)) {
 					List<Entity> list = this.getPassengers();
@@ -242,7 +247,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					this.setDead();
 				}
 			}
-			if (this.ticksExisted <= this.growTime) {
+			if (ticksAlive <= this.growTime) {
 				if (this.particleArea == null) {
 					this.particleArea = ProcedureUtils.getNonAirBlocks(this.world, 
 					 this.getEntityBoundingBox().offset(0d, -0.5d * this.height, 0d));
@@ -265,14 +270,8 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodspawn")),
 				 SoundCategory.BLOCKS, 2f, this.rand.nextFloat() * 0.6f + 0.6f);
 			}
-			if (this.chakraBurn > 0.0d && this.ticksExisted % 20 == 19) {
-				EntityLivingBase summoner = this.getSummoner();
-				if (summoner != null && (!this.isSageModeActive(summoner) || !Chakra.pathway(summoner).consume(this.chakraBurn))) {
-					this.setDead();
-				}
-			}
 			--this.attackCooldown;
-			this.setTicksAlive(this.getTicksAlive() + 1);
+			this.setTicksAlive(++ticksAlive);
 		}
 
 		private boolean isSageModeActive(EntityLivingBase summoner) {

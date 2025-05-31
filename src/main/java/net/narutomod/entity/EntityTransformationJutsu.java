@@ -15,7 +15,8 @@ import net.narutomod.ElementsNarutomodMod;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -109,6 +110,7 @@ public class EntityTransformationJutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (this.user instanceof EntityPlayer && this.user.isEntityAlive()
+			 && !this.user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
 			 && (this.ticksExisted % 20 > 0 || Chakra.pathway(this.user).consume(this.chakraBurnPerSec))) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.ticksExisted == 1) {

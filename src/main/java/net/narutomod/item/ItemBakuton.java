@@ -51,18 +51,11 @@ import net.narutomod.entity.EntityExplosiveClone;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 import net.narutomod.potion.PotionChakraEnhancedStrength;
-import net.narutomod.PlayerTracker;
 import net.narutomod.creativetab.TabModTab;
-import net.narutomod.NarutomodModVariables;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.EnergyStorage;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemBakuton extends ElementsNarutomodMod.ModElement {
@@ -70,7 +63,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
 	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
-	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 200d, new ExplosiveClay.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 75d, new ExplosiveClay.Jutsu());
 	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 150d, new EntityExplosiveClone.EC.Jutsu());
 
 	public ItemBakuton(ElementsNarutomodMod instance) {
@@ -301,10 +294,12 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 
 	    @Override
 	    public boolean attackEntityAsMob(Entity entityIn) {
-	    	EntityLivingBase owner = this.getOwner();
 	    	if (!this.world.isRemote) {
-		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
-			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+	    		EntityLivingBase owner = this.getOwner();
+		    	//this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			    // this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+			    ProcedureUtils.createJutsuExplosion(this.world, owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
 	    		this.setDead();
 	    		return true;
 	    	}
@@ -322,8 +317,11 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void onDeathUpdate() {
 			if (!this.world.isRemote) {
-		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
-			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+				EntityLivingBase owner = this.getOwner();
+		    	//this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			    // this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+			    ProcedureUtils.createJutsuExplosion(this.world, owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, false, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
 			}
     		this.setDead();
 		}
@@ -365,15 +363,12 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
-				} else if (powerIn < 4f && (double)PlayerTracker.getBattleXp((EntityPlayer) entity) >= 16000d) {
+				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 4000);
-				} else if (powerIn <= this.getMaxPower() && (double)PlayerTracker.getBattleXp((EntityPlayer) entity) >= 20000d) {
+				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(2.0f * f));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 6000);
-
 				} else {
 					return false;
 				}

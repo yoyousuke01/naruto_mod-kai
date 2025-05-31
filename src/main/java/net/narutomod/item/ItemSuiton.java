@@ -101,9 +101,8 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			this.idleTime = this.buildTime + (world.containsAnyLiquid(new AxisAlignedBB(x-15, y-6, z-15, x+15, y+10, z+15)) ? 800 : 400);
 		}
 
-		public EntityMist(EntityLivingBase userIn) {
-			this(userIn.world, userIn.posX, userIn.posY, userIn.posZ,
-					userIn instanceof EntityPlayer ? Math.min(1.5d*((EntityPlayer)userIn).experienceLevel, 60d) : 32);
+		public EntityMist(EntityLivingBase userIn, double r) {
+			this(userIn.world, userIn.posX, userIn.posY, userIn.posZ, r);
 			this.user = userIn;
 		}
 
@@ -149,7 +148,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 						d0 = d0 * d2 - MathHelper.clamp(d1, 0d, d2);
 						aInstance.applyModifier(new AttributeModifier(FOLLOW_MODIFIER, "suiton.followModifier", -d0, 0));
 					}
-					if (!entity.equals(this.user) && this.user instanceof EntityPlayerMP) {
+					if (!entity.equals(this.user) && this.user instanceof EntityPlayerMP && d1 < 0d) {
 						ProcedureSync.SetGlowing.send((EntityPlayerMP)this.user, entity, 5);
 					}
 				}
@@ -197,7 +196,11 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kirigakurenojutsu")),
 						SoundCategory.PLAYERS, 5, 1f);
-				entity.world.spawnEntity(new EntityMist(entity));
+				float f = 32f;
+				if (entity instanceof EntityPlayer) {
+					f *= 1f / ((ItemJutsu.Base)stack.getItem()).getModifier(stack, entity);
+				}
+				entity.world.spawnEntity(new EntityMist(entity, Math.min(f, 60f)));
 				return true;
 			}
 		}

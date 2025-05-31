@@ -49,7 +49,6 @@ import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.item.ItemJutsu;
 
-import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 
@@ -82,14 +81,14 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 
 		public EC(World a) {
 			super(a);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(0.5F, 0.35F);
 			this.isImmuneToFire = true;
 			this.damageSource = ItemJutsu.causeJutsuDamage(this, this.getOwner());
 		}
 
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(0.5F, 0.35F);
 			this.setEntityScale(0.1f);
 			this.setOwner(shooter);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, 0.0f, 0.0f);
@@ -117,6 +116,22 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 
 		protected void setOwner(EntityLivingBase entity) {
 			this.getDataManager().set(OWNER_ID, Integer.valueOf(entity.getEntityId()));
+		}
+
+		protected int getGrowTime() {
+			return this.growTime;
+		}
+
+		protected float getFullScale() {
+			return this.fullScale;
+		}
+
+		public void setDamageSource(DamageSource source) {
+			this.damageSource = source;
+		}
+
+		public DamageSource getDamageSource() {
+			return this.damageSource;
 		}
 
 		@Override
@@ -149,25 +164,38 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:rasengan_during")), 0.2f, 1.0f);
 			}
 			if (!this.world.isRemote) {
-				this.breakBlocks(this.world.getCollisionBoxes(null, this.getEntityBoundingBox()));
+				this.breakBlocks();
 			}
-			if (!this.world.isRemote && (this.shootingEntity == null || (!this.shootingEntity.getHeldItemMainhand().isEmpty() && 
-			  !(this.shootingEntity.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base)))) {
+			if (!this.world.isRemote && (this.shootingEntity == null || (!this.isLaunched() && !this.shootingEntity.getHeldItemMainhand().isEmpty()
+			 && !(this.shootingEntity.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base)))) {
 				this.setDead();
 			}
 		}
 
-		private void breakBlocks(List<AxisAlignedBB> list) {
-			if (!list.isEmpty()) {
-				for (AxisAlignedBB aabb : list) {
-					ProcedureUtils.breakBlockAndDropWithChance(this.world, new BlockPos(ProcedureUtils.BB.getCenter(aabb)), 5.0F, 1.0F, 0.3F);
-				}
+		@Override
+		public void onEntityUpdate() {
+			this.prevPosX = this.posX;
+			this.prevPosY = this.posY;
+			this.prevPosZ = this.posZ;
+			this.prevRotationPitch = this.rotationPitch;
+			this.prevRotationYaw = this.rotationYaw;
+			this.prevRotationRoll = this.rotationRoll;
+			this.handleWaterMovement();
+			if (this.posY < -64.0D) {
+				this.outOfWorld();
+			}
+			this.firstUpdate = false;
+		}
+
+		protected void breakBlocks() {
+			for (AxisAlignedBB aabb : this.world.getCollisionBoxes(null, this.getEntityBoundingBox())) {
+				ProcedureUtils.breakBlockAndDropWithChance(this.world, new BlockPos(ProcedureUtils.BB.getCenter(aabb)), 5.0F, 1.0F, 0.3F);
 			}
 			//if (!list.isEmpty() && this.shootingEntity != null && this.shootingEntity.isSwingInProgress)
 			//	this.setDead();
 		}
 
-		private void setPositionToHand() {
+		protected void setPositionToHand() {
 			EntityLivingBase entity = this.shootingEntity;
 			/*Vec3d vec3d = entity.isSwingInProgress 
 			 ? entity.getLookVec().scale(2d + 3d * Math.sin(entity.swingProgress * Math.PI))
@@ -201,6 +229,11 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public boolean canBeCollidedWith() {
+			return false;
+		}
+
+		@Override
 		public boolean canBePushed() {
 			return true;
 		}
@@ -219,11 +252,15 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
+		public float getImpactDamage() {
+			return 10f + this.fullScale * this.fullScale * 20f;
+		}
+
 		@Override
 		public void applyEntityCollision(Entity entityIn) {
 			if (this.ticksAlive > this.growTime && this.shootingEntity != null
 			 && !entityIn.equals(this.shootingEntity) && !this.bunshinHasSameSummoner(entityIn)) {
-				if (entityIn.attackEntityFrom(this.damageSource, 10f + this.fullScale * this.fullScale * 20f)) {
+				if (entityIn.attackEntityFrom(this.damageSource, this.getImpactDamage())) {
 					this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, this.rand.nextFloat() * 0.5F + 0.5F);
 					Vec3d vec = ProcedureUtils.pushEntity(this.shootingEntity, entityIn, 20d, 2f);
 					Vec3d vec1 = this.shootingEntity.getLookVec().add(this.shootingEntity.getPositionEyes(1.0f));
@@ -427,7 +464,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 	    }
 
 		@SideOnly(Side.CLIENT)
-		public class RenderRasengan extends Render<EC> {
+		public static class RenderRasengan<T extends EC> extends Render<T> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/longcube_white.png");
 			private final Random rand = new Random();
 			protected ModelBase mainModel;
@@ -446,7 +483,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			public void doRender(EC entity, double x, double y, double z, float f, float partialTicks) {
+			public void doRender(T entity, double x, double y, double z, float f, float partialTicks) {
 				this.bindEntityTexture(entity);
 				EntityLivingBase owner = entity.getOwner();
 				float scale = entity.getEntityScale();
@@ -460,7 +497,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 					 new Vec3d(model.bipedRightArm.rotateAngleX, model.bipedRightArm.rotateAngleY, model.bipedRightArm.rotateAngleZ),
 					 owner, partialTicks).addVector(0.0d, 0.275d - entity.height * 0.5d, 0.0d);
 					if (viewer.equals(owner) || !(owner instanceof EntityPlayer)) {
-						entity.angles = ballVec;
+						entity.handleClientPacket(ballVec);
 						//ProcedureSync.CPacketVec3d.sendToServer(entity, entity.angles);
 					}
 		            if (viewer.equals(owner) && this.renderManager.options.thirdPersonView == 0) {
@@ -490,28 +527,30 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 				float f1 = partialTicks + entity.ticksExisted;
 				GlStateManager.translate(0f, 0.5F - 0.175F * scale, 0f);
 				GlStateManager.scale(scale, scale, scale);
-				GlStateManager.enableAlpha();
 				GlStateManager.enableBlend();
 				GlStateManager.disableCull();
 				GlStateManager.disableLighting();
 				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				for (int i = 9; i >= 0; i--) {
-					GlStateManager.pushMatrix();
-					GlStateManager.rotate(20.0F * i, 1.0F, 0.0F, 0.0F);
-					GlStateManager.rotate(f1 * 60.0F, 0.0F, 1.0F, 0.0F);
-					float f2 = 1F - (float)i / 27F;
-					GlStateManager.scale(f2, f2, f2);
-					GlStateManager.color(0.66F + 0.34F * i / 9, 0.87F + 0.13F * i / 9, 1.0F, 0.3F * alpha);
-					this.mainModel.render(entity, 0.0F, 0.0F, f1, 0.0F, 0.0F, 0.0625F);
-					GlStateManager.popMatrix();
-				}
+				this.renderModel(entity, f1, alpha);
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				GlStateManager.enableLighting();
 				GlStateManager.enableCull();
-				//GlStateManager.disableAlpha();
 				GlStateManager.disableBlend();
 				GlStateManager.popMatrix();
+			}
+
+			protected void renderModel(T entity, float ageInTicks, float alpha) {
+				for (int i = 9; i >= 0; i--) {
+					GlStateManager.pushMatrix();
+					GlStateManager.rotate(20.0F * i, 1.0F, 0.0F, 0.0F);
+					GlStateManager.rotate(ageInTicks * 60.0F, 0.0F, 1.0F, 0.0F);
+					float f2 = 1F - (float)i / 27F;
+					GlStateManager.scale(f2, f2, f2);
+					GlStateManager.color(0.66F + 0.34F * i / 9, 0.87F + 0.13F * i / 9, 1.0F, 0.3F * alpha);
+					this.mainModel.render(entity, 0.0F, 0.0F, ageInTicks, 0.0F, 0.0F, 0.0625F);
+					GlStateManager.popMatrix();
+				}
 			}
 	
 			private void forceRightArmBowPose(ModelBiped model, EntityLivingBase owner, float partialTicks) {
@@ -526,8 +565,8 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			private void renderParticles(World worldIn, Vec3d vec, float size) {
 				for (int i = 0; i < 10; i++) {
 					Particles.spawnParticle(worldIn, Particles.Types.SMOKE, vec.x, vec.y, vec.z,
-					 1, 0d, 0.02d, 0d, 0.2d * worldIn.rand.nextGaussian(), 0.2d * worldIn.rand.nextGaussian(), 
-					 0.2d * worldIn.rand.nextGaussian(), 0x10FFFFFF, (int)(size * 5), 0);
+					 1, 0d, 0.02d, 0d, 0.6d * size * (worldIn.rand.nextFloat()-0.5f), 0.6d * size * (worldIn.rand.nextFloat()-0.5f), 
+					 0.6d * size * (worldIn.rand.nextFloat()-0.5f), 0x10FFFFFF, (int)(size * 8f), 5);
 				}
 			}
 	
@@ -536,7 +575,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			}
 	
 			@Override
-			protected ResourceLocation getEntityTexture(EC entity) {
+			protected ResourceLocation getEntityTexture(T entity) {
 				return this.texture;
 			}
 		}
@@ -545,7 +584,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		// Exported for Minecraft version 1.12
 		// Paste this class into your mod and generate all required imports
 		@SideOnly(Side.CLIENT)
-		public class ModelRasengan extends ModelBase {
+		public static class ModelRasengan extends ModelBase {
 			private final ModelRenderer shell;
 			private final ModelRenderer bone4;
 			private final ModelRenderer bone9;

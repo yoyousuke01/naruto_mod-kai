@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.EnumActionResult;
@@ -46,6 +47,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 //import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.block.state.IBlockState;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
@@ -53,9 +55,8 @@ import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.input.Mouse;
 import javax.annotation.Nullable;
-import java.util.List;
-import com.google.common.collect.Lists;
-import java.util.Iterator;
+import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PlayerInput extends ElementsNarutomodMod.ModElement {
@@ -81,7 +82,7 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class Hook {
-		private List<Integer> handlerList = Lists.newArrayList();
+		private Map<Integer, IHandler> handlersMap = Maps.newHashMap();
 		private boolean haltAllInput;
 		private boolean newMovementInput;
 		private float strafe;
@@ -104,17 +105,11 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 		public void onMovementInput(InputUpdateEvent event) {
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayerSP player = mc.player;
-			if (!this.handlerList.isEmpty()) {
+			if (!this.handlersMap.isEmpty()) {
 				MovementInput mi = player.movementInput;
-				Iterator<Integer> iter = this.handlerList.iterator();
-				while (iter.hasNext()) {
-					Entity entity = mc.world.getEntityByID(iter.next());
-					if (entity instanceof IHandler) {
-						MovementPacket.sendToServer(entity, mi.moveStrafe, mi.moveForward, mi.forwardKeyDown, mi.backKeyDown,
-						 mi.leftKeyDown, mi.rightKeyDown, mi.jump, mi.sneak);
-					} else {
-						iter.remove();
-					}
+				for (IHandler entity : this.handlersMap.values()) {
+					MovementPacket.sendToServer((Entity)entity, mi.moveStrafe, mi.moveForward, mi.forwardKeyDown, mi.backKeyDown,
+					 mi.leftKeyDown, mi.rightKeyDown, mi.jump, mi.sneak);
 				}
 			} else {
 				if (this.newMovementInput) {
@@ -146,30 +141,46 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+		public void handleMovement(Entity entity) {
+			this.handleMovement(entity, 0.91f);
+		}
 
-		public void handleMovement(EntityLivingBase entity) {
+		public void handleMovement(Entity entity, float baseFriction) {
 			this.clearMovementInput();
 			if (entity instanceof EntityPlayerMP) {
 				MovementPacket.sendToClient((EntityPlayerMP)entity, this.strafe, this.forward, 
 				 this.forwardKeyDown, this.backKeyDown, this.leftKeyDown, this.rightKeyDown, this.jump, this.sneak);
 			} else {
-				if (this.jump && entity.onGround) {
-					entity.motionY = 0.42d;
-					entity.isAirBorne = true;
+				if (entity instanceof EntityLivingBase) {
+					((EntityLivingBase)entity).setJumping(this.jump);
+				} else if (this.jump) {
+					entity.motionY += 0.01d;
 				}
-				entity.moveRelative(this.strafe, 0f, this.forward, 0.2f);
+				if (this.sneak) {
+					entity.motionY -= 0.01d;
+				}
+				float f6 = baseFriction;
+				BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(entity.posX, entity.getEntityBoundingBox().minY - 1.0D, entity.posZ);
+				if (entity.onGround) {
+					IBlockState underState = entity.world.getBlockState(pos.setPos(entity.posX, entity.getEntityBoundingBox().minY - 1.0D, entity.posZ));
+					f6 = underState.getBlock().getSlipperiness(underState, entity.world, pos, entity) * 0.91F;
+				}
+				float f7 = 0.1F / (f6 * f6 * f6);
+				float f8 = entity instanceof EntityLivingBase ? entity.onGround ? (float)ProcedureUtils.getModifiedSpeed((EntityLivingBase)entity) * f7 : ((EntityLivingBase)entity).jumpMovementFactor : 0.2f;
+				entity.moveRelative(this.strafe, 0f, this.forward, f8 * 0.6f);
 				entity.move(net.minecraft.entity.MoverType.SELF, entity.motionX, entity.motionY, entity.motionZ);
 				if (!entity.hasNoGravity()) {
 					entity.motionY += -0.08d;
 				}
-				entity.motionX *= 0.1d;
-				entity.motionZ *= 0.1d;
+
+				entity.motionX *= f6;
+				entity.motionZ *= f6;
 				entity.motionY *= 0.98d;
 				entity.setSneaking(this.sneak);
 			}
 		}
 
-		public void handleMouseEvent(EntityLivingBase entity) {
+		public void handleMouseEvent(Entity entity) {
 			this.clearMouseEvent();
 			if (entity instanceof EntityPlayerMP) {
 				MousePacket.sendToClient((EntityPlayerMP)entity, this.dx, this.dy, this.attackPressed, this.useItemPressed);
@@ -177,15 +188,22 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 	            float f1 = this.mouseSensitivity > 0.0F ? this.mouseSensitivity * 20.0F : 6.0F;
 	            float f2 = (float)this.dx * f1;
 	            float f3 = (float)this.dy * f1;
-	            entity.rotationYaw = entity.rotationYawHead = (float)((double)entity.rotationYawHead + (double)f2 * 0.15D);
-	            entity.rotationPitch = (float)((double)entity.rotationPitch - (double)f3 * 0.15D);
-	            entity.rotationPitch = MathHelper.clamp(entity.rotationPitch, -90.0F, 90.0F);
-	            if (this.attackPressed) {
-	            	entity.swingArm(EnumHand.MAIN_HAND);
-	            	RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 3d);
-	            	if (res.entityHit != null) {
-	            		entity.attackEntityAsMob(res.entityHit);
-	            	}
+	            if (entity instanceof EntityLivingBase) {
+	            	entity.setRotationYawHead(entity.getRotationYawHead() + f2 * 0.15F);
+	            	entity.rotationYaw = entity.getRotationYawHead();
+	            	entity.rotationPitch -= f3 * 0.15F;
+	            	entity.rotationPitch = MathHelper.clamp(entity.rotationPitch, -90.0F, 90.0F);
+		            if (this.attackPressed) {
+		            	((EntityLivingBase)entity).swingArm(EnumHand.MAIN_HAND);
+		            	RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 3d);
+		            	if (res.entityHit != null) {
+		            		((EntityLivingBase)entity).attackEntityAsMob(res.entityHit);
+		            	}
+		            }
+	            } else {
+	            	entity.rotationYaw += f2 * 0.1F;
+	            	entity.rotationPitch -= f3 * 0.1F;
+	            	entity.rotationPitch = MathHelper.clamp(entity.rotationPitch, -90.0F, 90.0F);
 	            }
 			}
 		}
@@ -194,17 +212,10 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 		@SubscribeEvent
 		public void onMouseInput(InputEvent.MouseInputEvent event) {
 			Minecraft mc = Minecraft.getMinecraft();
-			EntityPlayerSP player = mc.player;
-			if (!this.handlerList.isEmpty()) {
-				Iterator<Integer> iter = this.handlerList.iterator();
-				while (iter.hasNext()) {
-					Entity entity = mc.world.getEntityByID(iter.next());
-					if (entity instanceof IHandler) {
-						MousePacket.sendToServer(entity, Mouse.getEventDX(), Mouse.getEventDY(), mc.gameSettings.mouseSensitivity,
-						 mc.gameSettings.keyBindAttack.isPressed(), mc.gameSettings.keyBindUseItem.isPressed());
-					} else {
-						iter.remove();
-					}
+			if (!this.handlersMap.isEmpty()) {
+				for (IHandler entity : this.handlersMap.values()) {
+					MousePacket.sendToServer((Entity)entity, Mouse.getEventDX(), Mouse.getEventDY(), mc.gameSettings.mouseSensitivity,
+					 mc.gameSettings.keyBindAttack.isPressed(), mc.gameSettings.keyBindUseItem.isPressed());
 				}
 			}
 		}
@@ -301,19 +312,23 @@ public class PlayerInput extends ElementsNarutomodMod.ModElement {
 				@SideOnly(Side.CLIENT)
 				@Override
 				public IMessage onMessage(CopyInput message, MessageContext context) {
-					Minecraft.getMinecraft().addScheduledTask(() -> {
+					Minecraft mc = Minecraft.getMinecraft();
+					mc.addScheduledTask(() -> {
 						switch (message.handler) {
 							case -1:
 								INPUTHOOK.haltAllInput = message.flag;
 								break;
 							case 0:
-								INPUTHOOK.handlerList.clear();
+								INPUTHOOK.handlersMap.clear();
 								break;
 							default:
 								if (message.flag) {
-									INPUTHOOK.handlerList.add(Integer.valueOf(message.handler));
+									Entity entity = mc.world.getEntityByID(message.handler);
+									if (entity instanceof IHandler) {
+										INPUTHOOK.handlersMap.put(message.handler, (IHandler)entity);
+									}
 								} else {
-									INPUTHOOK.handlerList.remove(Integer.valueOf(message.handler));
+									INPUTHOOK.handlersMap.remove(message.handler);
 								}
 								break;
 						}

@@ -1,7 +1,6 @@
 package net.narutomod.procedure;
 
 import net.minecraft.util.math.Vec3d;
-//import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.Entity;
 
 import net.narutomod.item.ItemJutsu;

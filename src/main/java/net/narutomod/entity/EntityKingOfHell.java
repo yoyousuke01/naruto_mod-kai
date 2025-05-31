@@ -1,3 +1,4 @@
+
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -171,8 +172,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			int i = getArmSwingAnimationEnd();
 			if (this.isSwingInProgress) {
 				this.swingProgressInt++;
-				if (this.swingProgressInt == i / 2)
- {
+				if (this.swingProgressInt == i / 2) {
 					this.isSwingInProgress = false;
 				}
 				if (this.swingProgressInt >= i) {
@@ -222,20 +222,16 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 					this.setHealth(0.0F);
 				} else {
 					if (this.isArmsOpen()) {
-						if (this.healingPlayer != null)
- {
+						if (this.healingPlayer != null) {
 							this.rejuvenatePlayer();
-						} else
- {
+						} else {
 							this.toggleArmSwing();
 						}
 					}
 					if (summoner != null) {
-						if (summoner.getHealth() <= 0.0F)
- {
+						if (summoner.getHealth() <= 0.0F) {
 							this.setHealth(0.0F);
-						} else if (summoner.getHealth() < 4.0F)
- {
+						} else if (summoner.getHealth() < 4.0F) {
 							this.rejuvenateSummoningPlayer();
 						}
 					}

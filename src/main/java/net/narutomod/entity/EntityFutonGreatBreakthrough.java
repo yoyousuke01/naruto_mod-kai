@@ -231,11 +231,11 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			this.prevPosZ = this.posZ;
 			this.motionY += 0.004d;
 			EntityLivingBase shooter = this.getShooter();
-			RayTraceResult res = ProjectileHelper.forwardsRaycast(this, true, false, shooter);
+			RayTraceResult res = ProjectileHelper.forwardsRaycast(this, true, true, shooter);
 			if (res != null && shooter != null) {
 				if (res.entityHit != null) {
+					res.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this.ecEntity, shooter), this.ecEntity.power * 3f);
 					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 3.0F);
-					res.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(shooter, null), 20f);
 				} else if (this.world.isRemote) {
 					IBlockState blockstate = this.world.getBlockState(res.getBlockPos());
 					if (this.canRaiseDustList.contains(blockstate.getMaterial())) {

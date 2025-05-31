@@ -28,7 +28,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
-
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
@@ -75,8 +74,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
 				.id(new ResourceLocation("narutomod", "puppet_hiruko"), ENTITYID).name("puppet_hiruko").tracker(64, 3, true).build());
 	}
-
-
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
@@ -594,7 +592,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			};
-	
+
 			public ModelPuppetHiruko() {
 				textureWidth = 128;
 				textureHeight = 128;
@@ -1005,7 +1003,7 @@ public class EntityPuppetHiruko extends ElementsNarutomodMod.ModElement {
 				torpedo.setRotationPoint(-6.0F, 18.0F, -2.0F);
 				bipedLeftForeArm.addChild(torpedo);
 				torpedo.cubeList.add(new ModelBox(torpedo, 44, 66, 4.0F, -18.0F, -2.0F, 4, 6, 4, 0.5F, true));
-		
+
 				bipedRightLeg = new ModelRenderer(this);
 				bipedRightLeg.setRotationPoint(-1.9F, 15.0F, 0.0F);
 				rightThigh = new ModelRenderer(this);

@@ -8,6 +8,7 @@ import net.narutomod.item.ItemMokuton;
 import net.narutomod.item.ItemMangekyoSharinganEternal;
 import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemDojutsu;
+import net.narutomod.entity.EntityKageBunshin;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -76,7 +77,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							&& (!((entity instanceof EntityPlayer)
 									? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemRinnegan.helmet, (int) (1)))
 									: false)))
-							&& (Math.random() < 0.2)))) {
+							&& (!EntityKageBunshin.isPlayerClone((EntityPlayer) entity) && (Math.random() < 0.2))))) {
 				rinneganstack = new ItemStack(ItemRinnegan.helmet, (int) (1));
 				((ItemDojutsu.Base) rinneganstack.getItem()).setOwner(rinneganstack, (EntityLivingBase) entity);
 				if (entity instanceof EntityPlayer) {
@@ -110,7 +111,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 					&& (!((entity instanceof EntityPlayer)
 							? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemMokuton.block, (int) (1)))
 							: false)))
-					&& (entity.isEntityAlive()))) {
+					&& (!EntityKageBunshin.isPlayerClone((EntityPlayer) entity) && (entity.isEntityAlive())))) {
 				if ((world.getGameRules().getBoolean("keepInventory") || world.getGameRules().getBoolean("keepNinjaXp"))) {
 					flag = (boolean) (Math.random() < 0.01);
 				} else {

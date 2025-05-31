@@ -165,7 +165,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						if (this.damage >= 0.0f) {
 							if (entity.ticksExisted % 80 == 0) {
 								entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, this.damage * 12);
+								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, this.damage * 10);
 							}
 						} else {
 							entity.setHealth(entity.getHealth() - this.damage);

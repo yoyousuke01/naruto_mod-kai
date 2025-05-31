@@ -55,7 +55,7 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 	public static class RangedItem extends Item {
 		public RangedItem() {
 			super();
-			this.setMaxDamage(100);
+			this.setMaxDamage(200);
 			this.setFull3D();
 			this.setUnlocalizedName("sound_gaunlet");
 			this.setRegistryName("sound_gaunlet");
@@ -97,14 +97,6 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			return false;
-		}
-		
-		@Override
-		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
-			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("ench", 9)) {
-				stack.getTagCompound().removeTag("ench");
-			}
-			super.onUpdate(stack, world, entity, par4, par5);
 		}
 
 		@Override

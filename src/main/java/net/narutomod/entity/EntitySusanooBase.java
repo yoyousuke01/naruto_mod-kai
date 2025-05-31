@@ -1,7 +1,5 @@
 package net.narutomod.entity;
 
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
 import net.minecraft.world.World;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.math.MathHelper;
@@ -26,15 +24,12 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.item.ItemStack;
+import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
-import net.narutomod.item.ItemTotsukaSword;
-import net.narutomod.item.ItemChokuto;
-import net.narutomod.item.ItemShuriken;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSusanoo;
 import net.narutomod.PlayerTracker;
@@ -42,20 +37,17 @@ import net.narutomod.Particles;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.List;
 import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
-public abstract class EntitySusanooBase extends EntityCreature implements IRangedAttackMob {
+public abstract class EntitySusanooBase extends EntityCreature implements IRangedAttackMob, EntitySummonAnimal.ISummon {
 	private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> FLAME_COLOR = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
-	public static final double BXP_REQUIRED_L0 = 2000.0d;
-	public static final double BXP_REQUIRED_L1 = 5000.0d;
-	public static final double BXP_REQUIRED_L2 = 10000.0d;
-	public static final double BXP_REQUIRED_L3 = 20000.0d;
-	public static final double BXP_REQUIRED_L4 = 40000.0d;
+	public static final double BXP_REQUIRED_L0 = 10000.0d;
+	public static final double BXP_REQUIRED_L1 = 16000.0d;
+	public static final double BXP_REQUIRED_L2 = 32000.0d;
+	public static final double BXP_REQUIRED_L3 = 50000.0d;
+	public static final double BXP_REQUIRED_L4 = 60000.0d;
 	protected double chakraUsage = 30d; // per second
 	protected double chakraUsageModifier = 2d;
 	protected double playerXp;
@@ -105,8 +97,13 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.dataManager.register(FLAME_COLOR, Integer.valueOf(0x202C183D));
 	}
 
-	@Nullable
+	@Deprecated @Nullable
 	public EntityLivingBase getOwnerPlayer() {
+		return this.getSummoner();
+	}
+	
+	@Override @Nullable
+	public EntityLivingBase getSummoner() {
 		Entity entity = this.world.getEntityByID(((Integer)this.dataManager.get(OWNER_ID)).intValue());
 		return entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
 	}
@@ -185,7 +182,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			return false;
 		float f = this.getHealth();
 		boolean flag = super.attackEntityFrom(source, amount);
-		EntityLivingBase summoner = this.getOwnerPlayer();
+		EntityLivingBase summoner = this.getSummoner();
 		if (flag && summoner != null && !this.isEntityAlive()) {
 			summoner.attackEntityFrom(source, CombatRules.getDamageAfterAbsorb(amount, (float)this.getTotalArmorValue(), 0f) - f);
 		}
@@ -204,7 +201,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 			f *= f2;
 			ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
-			DamageSource ds = ItemJutsu.causeJutsuDamage(this, this.getOwnerPlayer());
+			DamageSource ds = ItemJutsu.causeJutsuDamage(this, this.getSummoner());
 			if (stack.getItem() == ItemTotsukaSword.block && entityIn instanceof EntityLivingBase
 			 && Chakra.pathway((EntityLivingBase)entityIn).getAmount() < 5d) {
 				ds = ds.setDamageIsAbsolute().setDamageBypassesArmor();
@@ -230,7 +227,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	@Override
 	public boolean processInteract(EntityPlayer entity, EnumHand hand) {
 		super.processInteract(entity, hand);
-		if (!this.world.isRemote && entity.equals(this.getOwnerPlayer())) {
+		if (!this.world.isRemote && entity.equals(this.getSummoner())) {
 			entity.startRiding(this);
 			return true;
 		}
@@ -255,7 +252,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 				float strafe = ((EntityLivingBase) entity).moveStrafing;
 				super.travel(strafe, 0.0F, forward);
 			}
-		} else {
+} else {
 			this.jumpMovementFactor = 0.02F;
 			super.travel(ti, tj, tk);
 		}
@@ -263,10 +260,17 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 
 	/*@Override
 	protected void addPassenger(Entity passenger) {
+		if (this.getPassengers().isEmpty() || (passenger instanceof EntityPlayer && this.getOwnerPlayer() instanceof EntityPlayer)) {
+			super.addPassenger(passenger);
+			return;
+		}
 		if (passenger.getRidingEntity() != this) {
 			throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
 		} else {
-			Object obj = ReflectionHelper.getPrivateValue(Entity.class, this, "riddenByEntities", "field_70725_aQ");
+			Object obj = ReflectionHelper.getPrivateValue(Entity.class, this, "riddenByEntities", "field_184244_h");
+			if (!(obj instanceof List)) {
+				obj = ReflectionHelper.getPrivateValue(Entity.class, this, 7);
+			}
 			if (!(obj instanceof List)) {
 				obj = null;
 				try {
@@ -286,7 +290,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 			((List<Entity>)obj).add(passenger);
 		}
-	}*/
+	}*/
 
 	@Override
 	public double getMountedYOffset() {
@@ -302,7 +306,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	public Entity getControllingPassenger() {
 		return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
 	}
-
+	
 	@Override
 	public boolean canBeSteered() {
 		return true;
@@ -349,7 +353,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 
 	protected void consumeChakra() {
 		if (this.ticksExisted % 20 == 0) {
-			if (!Chakra.pathway(this.getOwnerPlayer()).consume(this.chakraUsage * this.chakraUsageModifier)) {
+			if (!Chakra.pathway(this.getSummoner()).consume(this.chakraUsage * this.chakraUsageModifier)) {
 				this.setDead();
 			}
 		}
@@ -357,7 +361,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 
 	@Override
 	public void onLivingUpdate() {
-		EntityLivingBase ownerPlayer = this.getOwnerPlayer();
+		EntityLivingBase ownerPlayer = this.getSummoner();
 		boolean flag = ownerPlayer instanceof EntityPlayer;
 		if (!this.world.isRemote && (ownerPlayer == null || !ownerPlayer.isEntityAlive() || 
 		 (ownerPlayer instanceof EntityPlayerMP && ((EntityPlayerMP)ownerPlayer).hasDisconnected()) ||
@@ -385,11 +389,9 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		
 		this.clampMotion(0.05D);
 
-		if (this.ticksExisted % 30 == 0)
- {
+		if (this.ticksExisted % 30 == 0) {
 			this.playSound(net.minecraft.util.SoundEvent.REGISTRY
-			 .getObject(new ResourceLocation("block.fire.ambient")),
- 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
+			 .getObject(new ResourceLocation("block.fire.ambient")), 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
 		}
 		for (int i = 0; i < (int) this.height; i++) {
 			double d0 = this.posX + (this.rand.nextFloat() - 0.5D) * this.width;
@@ -423,10 +425,11 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
     }
 
     protected void showHeldWeapons() {
-		EntityLivingBase owner = this.getOwnerPlayer();
+		EntityLivingBase owner = this.getSummoner();
 		if (!this.world.isRemote && owner != null) {
-			this.setShowSword(owner.getHeldItemMainhand().getItem() == ItemChokuto.block);
-			if (owner.getHeldItemMainhand().getItem() == ItemShuriken.block) {
+			ItemStack stack = owner.getHeldItemMainhand();
+			this.setShowSword(stack.getItem() == ItemChokuto.block || stack.getItem() == Items.IRON_SWORD || stack.getItem() == ItemKunai.block || stack.getItem() == ItemAnbuSword.block);
+			if (stack.getItem() == ItemShuriken.block) {
 				this.createBullet((float)this.getEntityData().getDouble("entityModelScale") * 0.5f);
 			} else {
 				this.killBullet();

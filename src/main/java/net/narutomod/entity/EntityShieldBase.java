@@ -1,3 +1,4 @@
+
 package net.narutomod.entity;
 
 import net.minecraft.world.World;
@@ -252,14 +253,15 @@ public abstract class EntityShieldBase extends EntityLivingBase implements Entit
 		this.clearActivePotions();
 		super.onLivingUpdate();
 		this.clampMotion(0.1D);
-		EntityLivingBase summoner = this.getSummoner();
-		if ((this.getPassengers().isEmpty() && this.dieOnNoPassengers) 
-		 || (summoner != null && !summoner.isEntityAlive())
-) {
-			this.setDead();
+		if (!this.world.isRemote) {
+			EntityLivingBase summoner = this.getSummoner();
+			if ((this.getPassengers().isEmpty() && this.dieOnNoPassengers) 
+			 || (summoner != null && !summoner.isEntityAlive())) {
+				this.setDead();
+			}
 		}
 	}
-
+	
 	@Override
 	public void onDeath(DamageSource cause) {
 		if (!this.dead) {

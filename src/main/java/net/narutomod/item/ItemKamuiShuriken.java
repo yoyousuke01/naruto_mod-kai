@@ -1,4 +1,4 @@
-
+		
 package net.narutomod.item;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -54,7 +54,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:kamuishuriken")
 	public static final Item block = null;
 	public static final int ENTITYID = 114;
-	private static final double CHAKRA_USAGE = 700.0d;
+	private static final double CHAKRA_USAGE = 1000.0d;
 	
 	public ItemKamuiShuriken(ElementsNarutomodMod instance) {
 		super(instance, 331);
@@ -90,13 +90,15 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP
 			 && net.narutomod.Chakra.pathway(entityLivingBase).consume(CHAKRA_USAGE)) {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
-				float power = 0.5f;
 				EntityKamuiShuriken entityarrow = new EntityKamuiShuriken(world, entity);
-				if (entity.isRiding() && entity.getRidingEntity() instanceof EntitySusanooWinged.EntityCustom) {
+				if (entity.getRidingEntity() instanceof EntitySusanooWinged.EntityCustom) {
 					entityarrow.setScale((float)entity.getRidingEntity().getEntityData().getDouble("entityModelScale"));
 				}
-				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
+				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, 1.6f, 0);
 				world.spawnEntity(entityarrow);
+				if (!entity.isCreative()) {
+					entity.getCooldownTracker().setCooldown(itemstack.getItem(), 100);
+				}
 			}
 		}
 
@@ -174,11 +176,10 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (result.entityHit != null && this.thrower instanceof EntityPlayer) {
 					EntityPlayer thrower = (EntityPlayer) this.thrower;
-					double d = 0.00000625d * this.getScale() * PlayerTracker.getBattleXp(thrower)
-							/ result.entityHit.getEntityBoundingBox().getAverageEdgeLength();
+					double d = 0.125d * this.getScale() / result.entityHit.getEntityBoundingBox().getAverageEdgeLength();
 					if (result.entityHit instanceof EntityLivingBase) {
 						EntityLivingBase elb = (EntityLivingBase) result.entityHit;
-						elb.attackEntityFrom(DamageSource.OUT_OF_WORLD, elb.getMaxHealth() * (float)d);
+						elb.attackEntityFrom(DamageSource.causeIndirectDamage(this, thrower).setDamageBypassesArmor().setDamageIsAbsolute(), elb.getMaxHealth() * (float)d);
 					} else {
 						result.entityHit.onKillCommand();
 					}
@@ -191,8 +192,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.ticksExisted % 40 == 2) {
-				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KamuiSFX")),
-				 1, 1f / (this.rand.nextFloat() * 0.5f + 1f) + 0.25f);
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kamui")),				 1, 1f / (this.rand.nextFloat() * 0.5f + 1f) + 0.25f);
 			}
 			if (this.inGround) {
 				this.world.removeEntity(this);

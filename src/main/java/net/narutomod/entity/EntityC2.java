@@ -42,8 +42,7 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "c_2"), ENTITYID)
-.name("c_2").tracker(64, 3, true).build());
+		 .id(new ResourceLocation("narutomod", "c_2"), ENTITYID).name("c_2").tracker(64, 3, true).build());
 	}
 
 	public static class EC extends ItemBakuton.ExplosiveClay {
@@ -55,13 +54,13 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 			this.setSize(WIDTH, HEIGHT);
-			this.setExplosionSize(12.0f);
+			this.setExplosionSize(14.0f);
 		}
 
 		public EC(EntityLivingBase ownerIn) {
 			super(ownerIn);
 			this.setSize(WIDTH, HEIGHT);
-			this.setExplosionSize(12.0f);
+			this.setExplosionSize(14.0f);
 		}
 
 		@Override
@@ -161,15 +160,6 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 		}
 
 	    @Override
-	    public boolean attackEntityAsMob(Entity entityIn) {
-	    	if (super.attackEntityAsMob(entityIn)) {
-	    		entityIn.hurtResistantTime = 10;
-		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 50f + this.rand.nextFloat() * 10f);
-	    	}
-	    	return false;
-	    }
-
-	    @Override
 	    public void onUpdate() {
 	    	super.onUpdate();
 	    	if (!this.world.isRemote && this.ticksExisted % 5 == 0) {
@@ -217,7 +207,7 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 				return this.texture;
 			}
 		}
-	
+
 		// Made with Blockbench 3.8.4
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports

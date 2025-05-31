@@ -85,7 +85,6 @@ public class EntityZetsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
 		}
@@ -105,7 +104,12 @@ public class EntityZetsu extends ElementsNarutomodMod.ModElement {
 				}
 			});
 			this.tasks.addTask(0, new EntityAISwimming(this));
-			//this.tasks.addTask(2, new EntityNinjaMob.AILeapAtTarget(this, 1.0F));
+			this.tasks.addTask(2, new EntityNinjaMob.AILeapAtTarget(this, 0.0F, 24.0F) {
+				@Override
+				public boolean shouldExecute() {
+					return super.shouldExecute() && this.leaper.getDistance(this.leaper.getAttackTarget()) > 16d;
+				}
+			});
 			//this.tasks.addTask(4, new EntityNinjaMob.AIAttackMelee(this, 1.2d, true));
 			this.tasks.addTask(4, new EntityNinjaMob.AIAttackRangedTactical(this, 0.8d, 60, 20f));
 			this.tasks.addTask(5, new EntityAIWatchClosest2(this, EntityPlayer.class, 32.0F, 1.0F));

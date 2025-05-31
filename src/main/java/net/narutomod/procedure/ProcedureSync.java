@@ -53,7 +53,8 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 		this.elements.addNetworkMessage(EntityPositionAndRotation.ClientHandler.class, EntityPositionAndRotation.class, Side.CLIENT);
 		this.elements.addNetworkMessage(EntityPositionAndRotation.ServerHandler.class, EntityPositionAndRotation.class, Side.SERVER);
 		this.elements.addNetworkMessage(EntityState.Handler.class, EntityState.class, Side.CLIENT);
-		this.elements.addNetworkMessage(EntityDead.Handler.class, EntityDead.class, Side.SERVER);
+		this.elements.addNetworkMessage(EntityDead.ServerHandler.class, EntityDead.class, Side.SERVER);
+		this.elements.addNetworkMessage(EntityDead.ClientHandler.class, EntityDead.class, Side.CLIENT);
 		this.elements.addNetworkMessage(EntityNBTTag.ServerHandler.class, EntityNBTTag.class, Side.SERVER);
 		this.elements.addNetworkMessage(EntityNBTTag.ClientHandler.class, EntityNBTTag.class, Side.CLIENT);
 		this.elements.addNetworkMessage(CPacketEarthBlocks.Handler.class, CPacketEarthBlocks.class, Side.SERVER);
@@ -409,8 +410,8 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 		public void setLocationAndAngles(Entity entity) {
 			entity.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
 		}
-
-		PositionRotationPacket(ByteBuf buf) {
+		
+		public PositionRotationPacket(ByteBuf buf) {
 			this.posX = buf.readDouble();
 			this.posY = buf.readDouble();
 			this.posZ = buf.readDouble();
@@ -418,7 +419,7 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 			this.rotationPitch = buf.readFloat();
 		}
 
-		void toBytes(ByteBuf buf) {
+		public void toBytes(ByteBuf buf) {
 			buf.writeDouble(this.posX);
 			buf.writeDouble(this.posY);
 			buf.writeDouble(this.posZ);
@@ -444,6 +445,10 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 
 		public static void sendToSelf(EntityPlayerMP entity) {
 			NarutomodMod.PACKET_HANDLER.sendTo(new EntityPositionAndRotation(entity), entity);
+		}
+
+		public static void sendTo(Entity entity, EntityPlayerMP player) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityPositionAndRotation(entity), player);
 		}
 
 		public static void sendToServer(Entity entity) {
@@ -541,21 +546,52 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 
 		public EntityDead() { }
 
+		public EntityDead(int idIn) {
+			this.id = idIn;
+		}
+
 		public EntityDead(Entity entity) {
-			this.id = entity.getEntityId();
+			this(entity.getEntityId());
+		}
+
+		public static void sendToSelf(int idIn, EntityPlayerMP player) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityDead(idIn), player);
 		}
 
 		public static void sendToServer(Entity entity) {
 			NarutomodMod.PACKET_HANDLER.sendToServer(new EntityDead(entity));
 		}
 
-		public static class Handler implements IMessageHandler<EntityDead, IMessage> {
+		public static class ServerHandler implements IMessageHandler<EntityDead, IMessage> {
 			@Override
 			public IMessage onMessage(EntityDead message, MessageContext context) {
 				WorldServer world = context.getServerHandler().player.getServerWorld();
 				world.addScheduledTask(() -> {
 					Entity entity = world.getEntityByID(message.id);
 					if (!(entity instanceof EntityPlayerMP)) {
+						entity.setDead();
+					}
+				});
+				return null;
+			}
+		}
+
+		public static class ClientHandler implements IMessageHandler<EntityDead, IMessage> {
+			@SideOnly(Side.CLIENT)
+			@Override
+			public IMessage onMessage(EntityDead message, MessageContext context) {
+				Minecraft mc = Minecraft.getMinecraft();
+				mc.addScheduledTask(() -> {
+					Entity entity = mc.world.getEntityByID(message.id);
+					if (entity == null) {
+						for (Entity entity1 : mc.world.loadedEntityList) {
+							if (entity1.getEntityId() == message.id) {
+								entity = entity1;
+								break;
+							}
+						}
+					}
+					if (entity != null && !(entity instanceof EntityPlayer)) {
 						entity.setDead();
 					}
 				});

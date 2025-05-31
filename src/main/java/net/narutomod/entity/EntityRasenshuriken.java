@@ -59,38 +59,27 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "rasenshuriken"), ENTITYID).name("rasenshuriken").tracker(96, 3, true).build());
 	}
 
-	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
+	public static class EC extends EntityRasengan.EC {
 		private static final DataParameter<Integer> IMPACT_TICKS = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> BALL_COLOR = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
-		//private final int s = 50;
-		//private int[] randomStartTick = new int[s];
-		private final int growTime = 20;
-		private float fullScale;
 		private Vec3d impactVec;
 		private RayTraceResult targetTrace;
 		protected float impactDamageMultiplier = 2.0f;
-		private DamageSource damageSource;
 
 		public EC(World a) {
 			super(a);
 			this.setOGSize(2.5F, 0.5F);
-			this.isImmuneToFire = true;
-			this.damageSource = ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor();
+			this.setDamageSource(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor());
 		}
 
 		public EC(EntityLivingBase shooter, float scale) {
-			super(shooter);
+			super(shooter, scale);
 			this.setOGSize(2.5F, 0.5F);
-			this.setPosition(shooter.posX, shooter.posY + shooter.height + 0.5D, shooter.posZ);
-			this.fullScale = scale;
-			this.setEntityScale(0.1f);
-			this.isImmuneToFire = true;
-			this.damageSource = ItemJutsu.causeJutsuDamage(this, shooter).setDamageBypassesArmor();
 		}
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.isDamageSourceSenjutsu(this.damageSource) ? ItemJutsu.JutsuEnum.Type.SENJUTSU : ItemJutsu.JutsuEnum.Type.FUTON;
+			return ItemJutsu.isDamageSourceSenjutsu(this.getDamageSource()) ? ItemJutsu.JutsuEnum.Type.SENJUTSU : ItemJutsu.JutsuEnum.Type.FUTON;
 		}
 
 		@Override
@@ -120,11 +109,19 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void setDead() {
-			super.setDead();
-			if (!this.world.isRemote && this.shootingEntity != null) {
-				ProcedureSync.EntityNBTTag.removeAndSync(this.shootingEntity, NarutomodModVariables.forceBowPose);
+		protected void setPositionToHand() {
+			if (!this.isLaunched()) {
+				super.setPositionToHand();
 			}
+		}
+
+		private boolean canBeLaunched() {
+			return this.getJutsuType() == ItemJutsu.JutsuEnum.Type.SENJUTSU;
+		}
+
+		@Override
+		public boolean isLaunched() {
+			return super.isLaunched() || this.getImpactTicks() > 0;
 		}
 
 		@Override
@@ -135,19 +132,12 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				this.onImpactUpdate();
 				return;
 			}
-			if (!this.world.isRemote && this.ticksAlive == 1 && this.shootingEntity instanceof EntityPlayer) {
-				ProcedureSync.EntityNBTTag.setAndSync(this.shootingEntity, NarutomodModVariables.forceBowPose, true);
-			}
-			if (!this.world.isRemote && this.shootingEntity != null) {
-				if (this.ticksAlive < this.growTime) {
-					this.setEntityScale(this.fullScale * (this.ticksAlive + 1) / this.growTime);
-					this.setPosition(this.shootingEntity.posX, this.shootingEntity.posY + this.shootingEntity.height + 0.5d, this.shootingEntity.posZ);
-				} else if (this.targetTrace == null || this.targetTrace.entityHit == null) {
-					if (this.getDistance(this.shootingEntity) < 48d) {
-						RayTraceResult rt = ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d);
-						if (!this.equals(rt.entityHit) && !this.shootingEntity.equals(rt.entityHit)) {
-							this.targetTrace = rt;
-						}
+			if (!this.world.isRemote && this.shootingEntity != null && this.canBeLaunched()) {
+				if (this.ticksAlive >= this.getGrowTime() && (this.targetTrace == null || this.targetTrace.entityHit == null)
+				 && this.getDistance(this.shootingEntity) < 48d) {
+					RayTraceResult rt = ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, this);
+					if (!this.shootingEntity.equals(rt.entityHit) && (rt.entityHit != null || this.shootingEntity.rotationPitch > -60f)) {
+						this.targetTrace = rt;
 					}
 				}
 				if (this.targetTrace != null) {
@@ -157,13 +147,13 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 					this.shoot(this.targetTrace.hitVec.x - this.posX, this.targetTrace.hitVec.y - this.posY, this.targetTrace.hitVec.z - this.posZ, 0.99f, 0f);
 				}
 			}
-			if (this.fullScale >= 4.0f) {
+			if (this.getFullScale() >= 4.0f) {
 				ProcedureLightSourceSetBlock.execute(this.world, MathHelper.floor(this.posX), MathHelper.floor(this.posY), MathHelper.floor(this.posZ));
 			}
 			if (this.ticksAlive % 80 == 79) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:wind")), 1, 1f);
 			}
-			if (this.ticksInAir > 200 || (!this.world.isRemote && this.shootingEntity == null && !this.isLaunched())) {
+			if (!this.world.isRemote && (this.ticksInAir > 200 || (this.shootingEntity == null && !this.isLaunched()))) {
 				this.setDead();
 			}
 		}
@@ -173,7 +163,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			if ((result.typeOfHit == RayTraceResult.Type.BLOCK
 			  && this.world.getBlockState(result.getBlockPos()).getBlock() == BlockLightSource.block)
 			 || (result.entityHit != null && result.entityHit.equals(this.shootingEntity))
-			 || (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale > 1.0f && this.ticksInAir < 15)) {
+			 || (result.typeOfHit == RayTraceResult.Type.BLOCK && this.getFullScale() > 1.0f && this.ticksInAir < 15)) {
 				return;
 			}
 			if (!this.world.isRemote && this.shootingEntity != null) {
@@ -188,11 +178,15 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			return this.impactVec;
 		}
 
+		public float getImpactDamage() {
+			return this.getFullScale() * this.impactDamageMultiplier;
+		}
+
 		protected void doImpactDamage() {
-			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width/2)
+			float damage = this.getImpactDamage();
+			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width * 0.5)
 			  .exclude(this.shootingEntity).exclude(EntityTruthSeekerBall.EntityCustom.class).resetHurtResistanceTime()
-			  .damageEntities(this.damageSource, this.fullScale * this.impactDamageMultiplier)
-			  .motion(0d, 0d, 0d);
+			  .damageEntities(this.getDamageSource(), damage).consumeChakra(50d * damage).motion(0d, 0d, 0d);
 		}
 
 		private void onImpactUpdate() {
@@ -214,14 +208,34 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				Particles.Renderer particles = new Particles.Renderer(this.world);
 				for (int i = 0; i < 300; i++) {
 					particles.spawnParticles(Particles.Types.SMOKE, this.posX, this.posY+this.height*0.5, this.posZ,
-					  1, 1d, 0d, 1d, (this.rand.nextDouble()-0.5d) * this.fullScale * 4.0d,
-					  0.5d * this.rand.nextGaussian(), 4.0d * (this.rand.nextDouble()-0.5d) * this.fullScale,
+					  1, 1d, 0d, 1d, (this.rand.nextDouble()-0.5d) * this.getFullScale() * 4.0d,
+					  0.5d * this.rand.nextGaussian(), 4.0d * (this.rand.nextDouble()-0.5d) * this.getFullScale(),
 					  0x10FFFFFF, (int)(newScale * 16f), 20);
 				}
 				particles.send();
 				if (impactTicks >= 200) {
 					this.setDead();
 				}
+			}
+		}
+
+		@Override
+		public void applyEntityCollision(Entity entityIn) {
+			if (this.getImpactTicks() == 0 && entityIn != this.shootingEntity) {
+				RayTraceResult res = new RayTraceResult(entityIn);
+				res.hitVec = ProcedureUtils.BB.getCenter(this.getEntityBoundingBox().intersect(entityIn.getEntityBoundingBox()));
+				this.onImpact(res);
+				if (this.shootingEntity != null) {
+					this.shootingEntity.attackEntityFrom(ItemJutsu.NINJUTSU_DAMAGE.setDamageBypassesArmor(), this.getImpactDamage() * 20f);
+					ProcedureUtils.pushEntity(entityIn, this.shootingEntity, this.getFullScale() * 20f, 1.5f);
+				}
+			}
+		}
+
+		@Override
+		protected void breakBlocks() {
+			if (!this.isLaunched()) {
+				super.breakBlocks();
 			}
 		}
 
@@ -233,7 +247,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		public void renderParticles() {
 			if (this.world.isRemote && this.getImpactTicks() == 0) {
 				Particles.Renderer particles = new Particles.Renderer(this.world);
-				for (int i = 0; i < this.growTime * 10; i++) {
+				for (int i = 0; i < this.getGrowTime() * 10; i++) {
 					particles.spawnParticles(Particles.Types.SMOKE, this.posX, this.posY+this.height*0.5, this.posZ, 1, 1d, 0d, 1d, 
 					  0.6d * this.rand.nextGaussian(), 0.1d * this.rand.nextGaussian(), 0.6d * this.rand.nextGaussian(), 0x10FFFFFF,
 					  (int)(this.getEntityScale() * 12), 0);
@@ -245,10 +259,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
 			super.readEntityFromNBT(compound);
-			this.fullScale = compound.getFloat("fullScale");
 			this.impactDamageMultiplier = compound.getFloat("impactDamageMultiplier");
-			this.damageSource = (compound.getBoolean("isSenjutsu") ? ItemJutsu.causeSenjutsuDamage(this, this.shootingEntity)
-			 : ItemJutsu.causeJutsuDamage(this, this.shootingEntity)).setDamageBypassesArmor();
 			int i = compound.getInteger("impactTicks");
 			this.setImpactTicks(i);
 			if (i > 0) {
@@ -259,9 +270,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void writeEntityToNBT(NBTTagCompound compound) {
 			super.writeEntityToNBT(compound);
-			compound.setFloat("fullScale", this.fullScale);
 			compound.setFloat("impactDamageMultiplier", this.impactDamageMultiplier);
-			compound.setBoolean("isSenjutsu", ItemJutsu.isDamageSourceSenjutsu(this.damageSource));
 			int i = this.getImpactTicks();
 			compound.setInteger("impactTicks", i);
 			if (i > 0) {
@@ -277,7 +286,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				  SoundCategory.PLAYERS, 5, 1f);
 			EC entity1 = new EC(entity, power);
 			if (isSenjutsu) {
-				entity1.damageSource = ItemJutsu.causeSenjutsuDamage(entity1, entity).setDamageBypassesArmor();
+				entity1.setDamageSource(ItemJutsu.causeSenjutsuDamage(entity1, entity).setDamageBypassesArmor());
 			}
 			entity.world.spawnEntity(entity1);
 			return entity1;
@@ -287,9 +296,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if ((stack.getItem() == ItemFuton.block && power >= 0.1f) || (stack.getItem() == ItemSenjutsu.block && power >= 2.0f)) {
-					if (entity instanceof EntityPlayer) {
-						ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 3600));
-					}
+					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer) entity, (long) (power * 3600));
 					EC.create(entity, power, stack.getItem() == ItemSenjutsu.block);
 					return true;
 				}
@@ -312,7 +319,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		public static class SageModeVairant extends Jutsu {
+		public static class SageModeVariant extends Jutsu {
 			@Override
 			public float getBasePower() {
 				return 1.9f;
@@ -354,9 +361,8 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		}
 
 		@SideOnly(Side.CLIENT)
-		public class RenderRasenshuriken extends Render<EC> {
+		public class RenderRasenshuriken extends EntityRasengan.Renderer.RenderRasengan<EC> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/rasenshuriken.png");
-			protected ModelBase mainModel;
 
 			public RenderRasenshuriken(RenderManager renderManagerIn) {
 				super(renderManagerIn);
@@ -365,25 +371,35 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				float scale = entity.getEntityScale();
-				float f = (float)entity.ticksExisted + partialTicks;
-				this.bindEntityTexture(entity);
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(x, y + (0.25F * scale), z);
-				GlStateManager.rotate(-ProcedureUtils.interpolateRotation(entity.prevRotationYaw, entity.rotationYaw, partialTicks), 0.0F, 1.0F, 0.0F);
-				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks - 180.0F, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(entity.prevRotationRoll + (entity.rotationRoll - entity.prevRotationRoll) * partialTicks, 0.0F, 0.0F, 1.0F);
-				GlStateManager.scale(scale, scale, scale);
-				GlStateManager.enableAlpha();
-				GlStateManager.enableBlend();
-				GlStateManager.disableCull();
-				GlStateManager.disableLighting();
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				this.mainModel.render(entity, 0.0F, 0.0F, f, 0.0F, 0.0F, 0.0625F);
-				GlStateManager.enableLighting();
-				GlStateManager.enableCull();
-				GlStateManager.disableBlend();
-				GlStateManager.popMatrix();
+				if (entity.isLaunched()) {
+					float scale = entity.getEntityScale();
+					float f = (float)entity.ticksExisted + partialTicks;
+					this.bindEntityTexture(entity);
+					GlStateManager.pushMatrix();
+					GlStateManager.translate(x, y + (0.25F * scale), z);
+					GlStateManager.rotate(-ProcedureUtils.interpolateRotation(entity.prevRotationYaw, entity.rotationYaw, partialTicks), 0.0F, 1.0F, 0.0F);
+					GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks - 180.0F, 1.0F, 0.0F, 0.0F);
+					GlStateManager.rotate(entity.prevRotationRoll + (entity.rotationRoll - entity.prevRotationRoll) * partialTicks, 0.0F, 0.0F, 1.0F);
+					GlStateManager.scale(scale, scale, scale);
+					GlStateManager.enableAlpha();
+					GlStateManager.enableBlend();
+					GlStateManager.disableCull();
+					GlStateManager.disableLighting();
+					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+					this.renderModel(entity, f, 1.0f);
+					GlStateManager.enableLighting();
+					GlStateManager.enableCull();
+					GlStateManager.disableBlend();
+					GlStateManager.popMatrix();
+				}
+ else {
+					super.doRender(entity, x, y, z, entityYaw, partialTicks);
+				}
+			}
+
+			@Override
+			protected void renderModel(EC entity, float ageInTicks, float alpha) {
+				this.mainModel.render(entity, 0.0F, 0.0F, ageInTicks, 0.0F, 0.0F, 0.0625F);
 			}
 
 			@Override
@@ -816,7 +832,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				GlStateManager.pushMatrix();
-				ball.rotateAngleY = -f2 * 0.8F;
+				ball.rotateAngleY = -f2 * 5.0F;
 				ball.rotateAngleX = f2 * 0.6F;
 				int impactTicks = ((EC)entity).getImpactTicks();
 				if (impactTicks == 0) {
@@ -831,7 +847,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				}
 				ball.render(f5);
 				if (impactTicks == 0) {
-					flaps.rotateAngleY = f2 * 0.6F;
+					flaps.rotateAngleY = f2 * 0.8F;
 					float f6 = (float)Math.sin(f2 * 0.2F) * 0.1F;
 					flaps.rotateAngleX = f6;
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

@@ -537,7 +537,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 					}
 					return;
 				}
-				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 20000) {
+				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 800) {
 					ItemSenjutsu.deactivateSageMode(this.jinchurikiPlayer);
 				}
 				double d = 5000d + this.getCloakXp();

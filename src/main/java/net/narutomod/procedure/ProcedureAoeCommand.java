@@ -383,4 +383,15 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 			}
 		return this;
 	}
+
+	public ProcedureAoeCommand consumeChakra(double amount) {
+		if (!entitiesList.isEmpty())
+			for (Entity entity : entitiesList) {
+				if (entity instanceof EntityLivingBase) {
+					net.narutomod.Chakra.Pathway chakra = net.narutomod.Chakra.pathway((EntityLivingBase)entity);
+					chakra.consume(chakra.getAmount() < amount ? chakra.getAmount() : amount);
+				}
+			}
+		return this;
+	}
 }

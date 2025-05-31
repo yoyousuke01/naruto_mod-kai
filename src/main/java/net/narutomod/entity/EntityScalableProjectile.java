@@ -102,7 +102,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 		}
 
 		public boolean isLaunched() {
-			return this.motionFactor > 0.0F;
+			return this.world.isRemote ? ProcedureUtils.getVelocity(this) > 0.001d : this.motionFactor > 0.0F;
 		}
 
 		public void haltMotion() {

@@ -8,7 +8,9 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 
 import net.narutomod.creativetab.TabModTab;
@@ -44,8 +46,9 @@ public class ItemNinjaArmorSuna extends ElementsNarutomodMod.ModElement {
 				}
 				@SideOnly(Side.CLIENT)
 				@Override
-				public void setSlotVisible() {
+				public void setSlotVisible(ItemStack stack, Entity entity, EntityEquipmentSlot slot) {
 					this.model.bipedHeadwear.showModel = false;
+					((ItemNinjaArmor.ModelNinjaArmor)this.model).headwear.showModel = !stack.hasTagCompound() || !stack.getTagCompound().getBoolean("noHeadClothe");
 				}
 			}
 		}.setUnlocalizedName("ninja_armor_sunahelmet").setRegistryName("ninja_armor_sunahelmet").setCreativeTab(TabModTab.tab));

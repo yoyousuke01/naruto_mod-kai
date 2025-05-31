@@ -70,7 +70,8 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 		if (!flag) {
 			entity.extinguish();
 		}
-		if (entity instanceof EntityLivingBase && paralysisTicks > 0) {
+
+		if (entity instanceof EntityLivingBase && paralysisTicks > 0 && retval) {
 			((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionParalysis.potion, 
 			 (int)((float)paralysisTicks * 2f / entity.height), 2 + (int)(damage * 0.1f), false, false));
 		}
@@ -265,6 +266,9 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
+			if (this.world.isRemote) {
+				this.createBranches();
+			}
 			if (this.inaccuracy > 0.0f) {
 				this.setEndVec(this.ogEndVec.addVector((this.rand.nextFloat()-0.5d) * this.inaccuracy * 2,
 				  this.rand.nextFloat() * this.inaccuracy * 2, this.rand.nextFloat() * this.inaccuracy * 2));
@@ -314,6 +318,33 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 			this.branches.get(0).setTotal(0);
 		}
 
+		private void createBranches() {
+			SegmentInfo si = this.branches.get(0);
+			if (!this.isStatic() || si.getTotal() == 0) {
+				this.resetBranches();
+				this.calcSections(Vec3d.ZERO, new Vec3d(0d, 0d, this.getEndVec().subtract(this.getPositionVector()).lengthVector()), 0, si);
+			}
+		}
+
+		private void calcSections(Vec3d fromVec, Vec3d toVec, int recursiveDepth, SegmentInfo segdata) {
+			if (recursiveDepth == this.getMaxRecursiveDepth()) {
+				int i = segdata.getTotal();
+				segdata.setData(i, fromVec, toVec);
+				segdata.setTotal(i + 1);
+			} else {
+				Vec3d vec3d = toVec.subtract(fromVec).scale(0.5d);
+				double offset = vec3d.lengthVector() * 0.15d;
+				vec3d = vec3d.addVector(this.rand.nextGaussian() * offset, this.rand.nextGaussian() * offset, this.rand.nextGaussian() * offset);
+				this.calcSections(fromVec, fromVec.add(vec3d), recursiveDepth + 1, segdata);
+				this.calcSections(fromVec.add(vec3d), toVec, recursiveDepth + 1, segdata);
+				if (this.rand.nextInt(5) == 0) {
+					SegmentInfo si = new SegmentInfo();
+					this.calcSections(fromVec.add(vec3d), fromVec.add(vec3d.scale(1.8d)), recursiveDepth + 1, si);
+					this.branches.add(si);
+				}
+			}
+		}
+
 		static class SegmentInfo {
 			final Vec3d[][] segment = new Vec3d[65][2];
 			int totalSegments;
@@ -356,10 +387,6 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends Render<Base> {
-			private final double segmentOffset = 0.1d;
-			private int maxRecursiveDepth;
-			private final Random rand = new Random();
-
 			public RenderCustom(RenderManager renderManagerIn) {
 				super(renderManagerIn);
 			}
@@ -371,7 +398,6 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public void doRender(Base entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				this.maxRecursiveDepth = entity.getMaxRecursiveDepth();
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y, z);
 				Vec3d vec3d = entity.getEndVec().subtract(entity.posX, entity.posY, entity.posZ);
@@ -380,13 +406,7 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 				double d = (double) entity.getThickness();
 				d = d == 0d ? Math.max(vec3d.lengthVector() * 0.004d, 0.0006d) : d;
 				int color = entity.getColor();
-				boolean isstatic = entity.isStatic();
-				Base.SegmentInfo si = entity.branches.get(0);
-				if (!isstatic || si.getTotal() == 0) {
-					entity.resetBranches();
-					this.calcSections(entity, new Vec3d(0d, 0d, 0d), new Vec3d(0d, 0d, vec3d.lengthVector()), 0, si);
-				}
-				float f = isstatic ? ((float)entity.getLifeSpan() - partialTicks) / 20f : 1.0f;
+				float f = entity.isStatic() ? ((float)entity.getLifeSpan() - partialTicks) / 20f : 1.0f;
 				GlStateManager.disableTexture2D();
 				GlStateManager.enableAlpha();
 				GlStateManager.alphaFunc(0x204, 0.0f);
@@ -397,7 +417,7 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 				Tessellator tessellator = Tessellator.getInstance();
 				BufferBuilder bufferbuilder = tessellator.getBuffer();
 				for (int j = 0; j < entity.branches.size(); j++) {
-					si = entity.branches.get(j);
+					Base.SegmentInfo si = entity.branches.get(j);
 					for (int i = 0; i < si.getTotal(); i++) {
 						this.renderSection(bufferbuilder, si.getFrom(i), si.getTo(i), d * (j == 0 ? 1d : 0.6d), color, f, j > 0);
 						tessellator.draw();
@@ -408,28 +428,8 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 				GlStateManager.enableCull();
 				GlStateManager.disableBlend();
 				GlStateManager.alphaFunc(0x204, 0.1f);
-				//GlStateManager.disableAlpha();
 				GlStateManager.enableTexture2D();
 				GlStateManager.popMatrix();
-			}
-
-			private void calcSections(Base entity, Vec3d fromVec, Vec3d toVec, int recursiveDepth, Base.SegmentInfo segdata) {
-				if (recursiveDepth == this.maxRecursiveDepth) {
-					int i = segdata.getTotal();
-					segdata.setData(i, fromVec, toVec);
-					segdata.setTotal(i + 1);
-				} else {
-					Vec3d vec3d = toVec.subtract(fromVec).scale(0.5d);
-					double offset = vec3d.lengthVector() * this.segmentOffset;
-					vec3d = vec3d.addVector(rand.nextGaussian() * offset, rand.nextGaussian() * offset, rand.nextGaussian() * offset);
-					this.calcSections(entity, fromVec, fromVec.add(vec3d), recursiveDepth + 1, segdata);
-					this.calcSections(entity, fromVec.add(vec3d), toVec, recursiveDepth + 1, segdata);
-					if (this.rand.nextInt(5) == 0) {
-						Base.SegmentInfo si = new Base.SegmentInfo();
-						this.calcSections(entity, fromVec.add(vec3d), fromVec.add(vec3d.scale(1.8d)), recursiveDepth + 1, si);
-						entity.branches.add(si);
-					}
-				}
 			}
 
 			private void renderSection(BufferBuilder buffer, Vec3d fromVec, Vec3d toVec, double thickness, int color, float opacity, boolean isBranch) {
