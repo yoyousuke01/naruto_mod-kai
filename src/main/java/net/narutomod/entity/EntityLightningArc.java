@@ -142,8 +142,12 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 		}
 
 		public Base(World worldIn, Vec3d centerVec, double length, double xMotion, double yMotion, double zMotion, int color, int duration, float thickness, float inaccuracyIn) {
+			this(worldIn, centerVec, length, xMotion, yMotion, zMotion, color, duration, thickness, inaccuracyIn, 4);
+		}
+
+		public Base(World worldIn, Vec3d centerVec, double length, double xMotion, double yMotion, double zMotion, int color, int duration, float thickness, float inaccuracyIn, int sections) {
 			this(worldIn, centerVec, centerVec.addVector((rng.nextDouble()-0.5d) * length * 2d, (rng.nextDouble()-0.5d) * length * 2d, 
-			  (rng.nextDouble()-0.5d) * length * 2d), color, duration, inaccuracyIn, thickness);
+			  (rng.nextDouble()-0.5d) * length * 2d), color, duration, inaccuracyIn, thickness, sections);
 			this.motionX = xMotion;
 			this.motionY = yMotion;
 			this.motionZ = zMotion;

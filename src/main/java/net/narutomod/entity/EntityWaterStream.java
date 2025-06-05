@@ -81,7 +81,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterstream")), 0.4f, this.power / 30f - this.rand.nextFloat() * 0.1f);
 				}
 				this.shoot();
-				this.stream.execute2(this.shootingEntity, (double)this.power, 0.5d);
+				this.stream.execute2(this.shootingEntity, (double)this.power, 0.2d);
 			}
 			if (!this.world.isRemote && (this.ticksAlive > this.maxLife || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
@@ -104,12 +104,13 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void preExecuteParticles(Entity player) {
 				double range = this.getRange(0);
+				double radius = this.getFarRadius(0);
 				Vec3d vec0 = EC.this.getPositionVector();
 				Vec3d vec1 = player.getLookVec();
 				Particles.Renderer particles = new Particles.Renderer(player.world);
 				for (int i = 1, j = (int)(range * 10d); i < j; i++) {
-					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * 0.2d,
-					 this.rand.nextDouble() * 0.2d, (this.rand.nextDouble()-0.5d) * 0.2d);
+					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * radius,
+					 this.rand.nextDouble() * radius, (this.rand.nextDouble()-0.5d) * radius);
 					Vec3d vec3d = vec1.scale(range * (this.rand.nextDouble() * 0.5d + 0.5d) * 0.4d);
 					particles.spawnParticles(Particles.Types.WATER_SPLASH, vec.x, vec.y, vec.z,
 					 1, 0, 0, 0, vec3d.x, vec3d.y, vec3d.z, 35 + this.rand.nextInt(15));

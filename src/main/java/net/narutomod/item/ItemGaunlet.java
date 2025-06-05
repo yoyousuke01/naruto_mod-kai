@@ -552,7 +552,7 @@ public class ItemGaunlet extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(cube_r2, -0.7854F, 0.0F, 0.0F);
 				cube_r2.cubeList.add(new ModelBox(cube_r2, 16, 5, -1.75F, -0.5F, -0.5F, 3, 1, 1, 0.0F, false));
 				finger2 = new ModelRenderer(this);
-				finger2.setRotationPoint(-2.2F, 3.0F, 0.65F);
+				finger2.setRotationPoint(-2.7F, 3.0F, 0.65F);
 				claw.addChild(finger2);
 				setRotationAngle(finger2, 0.1309F, 0.0F, 0.7854F);
 				cube_r3 = new ModelRenderer(this);
@@ -566,7 +566,7 @@ public class ItemGaunlet extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(cube_r4, -0.7854F, 0.0F, 0.0F);
 				cube_r4.cubeList.add(new ModelBox(cube_r4, 16, 5, -1.75F, -0.5F, -0.5F, 3, 1, 1, 0.0F, false));
 				finger3 = new ModelRenderer(this);
-				finger3.setRotationPoint(-2.2F, 3.0F, -0.6F);
+				finger3.setRotationPoint(-2.7F, 3.0F, -0.6F);
 				claw.addChild(finger3);
 				setRotationAngle(finger3, -0.1309F, 0.0F, 0.7854F);
 				cube_r5 = new ModelRenderer(this);

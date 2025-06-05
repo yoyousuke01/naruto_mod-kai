@@ -277,8 +277,9 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 		for (int i = 0; i < player.getRNG().nextInt(11); i++) {
 			Vec3d vec = player.getPositionVector().addVector((player.getRNG().nextDouble()-0.5d) * 120d,
 			 95d + player.getRNG().nextDouble() * 10d, (player.getRNG().nextDouble()-0.5d) * 120d);
+			double length = player.getRNG().nextDouble() * 120d + 10d;
 			EntityLightningArc.Base entity = new EntityLightningArc.Base(player.world, vec,
-			 player.getRNG().nextDouble() * 120d + 10d, 0d, 0d, 0d, 0xc00000ff, 1, 0f, 0f).setStatic();
+			 length, 0d, 0d, 0d, 0xc00000ff, 1, 0f, 0f, (int)MathHelper.sqrt(MathHelper.sqrt(length)) + 3).setStatic();
 			player.world.spawnEntity(entity);
 		}
 	}

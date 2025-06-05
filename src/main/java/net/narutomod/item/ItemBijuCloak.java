@@ -1310,6 +1310,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void render(Entity entity, float f0, float f1, float f2, float f3, float f4, float f5) {
+			float partialTicks = f2 - entity.ticksExisted;
 			bipedHeadwear.showModel = false;
 			bipedBody.showModel = bipedBody.showModel && !bipedRightLeg.showModel && !bipedLeftLeg.showModel;
 			GlStateManager.pushMatrix();
@@ -1319,7 +1320,8 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			GlStateManager.translate(0.0F, f2 * 0.01F, 0.0F);
 			GlStateManager.matrixMode(5888);
 			GlStateManager.enableBlend();
-			GlStateManager.color(1.0F, 1.0F, 1.0F, MathHelper.clamp((float)getWearingTicks(entity) / 80.0F, 0.0F, 1.0F));
+			GlStateManager.alphaFunc(0x204, 0.01f);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, MathHelper.clamp((partialTicks + getWearingTicks(entity)) / 80.0F, 0.0F, 1.0F));
 			GlStateManager.disableLighting();
 			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			int k = entity.getBrightnessForRender();
@@ -1360,6 +1362,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			bipedRightLegWear.render(f5);
 			bipedLeftLegWear.render(f5);
 			GlStateManager.enableLighting();
+			GlStateManager.alphaFunc(0x204, 0.1f);
 			GlStateManager.disableBlend();
 			GlStateManager.depthMask(false);
 			GlStateManager.popMatrix();

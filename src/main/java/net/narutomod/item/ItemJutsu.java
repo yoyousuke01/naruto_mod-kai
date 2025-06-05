@@ -416,6 +416,10 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			return list;
 		}
 
+		public List<JutsuEnum> getAllJutsus(ItemStack stack) {
+			return this.jutsuList;
+		}
+
 		private boolean canUseJutsu(ItemStack stack, int index, @Nullable EntityLivingBase entity) {
 			return (entity != null && this.isOwner(stack, entity) && this.isJutsuEnabled(stack, index)) ||
 			       (entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative());
@@ -793,6 +797,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			SIXPATHSENJUTSU,
 			KEKKEIMORA,
 			SHOTON,
+			SENNINKA,
 			OTHER;
 		}
 	}

@@ -276,7 +276,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 				return false;
 			}*/
 			if (this.village == null
-					|| this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 10d, 96d)).size() >= 2
+					|| this.world.getEntitiesWithinAABB(Base.class, new AxisAlignedBB(this.village.getCenter()).grow(96d, 8d, 96d)).size() >= 2
 					|| this.rand.nextInt(10) != 0) {
 				return false;
 			}

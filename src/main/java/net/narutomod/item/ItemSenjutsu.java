@@ -55,11 +55,14 @@ import net.narutomod.entity.EntityRasenshuriken;
 import net.narutomod.entity.EntityBuddha1000;
 import net.narutomod.entity.EntitySnake8Heads;
 import net.narutomod.entity.EntityGamarinsho;
+import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.gui.overlay.OverlayChakraDisplay;
 import net.narutomod.Chakra;
+import net.narutomod.PlayerTracker;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Maps;
@@ -110,12 +113,17 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 	public static class RangedItem extends ItemJutsu.Base implements ItemOnBody.Interface {
 		private static final String TYPEKEY = "SageType";
+		protected static final UUID REACH_BOOST = UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6");
+		protected static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868");
+		protected static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("33b7fa14-828a-4964-b014-b61863526589");
+		protected static final UUID MOVEMENT_SPEED_MODIFIER = UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414");
+		protected static final UUID MAX_HEALTH_MODIFIER = UUID.fromString("70e0acc2-cf75-4bbd-a21a-753088324a59");
 		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
-			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", 60.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.5d, 1))
-			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(UUID.fromString("70e0acc2-cf75-4bbd-a21a-753088324a59"), "sagemode.health", 80.0d, 0))
+			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(REACH_BOOST, "sagemode.reach", 2.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "sagemode.damage", 60.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "sagemode.damagespeed", 2.0d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(MOVEMENT_SPEED_MODIFIER, "sagemode.movement", 1.5d, 1))
+			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(MAX_HEALTH_MODIFIER, "sagemode.health", 80.0d, 0))
 			.build();
 
 		@SideOnly(Side.CLIENT)
@@ -143,7 +151,17 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityLivingBase) {
+			if (world.isRemote) {
+				if (entity.ticksExisted % 20 == 2 && isSageModeActivated(itemstack)) {
+					for (EntityLivingBase entitylb : world.getEntities(EntityLivingBase.class, (p)-> {
+						return (p instanceof EntityPlayer && PlayerTracker.isNinja((EntityPlayer)p)) || p instanceof EntityNinjaMob.Base;
+					})) {
+						if (!entitylb.equals(entity)) {
+							ProcedureOnLivingUpdate.setGlowingFor(entitylb, 25);
+						}
+					}
+				}
+			} else if (entity instanceof EntityLivingBase) {
 				Type sageType = this.getSageType(itemstack);
 				if (sageType == Type.NONE) {
 					Type forcedType = itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("Type", 8)
