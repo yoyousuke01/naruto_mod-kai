@@ -206,7 +206,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 				GlStateManager.translate(x, y, z);
 				GlStateManager.rotate(ProcedureUtils.interpolateRotation(bullet.prevRotationYaw, bullet.rotationYaw, pt), 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(90.0F - bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * pt, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(age * 90F, 0.0F, 1.0F, 0.0F);
+				//GlStateManager.rotate(age * 90F, 0.0F, 1.0F, 0.0F);
 				Tessellator tessellator = Tessellator.getInstance();
 				BufferBuilder bufferbuilder = tessellator.getBuffer();
 				GlStateManager.enableBlend();

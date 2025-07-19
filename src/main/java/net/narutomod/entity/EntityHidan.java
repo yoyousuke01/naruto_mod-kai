@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.narutomod.item.ItemAkatsukiRobe;
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemScytheHidan;
 import net.narutomod.item.ItemScytheHidanThrown;
 import net.narutomod.item.ItemSpearRetractable;
@@ -233,7 +234,9 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 				}
 			} else {
 				if (this.curseTarget != null && EntityAITarget.isSuitableTarget(this, this.curseTarget, false, false)) {
-					if (this.jashinSymbol != null && !this.jashinSymbol.isDead) {
+					if (!ItemJutsu.canTarget(this.curseTarget)) {
+						this.curseTarget = null;
+					} else if (this.jashinSymbol != null && !this.jashinSymbol.isDead) {
 						AxisAlignedBB bb1 = this.getEntityBoundingBox();
 						AxisAlignedBB bb2 = this.jashinSymbol.getEntityBoundingBox().expand(0d, 1d, 0d);
 						if (this.jashinTransitionDirection >= 0 && !ProcedureUtils.BB.touches(bb1, bb2)) {

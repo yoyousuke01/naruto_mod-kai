@@ -72,6 +72,7 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 	private static final String PLAYERTRANSPARENT = "PlayerRenderTransparent";
 	private static final String COLORMULTIPLIER = "SkinColorMultiplier";
 	private static final String HIDEHEADWEAR = "HideBipedHeadwear";
+	@SideOnly(Side.CLIENT)	
 	private RenderPlayer playerRenderer;
 	/**
 	 * Do not remove this constructor
@@ -105,6 +106,11 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 		} catch (Exception e) {
 			throw new RuntimeException("RenderManager hook");
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static RenderPlayer getPlayerRenderer() {
+		return INSTANCE.playerRenderer;
 	}
 
 	public static void setSkinCloneTarget(EntityPlayer entity, @Nullable EntityPlayer target) {

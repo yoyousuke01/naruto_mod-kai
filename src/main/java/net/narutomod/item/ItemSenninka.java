@@ -6,49 +6,47 @@ import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.gui.overlay.OverlayChakraDisplay;
+import net.narutomod.Particles;
+import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
+//import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+//import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.ActionResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
-import net.minecraft.item.EnumAction;
-import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.entity.RenderSnowball;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.Minecraft;
-import java.util.Map;
-import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import com.google.common.collect.ImmutableMap;
-import java.util.UUID;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.UUID;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.init.MobEffects;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSenninka extends ElementsNarutomodMod.ModElement {
@@ -56,6 +54,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 524;
 	private static final String CHAKRA_BEFORE = "ChakraAmountB4Activation";
+	private static final String START_TIME = "SenninkaStartTime";
 	public static final ItemJutsu.JutsuEnum BROADAXE = new ItemJutsu.JutsuEnum(0, "item.senninka_broadaxe.name", 'S', 150, 50d, new Broadaxe());
 	public static final ItemJutsu.JutsuEnum PISTONFIST = new ItemJutsu.JutsuEnum(1, "item.senninka.pistonfist", 'S', 150, 50d, new PistonFist());
 	public static final ItemJutsu.JutsuEnum STAGE2 = new ItemJutsu.JutsuEnum(2, "item.senninka.stage2", 'S', 150, 50d, new Stage2());
@@ -67,8 +66,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.items.add(() -> new RangedItem(BROADAXE, PISTONFIST, STAGE2));
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityArrowCustom.class)
-				.id(new ResourceLocation("narutomod", "entitybulletsenninka"), ENTITYID).name("entitybulletsenninka").tracker(64, 1, true).build());
+		//elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityArrowCustom.class)
+		//		.id(new ResourceLocation("narutomod", "entitybulletsenninka"), ENTITYID).name("entitybulletsenninka").tracker(64, 1, true).build());
 	}
 
 	@Override
@@ -91,8 +90,12 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			for (ItemJutsu.JutsuEnum jutsuEnum : ((RangedItem)itemstack.getItem()).getAllJutsus(itemstack)) {
-				((SenninkaJutsu)jutsuEnum.jutsu).onUpdate(itemstack, world, entity, par4, par5);
+			if (entity instanceof EntityLivingBase) {
+				for (ItemJutsu.JutsuEnum jutsuEnum : ((RangedItem)itemstack.getItem()).getAllJutsus(itemstack)) {
+					if (((RangedItem)itemstack.getItem()).canUseJutsu(itemstack, jutsuEnum, (EntityLivingBase)entity)) {
+						((SenninkaJutsu)jutsuEnum.jutsu).onUpdate(itemstack, world, entity, par4, par5);
+					}
+				}
 			}
 		}
 
@@ -139,7 +142,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (entity instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)entity, ItemSenninkaBroadaxe.block)) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), SoundCategory.PLAYERS, 1f, 1f);
+				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				//Chakra.Pathway cp = Chakra.pathway(entity);
 				//stack.getTagCompound().setDouble(CHAKRA_BEFORE, cp.getAmount());
 				//float f = ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity);
@@ -178,7 +181,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	public static class PistonFist extends SenninkaJutsu {
 		private final String idKey = "PistonFistStackKey";
 		private final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.RangedItem.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 60.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.RangedItem.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 50.0d, 0))
 			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(ItemSenjutsu.RangedItem.MOVEMENT_SPEED_MODIFIER, "senninka.movement", 1.5d, 1))
 			.build();
 
@@ -186,9 +189,10 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (!this.isActivated(stack)) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), SoundCategory.PLAYERS, 1f, 1f);
+				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				STAGE2.jutsu.deactivate(entity);
 				stack.getTagCompound().setBoolean(this.idKey, true);
+				ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.ticksExisted + 3);
 				for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
 					if (attr != null) {
@@ -205,7 +209,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		@Override
 		@SideOnly(Side.CLIENT)
 		public boolean setModelVisibility(EntityLivingBase living, ItemStack stack, Renderer.ModelJugo model) {
-			if (stack.getTagCompound().getBoolean(this.idKey)) {
+			if (this.isActivated(stack)) {
 				model.setVisible(false);
 				model.bipedHead.showModel = true;
 				model.headStage1.showModel = true;
@@ -239,6 +243,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			if (stack != null) {
 				stack.getTagCompound().removeTag(this.idKey);
 			}
+			ProcedureSync.EntityNBTTag.removeAndSync(entity, START_TIME);
 		}
 	}
 
@@ -255,9 +260,10 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (!this.isActivated(stack)) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), SoundCategory.PLAYERS, 1f, 1f);
+				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				PISTONFIST.jutsu.deactivate(entity);
 				stack.getTagCompound().setBoolean(this.idKey, true);
+				ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.ticksExisted + 3);
 				for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
 					if (attr != null && !attr.hasModifier(entry.getValue())) {
@@ -272,9 +278,44 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			if (this.isActivated(itemstack) && entity instanceof EntityLivingBase && !world.isRemote) {
+				if (entity.ticksExisted % 20 == 3) {
+					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 8, false, false));
+				}
+				if (entity.ticksExisted > entity.getEntityData().getInteger(START_TIME) + 40) {
+					Vec3d vec = new Vec3d(-0.365625d, 0.884375d, -0.440625d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+					 .add(entity.getPositionVector());
+					Vec3d vec1 = new Vec3d(-0.25d, -0.0625d, -0.25d).scale(1.4d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F);
+					Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
+					 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
+					vec = new Vec3d(-0.365625d, 0.61875d, -0.409375d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+					 .add(entity.getPositionVector());
+					Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
+					 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
+					vec = new Vec3d(0.365625d, 0.884375d, -0.440625d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+					 .add(entity.getPositionVector());
+					vec1 = new Vec3d(0.25d, -0.0625d, -0.25d).scale(1.4d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F);
+					Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
+					 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
+					vec = new Vec3d(0.365625d, 0.61875d, -0.409375d)
+					 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+					 .add(entity.getPositionVector());
+					Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
+					 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
+				}
+			}
+		}
+
+		@Override
 		@SideOnly(Side.CLIENT)
 		public boolean setModelVisibility(EntityLivingBase living, ItemStack stack, Renderer.ModelJugo model) {
-			if (stack.getTagCompound().getBoolean(this.idKey)) {
+			if (this.isActivated(stack)) {
 				model.setVisible(false);
 				model.bipedHead.showModel = true;
 				model.bipedHeadwear.showModel = true;
@@ -311,10 +352,11 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			if (stack != null) {
 				stack.getTagCompound().removeTag(this.idKey);
 			}
+			ProcedureSync.EntityNBTTag.removeAndSync(entity, START_TIME);
 		}
 	}
 
-	public static class EntityArrowCustom extends EntityTippedArrow {
+	/*public static class EntityArrowCustom extends EntityTippedArrow {
 		public EntityArrowCustom(World a) {
 			super(a);
 		}
@@ -350,15 +392,9 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
-	}
+	}*/
 
 	public static class Renderer extends EntityRendererRegister {
-		private static Renderer instance;
-
-		public Renderer() {
-			instance = this;
-		}
-
 		@SideOnly(Side.CLIENT)
 		public static class ModelJugo extends ModelBiped {
 			//private final ModelRenderer bipedHead;
@@ -1174,7 +1210,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone25.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone72.addChild(bone25);
 				setRotationAngle(bone25, 0.0F, 0.7854F, 0.0F);
-				bone25.cubeList.add(new ModelBox(bone25, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone25.cubeList.add(new ModelBox(bone25, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone125 = new ModelRenderer(this);
 				bone125.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1186,7 +1222,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone126.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone125.addChild(bone126);
 				setRotationAngle(bone126, 0.0F, -0.7854F, 0.0F);
-				bone126.cubeList.add(new ModelBox(bone126, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone126.cubeList.add(new ModelBox(bone126, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone127 = new ModelRenderer(this);
 				bone127.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1198,19 +1234,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone128.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone127.addChild(bone128);
 				setRotationAngle(bone128, 0.0F, 2.3562F, 0.0F);
-				bone128.cubeList.add(new ModelBox(bone128, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone128.cubeList.add(new ModelBox(bone128, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone124 = new ModelRenderer(this);
 				bone124.setRotationPoint(-1.5F, 1.0F, -1.5F);
 				bone129.addChild(bone124);
 				setRotationAngle(bone124, 0.2618F, 0.0F, -0.2618F);
-				bone124.cubeList.add(new ModelBox(bone124, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone124.cubeList.add(new ModelBox(bone124, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone86 = new ModelRenderer(this);
 				bone86.setRotationPoint(-1.5F, 1.0F, 1.5F);
 				bone129.addChild(bone86);
 				setRotationAngle(bone86, -1.5708F, 1.309F, -1.8326F);
-				bone86.cubeList.add(new ModelBox(bone86, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone86.cubeList.add(new ModelBox(bone86, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone131 = new ModelRenderer(this);
 				bone131.setRotationPoint(0.0F, 2.5F, 0.0F);
@@ -1228,7 +1264,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone133.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone132.addChild(bone133);
 				setRotationAngle(bone133, 0.0F, 0.7854F, 0.0F);
-				bone133.cubeList.add(new ModelBox(bone133, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone133.cubeList.add(new ModelBox(bone133, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone134 = new ModelRenderer(this);
 				bone134.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1240,7 +1276,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone135.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone134.addChild(bone135);
 				setRotationAngle(bone135, 0.0F, -0.7854F, 0.0F);
-				bone135.cubeList.add(new ModelBox(bone135, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone135.cubeList.add(new ModelBox(bone135, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone136 = new ModelRenderer(this);
 				bone136.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1252,19 +1288,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone137.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone136.addChild(bone137);
 				setRotationAngle(bone137, 0.0F, 2.3562F, 0.0F);
-				bone137.cubeList.add(new ModelBox(bone137, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone137.cubeList.add(new ModelBox(bone137, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone138 = new ModelRenderer(this);
 				bone138.setRotationPoint(-1.5F, 1.0F, -1.5F);
 				bone131.addChild(bone138);
 				setRotationAngle(bone138, 0.2618F, 0.0F, -0.2618F);
-				bone138.cubeList.add(new ModelBox(bone138, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone138.cubeList.add(new ModelBox(bone138, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone139 = new ModelRenderer(this);
 				bone139.setRotationPoint(-1.5F, 1.0F, 1.5F);
 				bone131.addChild(bone139);
 				setRotationAngle(bone139, -1.5708F, 1.309F, -1.8326F);
-				bone139.cubeList.add(new ModelBox(bone139, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone139.cubeList.add(new ModelBox(bone139, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone140 = new ModelRenderer(this);
 				bone140.setRotationPoint(0.0F, 0.5F, 0.0F);
@@ -1282,7 +1318,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone142.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone141.addChild(bone142);
 				setRotationAngle(bone142, 0.0F, 0.7854F, 0.0F);
-				bone142.cubeList.add(new ModelBox(bone142, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone142.cubeList.add(new ModelBox(bone142, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone143 = new ModelRenderer(this);
 				bone143.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1294,7 +1330,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone144.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone143.addChild(bone144);
 				setRotationAngle(bone144, 0.0F, -0.7854F, 0.0F);
-				bone144.cubeList.add(new ModelBox(bone144, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone144.cubeList.add(new ModelBox(bone144, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone145 = new ModelRenderer(this);
 				bone145.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1306,19 +1342,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone146.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone145.addChild(bone146);
 				setRotationAngle(bone146, 0.0F, 2.3562F, 0.0F);
-				bone146.cubeList.add(new ModelBox(bone146, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone146.cubeList.add(new ModelBox(bone146, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone147 = new ModelRenderer(this);
 				bone147.setRotationPoint(-1.5F, 1.0F, -1.5F);
 				bone140.addChild(bone147);
 				setRotationAngle(bone147, 0.2618F, 0.0F, -0.2618F);
-				bone147.cubeList.add(new ModelBox(bone147, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone147.cubeList.add(new ModelBox(bone147, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone148 = new ModelRenderer(this);
 				bone148.setRotationPoint(-1.5F, 1.0F, 1.5F);
 				bone140.addChild(bone148);
 				setRotationAngle(bone148, -1.5708F, 1.309F, -1.8326F);
-				bone148.cubeList.add(new ModelBox(bone148, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone148.cubeList.add(new ModelBox(bone148, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone150 = new ModelRenderer(this);
 				bone150.setRotationPoint(0.0F, -1.5F, 0.0F);
@@ -1336,7 +1372,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone152.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone151.addChild(bone152);
 				setRotationAngle(bone152, 0.0F, 0.7854F, 0.0F);
-				bone152.cubeList.add(new ModelBox(bone152, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone152.cubeList.add(new ModelBox(bone152, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone153 = new ModelRenderer(this);
 				bone153.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1348,25 +1384,25 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone154.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone153.addChild(bone154);
 				setRotationAngle(bone154, 0.0F, -0.7854F, 0.0F);
-				bone154.cubeList.add(new ModelBox(bone154, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone154.cubeList.add(new ModelBox(bone154, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone157 = new ModelRenderer(this);
 				bone157.setRotationPoint(-1.5F, 1.0F, -1.5F);
 				bone150.addChild(bone157);
 				setRotationAngle(bone157, 0.2618F, 0.0F, -0.2618F);
-				bone157.cubeList.add(new ModelBox(bone157, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone157.cubeList.add(new ModelBox(bone157, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				bone158 = new ModelRenderer(this);
 				bone158.setRotationPoint(-1.5F, 1.0F, 1.5F);
 				bone150.addChild(bone158);
 				setRotationAngle(bone158, -1.5708F, 1.309F, -1.8326F);
-				bone158.cubeList.add(new ModelBox(bone158, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, false));
+				bone158.cubeList.add(new ModelBox(bone158, 40, 32, 0.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, false));
 		
 				broadaxe = new ModelRenderer(this);
-				broadaxe.setRotationPoint(-4.0F, 10.0F, 0.0F);
+				broadaxe.setRotationPoint(-5.0F, 10.0F, 2.0F);
 				bipedRightArm.addChild(broadaxe);
 				setRotationAngle(broadaxe, 0.0F, 0.0F, -0.6981F);
-				broadaxe.cubeList.add(new ModelBox(broadaxe, 16, 49, -3.0F, -6.0F, 0.0F, 6, 12, 0, 0.0F, false));
+				broadaxe.cubeList.add(new ModelBox(broadaxe, 18, 50, -3.0F, -6.0F, 0.0F, 6, 12, 0, 2.0F, false));
 		
 				armExhaust = new ModelRenderer(this);
 				armExhaust.setRotationPoint(-3.5F, 2.5F, 0.0F);
@@ -1378,31 +1414,31 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone106.setRotationPoint(0.5F, -0.5F, 0.0F);
 				armExhaust.addChild(bone106);
 				setRotationAngle(bone106, -0.0315F, -0.8124F, -0.501F);
-				bone106.cubeList.add(new ModelBox(bone106, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.0F, false));
+				bone106.cubeList.add(new ModelBox(bone106, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
 				bone109 = new ModelRenderer(this);
 				bone109.setRotationPoint(1.0F, -2.5F, -1.0F);
 				armExhaust.addChild(bone109);
 				setRotationAngle(bone109, 0.3182F, -0.7925F, -0.6233F);
-				bone109.cubeList.add(new ModelBox(bone109, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.0F, false));
+				bone109.cubeList.add(new ModelBox(bone109, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
 				bone110 = new ModelRenderer(this);
 				bone110.setRotationPoint(1.0F, -2.5F, 1.0F);
 				armExhaust.addChild(bone110);
 				setRotationAngle(bone110, -0.3864F, -0.9815F, -0.0904F);
-				bone110.cubeList.add(new ModelBox(bone110, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.0F, false));
+				bone110.cubeList.add(new ModelBox(bone110, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
 				bone107 = new ModelRenderer(this);
 				bone107.setRotationPoint(1.0F, -0.5F, -1.0F);
 				armExhaust.addChild(bone107);
 				setRotationAngle(bone107, 0.6902F, -0.7106F, -1.0887F);
-				bone107.cubeList.add(new ModelBox(bone107, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.0F, false));
+				bone107.cubeList.add(new ModelBox(bone107, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
 				bone108 = new ModelRenderer(this);
 				bone108.setRotationPoint(1.0F, -0.5F, 1.0F);
 				armExhaust.addChild(bone108);
 				setRotationAngle(bone108, -0.7646F, -0.8326F, 0.018F);
-				bone108.cubeList.add(new ModelBox(bone108, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.0F, false));
+				bone108.cubeList.add(new ModelBox(bone108, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
 				bipedLeftArm = new ModelRenderer(this);
 				bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
@@ -1430,7 +1466,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone21.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone20.addChild(bone21);
 				setRotationAngle(bone21, 0.0F, -0.7854F, 0.0F);
-				bone21.cubeList.add(new ModelBox(bone21, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone21.cubeList.add(new ModelBox(bone21, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone22 = new ModelRenderer(this);
 				bone22.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1442,7 +1478,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone23.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone22.addChild(bone23);
 				setRotationAngle(bone23, 0.0F, 0.7854F, 0.0F);
-				bone23.cubeList.add(new ModelBox(bone23, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone23.cubeList.add(new ModelBox(bone23, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone24 = new ModelRenderer(this);
 				bone24.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1454,19 +1490,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone26.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone24.addChild(bone26);
 				setRotationAngle(bone26, 0.0F, -2.3562F, 0.0F);
-				bone26.cubeList.add(new ModelBox(bone26, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone26.cubeList.add(new ModelBox(bone26, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone27 = new ModelRenderer(this);
 				bone27.setRotationPoint(1.5F, 1.0F, -1.5F);
 				bone19.addChild(bone27);
 				setRotationAngle(bone27, 0.2618F, 0.0F, 0.2618F);
-				bone27.cubeList.add(new ModelBox(bone27, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone27.cubeList.add(new ModelBox(bone27, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone28 = new ModelRenderer(this);
 				bone28.setRotationPoint(1.5F, 1.0F, 1.5F);
 				bone19.addChild(bone28);
 				setRotationAngle(bone28, -1.5708F, -1.309F, 1.8326F);
-				bone28.cubeList.add(new ModelBox(bone28, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone28.cubeList.add(new ModelBox(bone28, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone29 = new ModelRenderer(this);
 				bone29.setRotationPoint(0.0F, 2.5F, 0.0F);
@@ -1484,7 +1520,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone34.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone32.addChild(bone34);
 				setRotationAngle(bone34, 0.0F, -0.7854F, 0.0F);
-				bone34.cubeList.add(new ModelBox(bone34, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone34.cubeList.add(new ModelBox(bone34, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone35 = new ModelRenderer(this);
 				bone35.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1496,7 +1532,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone36.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone35.addChild(bone36);
 				setRotationAngle(bone36, 0.0F, 0.7854F, 0.0F);
-				bone36.cubeList.add(new ModelBox(bone36, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone36.cubeList.add(new ModelBox(bone36, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone37 = new ModelRenderer(this);
 				bone37.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1508,19 +1544,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone38.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone37.addChild(bone38);
 				setRotationAngle(bone38, 0.0F, -2.3562F, 0.0F);
-				bone38.cubeList.add(new ModelBox(bone38, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone38.cubeList.add(new ModelBox(bone38, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone39 = new ModelRenderer(this);
 				bone39.setRotationPoint(1.5F, 1.0F, -1.5F);
 				bone29.addChild(bone39);
 				setRotationAngle(bone39, 0.2618F, 0.0F, 0.2618F);
-				bone39.cubeList.add(new ModelBox(bone39, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone39.cubeList.add(new ModelBox(bone39, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone40 = new ModelRenderer(this);
 				bone40.setRotationPoint(1.5F, 1.0F, 1.5F);
 				bone29.addChild(bone40);
 				setRotationAngle(bone40, -1.5708F, -1.309F, 1.8326F);
-				bone40.cubeList.add(new ModelBox(bone40, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone40.cubeList.add(new ModelBox(bone40, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone41 = new ModelRenderer(this);
 				bone41.setRotationPoint(0.0F, 0.5F, 0.0F);
@@ -1538,7 +1574,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone43.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone42.addChild(bone43);
 				setRotationAngle(bone43, 0.0F, -0.7854F, 0.0F);
-				bone43.cubeList.add(new ModelBox(bone43, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone43.cubeList.add(new ModelBox(bone43, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone44 = new ModelRenderer(this);
 				bone44.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1550,7 +1586,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone45.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone44.addChild(bone45);
 				setRotationAngle(bone45, 0.0F, 0.7854F, 0.0F);
-				bone45.cubeList.add(new ModelBox(bone45, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone45.cubeList.add(new ModelBox(bone45, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone46 = new ModelRenderer(this);
 				bone46.setRotationPoint(0.0F, 1.0F, 2.0F);
@@ -1562,19 +1598,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone48.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone46.addChild(bone48);
 				setRotationAngle(bone48, 0.0F, -2.3562F, 0.0F);
-				bone48.cubeList.add(new ModelBox(bone48, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone48.cubeList.add(new ModelBox(bone48, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone49 = new ModelRenderer(this);
 				bone49.setRotationPoint(1.5F, 1.0F, -1.5F);
 				bone41.addChild(bone49);
 				setRotationAngle(bone49, 0.2618F, 0.0F, 0.2618F);
-				bone49.cubeList.add(new ModelBox(bone49, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone49.cubeList.add(new ModelBox(bone49, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone50 = new ModelRenderer(this);
 				bone50.setRotationPoint(1.5F, 1.0F, 1.5F);
 				bone41.addChild(bone50);
 				setRotationAngle(bone50, -1.5708F, -1.309F, 1.8326F);
-				bone50.cubeList.add(new ModelBox(bone50, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone50.cubeList.add(new ModelBox(bone50, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone51 = new ModelRenderer(this);
 				bone51.setRotationPoint(0.0F, -1.5F, 0.0F);
@@ -1592,7 +1628,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone53.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone52.addChild(bone53);
 				setRotationAngle(bone53, 0.0F, -0.7854F, 0.0F);
-				bone53.cubeList.add(new ModelBox(bone53, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone53.cubeList.add(new ModelBox(bone53, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone54 = new ModelRenderer(this);
 				bone54.setRotationPoint(0.0F, 1.0F, -2.0F);
@@ -1604,19 +1640,19 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				bone55.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bone54.addChild(bone55);
 				setRotationAngle(bone55, 0.0F, 0.7854F, 0.0F);
-				bone55.cubeList.add(new ModelBox(bone55, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone55.cubeList.add(new ModelBox(bone55, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone56 = new ModelRenderer(this);
 				bone56.setRotationPoint(1.5F, 1.0F, -1.5F);
 				bone51.addChild(bone56);
 				setRotationAngle(bone56, 0.2618F, 0.0F, 0.2618F);
-				bone56.cubeList.add(new ModelBox(bone56, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone56.cubeList.add(new ModelBox(bone56, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bone57 = new ModelRenderer(this);
 				bone57.setRotationPoint(1.5F, 1.0F, 1.5F);
 				bone51.addChild(bone57);
 				setRotationAngle(bone57, -1.5708F, -1.309F, 1.8326F);
-				bone57.cubeList.add(new ModelBox(bone57, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.0F, true));
+				bone57.cubeList.add(new ModelBox(bone57, 40, 32, -4.0F, -6.0F, 0.0F, 4, 6, 4, 0.2F, true));
 		
 				bipedRightLeg = new ModelRenderer(this);
 				bipedRightLeg.setRotationPoint(-1.9F, 12.0F, 0.0F);
@@ -1678,6 +1714,17 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 					copyModelAngles(this.wearerModel.bipedRightArm, this.bipedRightArm);
 					copyModelAngles(this.wearerModel.bipedLeftLeg, this.bipedLeftLeg);
 					copyModelAngles(this.wearerModel.bipedRightLeg, this.bipedRightLeg);
+				}
+				float f6 = f2 - entity.getEntityData().getInteger(START_TIME);
+				if (f6 <= 40F) {
+					float gb = f6 >= 20F ? MathHelper.clamp((f6 - 20F) / 20F, 0.0F, 1.0F) : 0.0F;
+					float a = MathHelper.clamp(f6 / 20F, 0F, 1.0F);
+//System.out.println(">>>>>> f6="+f6+", gb="+gb+", a="+a);
+					GlStateManager.enableBlend();
+					GlStateManager.alphaFunc(0x204, 0.001f);
+					GlStateManager.color(1.0F, gb, gb, a);
+					GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				}
 			}
 		}

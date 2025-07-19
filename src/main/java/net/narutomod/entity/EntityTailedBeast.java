@@ -1019,7 +1019,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				new EventSphericalExplosion(this.world, this.shootingEntity, (int) this.posX, (int) this.posY,
 				 (int) this.posZ, (int)radius, 0, 0.33f);
 				ProcedureAoeCommand.set(this, 0d, radius * 1.2).exclude(excludePlayer)
-				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage);
+				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage);
 				this.setDead();
 			}
 		}

@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 524,
     "GUI": 73,
-    "DIMENSION": 13
+    "DIMENSION": 13,
+    "ENTITY": 524
   },
   "mod_elements": [
     {
@@ -8080,7 +8080,7 @@
       "type": "tool",
       "sortid": 941,
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "ids": {},
       "registry_name": "senninka_broadaxe"
     }
