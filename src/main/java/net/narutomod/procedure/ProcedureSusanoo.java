@@ -61,7 +61,7 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 		ItemStack helmet = player.inventory.armorInventory.get(3);
 		if (!player.getEntityData().getBoolean("susanoo_activated")) {
 			if (!ItemSharingan.isBlinded(helmet) && PlayerTracker.getBattleXp(player) >= EntitySusanooBase.BXP_REQUIRED_L0
-			 && Chakra.pathway(player).consume(BASE_CHAKRA_USAGE)) {
+			 && !player.isRiding() && Chakra.pathway(player).consume(BASE_CHAKRA_USAGE)) {
 				player.getEntityData().setBoolean("susanoo_activated", true);
 				player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + 2400.0D);
 				EntitySusanooBase entityCustom = new EntitySusanooSkeleton.EntityCustom(player);

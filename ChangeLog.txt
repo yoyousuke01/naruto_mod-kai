@@ -35,6 +35,8 @@ Jutsus
  - fixed earth wall jutsu skipping sections of the wall in water and grass
  - added magnet release third eye jutsu: spy on mobs/players from very far away
  - rasenshuriken only sage mode or 6-path variant can be thrown; will hurt user if not thrown; now takes target's chakra
+ - sage mode now highlights all entities with chakra in the vicinity
+ - adding Sage Transformation kekkei genkai (WIP)
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)

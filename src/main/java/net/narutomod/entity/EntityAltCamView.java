@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityAltCamView extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 60;
-	private static final int CAMERA_RADIUS = 4;
+	public static final int CAMERA_RADIUS = 4;
 
 	public EntityAltCamView(ElementsNarutomodMod instance) {
 		super(instance, 268);

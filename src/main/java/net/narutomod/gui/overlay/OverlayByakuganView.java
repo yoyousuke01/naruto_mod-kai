@@ -28,6 +28,7 @@ import net.minecraft.item.Item;
 
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.entity.EntityAltCamView;
+import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.PlayerTracker;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
@@ -120,32 +121,17 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 					GuiIngame.drawRect(sWidth / 2 - 5, sHeight / 2, sWidth / 2 + 5, sHeight / 2 + 1, -1);
 					GuiIngame.drawRect(sWidth / 2, sHeight / 2 - 5, sWidth / 2 + 1, sHeight / 2 + 5, -1);
 					this.setFOV(player, event.getPartialTicks());
-					for (EntityLivingBase entitylb : mc.world.getEntitiesWithinAABB(EntityLivingBase.class, 
-					 player.getEntityBoundingBox().grow(mc.gameSettings.renderDistanceChunks * 8))) {
-						if (!entitylb.isGlowing() && !entitylb.equals(player)) {
-							entitylb.setGlowing(true);
-							this.glowList.add(entitylb);
-						}
-					}
 				} else {
 					this.resetFOV(player);
-					if (!this.glowList.isEmpty()) {
-						for (EntityLivingBase entitylb : this.glowList) {
-							if (!entitylb.isInvisible()) {
-								entitylb.setGlowing(false);
-							}
-						}
-						this.glowList.clear();
-					}
 				}
 			}
 		}
 
 		@SideOnly(Side.CLIENT)
 		private void setFOV(EntityPlayer player, float partialTicks) {
+			Minecraft mc = Minecraft.getMinecraft();
 			double xp = PlayerTracker.getNinjaLevel(player) * 0.33333d;
 			if (this.first_on) {
-				Minecraft mc = Minecraft.getMinecraft();
 				this.prevRenderDistance = mc.gameSettings.renderDistanceChunks;
 				mc.gameSettings.renderDistanceChunks = 6;
 				this.camEntity = new EntityAltCamView.EntityCustom(player);
@@ -158,6 +144,15 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 				 .add(player.getLook(partialTicks).scale((110.0F - renderDistanceChunks) * Math.min((float)xp, 70f) / 10.0F + 1.0F));
 				if (this.camEntity.posX != vec3d1.x || this.camEntity.posY != vec3d1.y || this.camEntity.posZ != vec3d1.z) {
 					this.camEntity.setLocationAndAngles(vec3d1.x, vec3d1.y, vec3d1.z, player.rotationYaw, player.rotationPitch);
+				}
+				for (EntityLivingBase entitylb : mc.world.getEntitiesWithinAABB(EntityLivingBase.class, 
+				 this.camEntity.getEntityBoundingBox().grow(EntityAltCamView.CAMERA_RADIUS * 16), (p)-> {
+					return p instanceof EntityPlayer || p instanceof EntityNinjaMob.Base;
+				})) {
+					if (!entitylb.isGlowing() && !entitylb.equals(player)) {
+						entitylb.setGlowing(true);
+						this.glowList.add(entitylb);
+					}
 				}
 			}
 		}
@@ -173,6 +168,14 @@ public class OverlayByakuganView extends ElementsNarutomodMod.ModElement {
 				}
 				mc.gameSettings.renderDistanceChunks = this.prevRenderDistance;
 				this.first_on = true;
+			}
+			if (!this.glowList.isEmpty()) {
+				for (EntityLivingBase entitylb : this.glowList) {
+					if (!entitylb.isInvisible()) {
+						entitylb.setGlowing(false);
+					}
+				}
+				this.glowList.clear();
 			}
 		}
 

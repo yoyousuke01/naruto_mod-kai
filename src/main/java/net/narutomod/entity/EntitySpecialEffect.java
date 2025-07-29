@@ -204,6 +204,8 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 			this.setAge(compound.getInteger("age"));
 			this.setRadius(compound.getFloat("radius"));
 			this.setLifespan(compound.getInteger("lifespan"));
+			this.setColor(compound.getInteger("color"));
+			this.setRotate(compound.getFloat("rotate"));
 		}
 
 		@Override
@@ -212,6 +214,8 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 			compound.setInteger("age", this.getAge());
 			compound.setFloat("radius", this.getRadius());
 			compound.setInteger("lifespan", this.getLifespan());
+			compound.setInteger("color", this.getColor());
+			compound.setFloat("rotate", this.getRotate());
 		}
 	}
 

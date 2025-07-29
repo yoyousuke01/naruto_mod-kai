@@ -210,7 +210,7 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	@Nullable
 	public static ItemStack getMatchingItemStack(EntityLivingBase entity, Item item) {
-		if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+		if (entity instanceof EntityPlayer) {
 			return getMatchingItemStack((EntityPlayer)entity, item);
 		}
 		if (entity instanceof EntityNinjaMob.Base) {

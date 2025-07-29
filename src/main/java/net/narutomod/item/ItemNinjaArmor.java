@@ -156,7 +156,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 				headwear.addChild(cube_r1);
 				setRotationAngle(cube_r1, 0.0F, 0.0F, -0.7854F);
 				cube_r1.cubeList.add(new ModelBox(cube_r1, 28, 0, -2.0F, -1.975F, -0.975F, 3, 3, 2, 0.3F, false));
-			} else if (type == Type.SUNA || type == Type.IWA || type == Type.KUMO || type == Type.KONOHA) {
+			} else if (type == Type.SUNA || type == Type.IWA || type == Type.KUMO || type == Type.KONOHA || type == Type.TAKI) {
 				bipedHead.addChild(headwear);
 				headwear.cubeList.add(new ModelBox(headwear, 0, 48, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.26F, false));
 			} else if (type == Type.SOUND5) {
@@ -560,6 +560,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 		NARUTO_S,
 		SOUND5,
 		JIRAIYA,
+		TAKI,
 		OTHER
 	}
 }

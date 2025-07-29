@@ -780,7 +780,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	    }
 	
 	    protected void checkAndPerformAttack(EntityLivingBase target, double distanceToTarget) {
-	        if (distanceToTarget <= this.getAttackReachSqr(target) && this.attackTick <= 0) {
+	        if (this.attacker.getEntitySenses().canSee(target) && distanceToTarget <= this.getAttackReachSqr(target) && this.attackTick <= 0) {
 	            this.attackTick = 20;
 	            this.attacker.swingArm(EnumHand.MAIN_HAND);
 	            this.attacker.attackEntityAsMob(target);

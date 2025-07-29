@@ -29,6 +29,8 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.potion.PotionEffect;
@@ -38,10 +40,7 @@ import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemYooton;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
-
 import javax.annotation.Nullable;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.model.ModelBox;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {

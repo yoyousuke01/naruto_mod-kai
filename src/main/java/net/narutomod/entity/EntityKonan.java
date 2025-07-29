@@ -545,6 +545,16 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 				bipedHead = new ModelRenderer(this);
 				bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHead.cubeList.add(new ModelBox(bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.01F, false));
+				ModelRenderer bone = new ModelRenderer(this);
+				bone.setRotationPoint(-3.35F, -6.6F, -2.0F);
+				bipedHead.addChild(bone);
+				setRotationAngle(bone, 0.0F, 0.0F, -0.7854F);
+				bone.cubeList.add(new ModelBox(bone, -8, 0, -1.0F, 0.0F, -2.0F, 3, 0, 8, 0.0F, false));
+				ModelRenderer bone2 = new ModelRenderer(this);
+				bone2.setRotationPoint(3.35F, -6.6F, -2.0F);
+				bipedHead.addChild(bone2);
+				setRotationAngle(bone2, 0.0F, 0.0F, 0.7854F);
+				bone2.cubeList.add(new ModelBox(bone2, -8, 0, -2.0F, 0.0F, -2.0F, 3, 0, 8, 0.0F, true));
 				bipedHeadwear = new ModelRenderer(this);
 				bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHeadwear.cubeList.add(new ModelBox(bipedHeadwear, 32, 0, -4.0F, 0.0F, -4.0F, 8, 2, 8, 0.01F, false));
