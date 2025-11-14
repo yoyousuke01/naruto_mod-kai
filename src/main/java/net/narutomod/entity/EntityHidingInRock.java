@@ -5,6 +5,7 @@ import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemDoton;
+import net.narutomod.PlayerTracker;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -20,6 +21,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
+import net.minecraft.block.material.Material;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityHidingInRock extends ElementsNarutomodMod.ModElement {
@@ -71,18 +73,14 @@ public class EntityHidingInRock extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		private boolean isUserInEarth() {
-			BlockPos pos = new BlockPos(this.user);
-			return ItemDoton.isEarthenMaterial(this.world.getBlockState(pos).getMaterial())
-			 || ItemDoton.isEarthenMaterial(this.world.getBlockState(pos.up()).getMaterial());
-		}
-
 		private boolean isUserIntangible() {
 			return this.user != null && ProcedureOnLivingUpdate.isNoClip(this.user);
 		}
 
 		private void setUserIntangible(boolean intangibleIn) {
-			ProcedureOnLivingUpdate.setNoClip(this.user, intangibleIn);
+			if (this.isUserIntangible() != intangibleIn) {
+				ProcedureOnLivingUpdate.setNoClip(this.user, intangibleIn);
+			}
 			if (this.user instanceof EntityPlayer && !this.world.isRemote) {
 				String string = net.minecraft.util.text.translation.I18n.translateToLocal("chattext.intangible");
 				((EntityPlayer)this.user).sendStatusMessage(new TextComponentString(string + intangibleIn), true);
@@ -94,19 +92,44 @@ public class EntityHidingInRock extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.user != null && this.user.isEntityAlive()) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
-				boolean flag = this.ticksExisted % 20 != 0;
-				boolean flag1 = this.user instanceof EntityPlayer && (flag 
-				 || Chakra.pathway((EntityPlayer)this.user).getAmount() >= ItemDoton.HIDINGINROCK.chakraUsage);
-				if (this.ticksExisted > this.waitTime && !this.isUserInEarth() || !flag1) {
-					this.setDead();
+				BlockPos[] pos = { 
+					new BlockPos(this.user.posX, this.user.posY, this.user.posZ + this.user.width * 0.5),
+					new BlockPos(this.user.posX, this.user.posY, this.user.posZ - this.user.width * 0.5),
+					new BlockPos(this.user.posX + this.user.width * 0.5, this.user.posY, this.user.posZ),
+					new BlockPos(this.user.posX - this.user.width * 0.5, this.user.posY, this.user.posZ),
+					new BlockPos(this.user.posX, this.user.posY + 1.5, this.user.posZ + this.user.width * 0.5),
+					new BlockPos(this.user.posX, this.user.posY + 1.5, this.user.posZ - this.user.width * 0.5),
+					new BlockPos(this.user.posX + this.user.width * 0.5, this.user.posY + 1.5, this.user.posZ),
+					new BlockPos(this.user.posX - this.user.width * 0.5, this.user.posY + 1.5, this.user.posZ)
+				};
+				Material[] material = new Material[pos.length];
+				boolean[] inEarth = new boolean[pos.length];
+				for (int i = 0; i < pos.length; i++) {
+					material[i] = this.world.getBlockState(pos[i]).getMaterial();
+					inEarth[i] = ItemDoton.isEarthenMaterial(material[i]);
+				}
+				if (this.ticksExisted > this.waitTime) {
+					byte b = 0;
+					for (int i = 0; i < pos.length; i++) {
+						b |= inEarth[i] ? 1 : 0; 
+					}
+					if (b == 0) {
+						this.setDead();
+					}
 				} else {
-					this.setUserIntangible(true);
-					if (!flag && flag1) {
-						Chakra.pathway((EntityPlayer)this.user).consume(ItemDoton.HIDINGINROCK.chakraUsage);
+					for (int i = 0; i < pos.length; i++) {
+						if (material[i].isSolid() && !inEarth[i]) {
+							this.setDead();
+						}
 					}
 				}
-			} else if (!this.world.isRemote) {
-				this.setDead();
+				if (!this.isDead) {
+					if (this.ticksExisted % 20 == 1 && !Chakra.pathway(this.user).consume(ItemDoton.HIDINGINROCK.chakraUsage)) {
+						this.setDead();
+					} else {
+						this.setUserIntangible(true);
+					}
+				}
 			}
 		}
 
@@ -122,7 +145,7 @@ public class EntityHidingInRock extends ElementsNarutomodMod.ModElement {
 			private static final String ID_KEY = "HidingInRockIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (!ProcedureOnLivingUpdate.isNoClip(entity)) {
+				if (!PlayerTracker.noKamuiAndHidingInRock(entity.world) && !ProcedureOnLivingUpdate.isNoClip(entity)) {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 					entity.world.spawnEntity(new EC(entity));

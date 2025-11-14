@@ -31,10 +31,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.potion.PotionAmaterasuFlame;
+import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ModConfig;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Random;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class BlockAmaterasuBlock extends ElementsNarutomodMod.ModElement {
@@ -515,6 +518,12 @@ public class BlockAmaterasuBlock extends ElementsNarutomodMod.ModElement {
 
 	public static class TileEntityCustom extends TileEntity {
 		private int level;
+		private EntityLivingBase owner;
+
+		public void setData(int l, EntityLivingBase entity) {
+			this.setLevel(l);
+			this.setOwner(entity);
+		}
 
 		public void setLevel(int l) {
 			this.level = l;
@@ -526,6 +535,25 @@ public class BlockAmaterasuBlock extends ElementsNarutomodMod.ModElement {
 				this.level = this.getTileData().getInteger("amaterasuLevel");
 			}
 			return this.level;
+		}
+
+		public void setOwner(EntityLivingBase entity) {
+			if (!this.getTileData().hasUniqueId("ownerUUID")) {
+				this.owner = entity;
+				this.getTileData().setUniqueId("ownerUUID", entity.getUniqueID());
+			}
+		}
+
+		@Nullable
+		public EntityLivingBase getOwner() {
+			UUID uuid = this.getTileData().getUniqueId("ownerUUID");
+			if (uuid != null) {
+				EntityLivingBase entity = ProcedureUtils.searchLivingMatchingId(uuid);
+				if (entity != null) {
+					return entity;
+				}
+			}
+			return null;
 		}
 	}
 

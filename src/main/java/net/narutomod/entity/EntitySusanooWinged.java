@@ -36,7 +36,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.procedure.ProcedureTotsukaSwordToolInHandTick;
 import net.narutomod.procedure.ProcedureKagutsuchiSwordToolInUseTick;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.item.ItemSharingan;
@@ -248,11 +247,11 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 					this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, ItemStack.EMPTY);
 				}
 				if (thisHeldstack.getItem() == ItemTotsukaSword.block) {
-					HashMap<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("entity", this);
-					$_dependencies.put("itemstack", this.getHeldItemMainhand());
-					$_dependencies.put("world", this.world);
-					ProcedureTotsukaSwordToolInHandTick.executeProcedure($_dependencies);
+					if (this.rand.nextFloat() < 0.05f) {
+						this.world.playSound(null, this.posX, this.posY + this.height * 0.5f, this.posZ, 
+						 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("block.fire.ambient")),
+						 net.minecraft.util.SoundCategory.NEUTRAL, 0.9f, this.rand.nextFloat() * 0.7f + 0.3f);
+					}
 				} else if (thisHeldstack.getItem() == kagutsuchi.getItem()) {
 					HashMap<String, Object> $_dependencies = new HashMap<>();
 					$_dependencies.put("entity", this);

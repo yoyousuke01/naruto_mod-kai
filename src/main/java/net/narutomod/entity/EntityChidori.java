@@ -407,6 +407,10 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					Vec3d vec0 = this.summoner.getPositionEyes(1f);
 					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale(6d));
 					vec0 = this.handPos != null ? this.handPos : vec0.subtract(0d, 0.5d, 0d);
+					for (int i = 0; i < 20; i++) {
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, vec0.x, vec0.y, vec0.z, 1, 0d, 0d, 0d, 0d, 0d, 0d,
+								0x20FFFFFF, 5 + this.rand.nextInt(55), 5, 0xF0, -1, 0);
+					}
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec0, vec1, 0x800000FF, 1, 0f, 0.04f, 0);
 					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 10f * this.damageMultiplier(), this.summoner);
 					this.world.spawnEntity(entity);

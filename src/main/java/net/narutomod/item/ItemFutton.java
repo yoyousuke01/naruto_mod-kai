@@ -28,7 +28,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.nbt.NBTTagCompound;
@@ -193,7 +192,8 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 200, EntityBoilingMist.this.damagePerSec));
+					((EntityLivingBase)target).addPotionEffect(new ProcedureUtils.JutsuPotionEffect(PotionCorrosion.potion, 200,
+					 EntityBoilingMist.this.damagePerSec, player));
 				}
 			}
 

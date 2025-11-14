@@ -38,7 +38,6 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 
-import net.narutomod.procedure.ProcedureTotsukaSwordToolInHandTick;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.potion.PotionAmaterasuFlame;
@@ -48,8 +47,6 @@ import net.narutomod.item.ItemMangekyoSharingan;
 import net.narutomod.item.ItemMangekyoSharinganEternal;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
-
-import java.util.HashMap;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
@@ -203,11 +200,11 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (this.getHeldItemMainhand().getItem() == ItemTotsukaSword.block) {
-				HashMap<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("entity", this);
-				$_dependencies.put("itemstack", this.getHeldItemMainhand());
-				$_dependencies.put("world", this.world);
-				ProcedureTotsukaSwordToolInHandTick.executeProcedure($_dependencies);
+				if (this.rand.nextFloat() < 0.05f) {
+					this.world.playSound(null, this.posX, this.posY + this.height * 0.5f, this.posZ, 
+					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("block.fire.ambient")),
+					 net.minecraft.util.SoundCategory.NEUTRAL, 2f, this.rand.nextFloat() * 0.7f + 0.3f);
+				}
 			}
 		}
 

@@ -4,6 +4,7 @@ import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.item.ItemMangekyoSharinganEternal;
 import net.narutomod.item.ItemMangekyoSharingan;
 import net.narutomod.entity.EntitySusanooWinged;
+import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 
@@ -72,8 +73,9 @@ public class ProcedureKagutsuchiSwordToolInUseTick extends ElementsNarutomodMod.
 			z1 = (double) ((z1) + (Math.cos(((renderYawOffset) * 0.0174533)) * ((random) * ((entity_scale) * 1.6))));
 			y1 = (double) ((entity.posY) + (((Math.sin((0.0174533 * 30)) * (random)) + 0.9) * (entity_scale)));
 			if (((entity_scale) >= 4)) {
-				world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, ((x1) + (Math.random() - 0.5)), (y1), ((z1) + (Math.random() - 0.5)), 0.01, 0.01,
-						0.01);
+				Particles.spawnParticle(world, Particles.Types.FLAME, x1 + (Math.random() - 0.5), y1 + (Math.random() - 0.5),
+						z1 + (Math.random() - 0.5), 1, 0, 0, 0, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02,
+						(Math.random() - 0.5) * 0.02, 0xA0000000, 20);
 			} else {
 				world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (x1), (y1), (z1), 0, 0.01, 0);
 			}

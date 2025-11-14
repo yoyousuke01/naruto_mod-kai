@@ -348,6 +348,10 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			return this.getJutsuCooldown(stack, this.getCurrentJutsuIndex(stack));
 		}
 		
+		public long getJutsuCooldown(ItemStack stack, JutsuEnum jutsuIn) {
+			return this.getJutsuCooldown(stack, jutsuIn.index);
+		}
+
 		private long getJutsuCooldown(ItemStack stack, int index) {
 			this.validateMapTags(stack, index);
 			return stack.getTagCompound().getLong(CDMAP_KEY+index);
@@ -664,8 +668,15 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 				if (player instanceof EntityPlayer) {
 					ProcedureUtils.sendStatusMessage((EntityPlayer)player, String.format("%.1f", power), true);
 				}
-				Particles.spawnParticle(player.world, Particles.Types.SMOKE, player.posX, player.posY, player.posZ, 
-				 40, 0.2d, 0d, 0.2d, 0d, 0.5d, 0d, 0x106AD1FF, 40, 5, 0xF0, player.getEntityId());
+				Particles.Renderer particles = new Particles.Renderer(player.world);
+				for (int i = 0; i < 40; i++) {
+					particles.spawnParticles(Particles.Types.SMOKE, player.posX, player.posY, player.posZ, 
+					 1, 0.2d, 0d, 0.2d, (player.getRNG().nextFloat()-0.5f) * 0.4f, 0.6f * (player.getRNG().nextFloat() * 0.3f + 0.85f),
+					 (player.getRNG().nextFloat()-0.5f) * 0.4f, 0x106AD1FF, 40, 5, 0xF0, player.getEntityId());
+				}
+				particles.send();
+				//Particles.spawnParticle(player.world, Particles.Types.SMOKE, player.posX, player.posY, player.posZ, 
+				// 40, 0.2d, 0d, 0.2d, 0d, 0.5d, 0d, 0x106AD1FF, 40, 5, 0xF0, player.getEntityId());
 				if (player.ticksExisted % 10 == 0) {
 					player.world.playSound(null, player.posX, player.posY, player.posZ,
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:charging_chakra")),

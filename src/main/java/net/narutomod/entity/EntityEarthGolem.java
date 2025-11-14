@@ -289,12 +289,13 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer hornRight;
 			private final ModelRenderer hornLeft;
 			private final ModelRenderer ironGolemBody;
+			private final ModelRenderer chest;
 			private final ModelRenderer ironGolemRightArm;
 			private final ModelRenderer right_arm;
-			private final ModelRenderer bone;
+			private final ModelRenderer right_arm2;
 			private final ModelRenderer ironGolemLeftArm;
 			private final ModelRenderer left_arm;
-			private final ModelRenderer bone2;
+			private final ModelRenderer left_arm2;
 			private final ModelRenderer ironGolemRightLeg;
 			private final ModelRenderer right_leg;
 			private final ModelRenderer right_leg2;
@@ -302,13 +303,13 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer left_leg;
 			private final ModelRenderer left_leg2;
 			private final Vector3f headStart = new Vector3f(0.0F, 34.0F, 0.0F);
-			private final Vector3f headEnd = new Vector3f(0.0F, -12.0F, 0.0F);
+			private final Vector3f headEnd = new Vector3f(0.0F, -10.0F, -6.0F);
 			private final Vector3f bodyStart = new Vector3f(0.0F, 24.0F, 0.0F);
 			private final Vector3f bodyEnd = new Vector3f(0.0F, -12.0F, 0.0F);
 			private final Vector3f rightArmStart = new Vector3f(0.0F, 26.0F, 2.0F);
-			private final Vector3f rightArmEnd = new Vector3f(-8.0F, -10.0F, 0.0F);
+			private final Vector3f rightArmEnd = new Vector3f(-8.0F, -10.0F, -2.0F);
 			private final Vector3f leftArmStart = new Vector3f(0.0F, 26.0F, 2.0F);
-			private final Vector3f leftArmEnd = new Vector3f(8.0F, -10.0F, 0.0F);
+			private final Vector3f leftArmEnd = new Vector3f(8.0F, -10.0F, -2.0F);
 			private final Vector3f rightLegStart = new Vector3f(-0.5F, 26.5F, 0.0F);
 			private final Vector3f rightLegEnd = new Vector3f(-3.5F, 5.5F, 0.0F);
 			private final Vector3f leftLegStart = new Vector3f(0.5F, 26.5F, 0.0F);
@@ -317,70 +318,95 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			public ModelRockGolem() {
 				textureWidth = 128;
 				textureHeight = 128;
+				
 				ironGolemHead = new ModelRenderer(this);
-				ironGolemHead.setRotationPoint(0.0F, -12.0F, 0.0F);
-				ironGolemHead.cubeList.add(new ModelBox(ironGolemHead, 32, 24, -4.0F, -10.0F, -7.5F, 8, 10, 8, 0.0F, false));
+				ironGolemHead.setRotationPoint(0.0F, -10.0F, -6.0F);
+				ironGolemHead.cubeList.add(new ModelBox(ironGolemHead, 32, 24, -4.0F, -10.0F, -4.5F, 8, 10, 8, 0.0F, false));
+		
 				hornRight = new ModelRenderer(this);
-				hornRight.setRotationPoint(-1.35F, -10.5F, -5.4F);
+				hornRight.setRotationPoint(-1.35F, -10.5F, -2.4F);
 				ironGolemHead.addChild(hornRight);
 				setRotationAngle(hornRight, 0.0F, 0.0F, 0.5236F);
 				hornRight.cubeList.add(new ModelBox(hornRight, 24, 24, -2.05F, -0.2F, -2.1F, 4, 2, 2, -0.01F, false));
+		
 				hornLeft = new ModelRenderer(this);
-				hornLeft.setRotationPoint(1.35F, -10.5F, -5.4F);
+				hornLeft.setRotationPoint(1.35F, -10.5F, -2.4F);
 				ironGolemHead.addChild(hornLeft);
 				setRotationAngle(hornLeft, 0.0F, 0.0F, -0.5236F);
 				hornLeft.cubeList.add(new ModelBox(hornLeft, 24, 24, -1.95F, -0.2F, -2.1F, 4, 2, 2, -0.01F, true));
+		
 				ironGolemBody = new ModelRenderer(this);
 				ironGolemBody.setRotationPoint(0.0F, -12.0F, 0.0F);
-				ironGolemBody.cubeList.add(new ModelBox(ironGolemBody, 0, 0, -9.0F, 0.0F, -6.0F, 18, 13, 11, 0.0F, false));
 				ironGolemBody.cubeList.add(new ModelBox(ironGolemBody, 50, 52, -5.0F, 13.5F, -3.0F, 10, 8, 6, 0.5F, false));
+		
+				chest = new ModelRenderer(this);
+				chest.setRotationPoint(0.0F, 13.0F, 3.5F);
+				ironGolemBody.addChild(chest);
+				setRotationAngle(chest, 0.2618F, 0.0F, 0.0F);
+				chest.cubeList.add(new ModelBox(chest, 0, 0, -9.0F, -13.0F, -9.5F, 18, 13, 11, 0.0F, false));
+		
 				ironGolemRightArm = new ModelRenderer(this);
-				ironGolemRightArm.setRotationPoint(-8.0F, -10.0F, 0.0F);
+				ironGolemRightArm.setRotationPoint(-8.0F, -10.0F, -2.0F);
+				
+		
 				right_arm = new ModelRenderer(this);
 				right_arm.setRotationPoint(0.0F, 1.0F, 0.0F);
 				ironGolemRightArm.addChild(right_arm);
 				setRotationAngle(right_arm, 0.0F, -0.5236F, 0.1745F);
 				right_arm.cubeList.add(new ModelBox(right_arm, 24, 42, -8.0F, -2.5F, -3.5F, 8, 8, 8, 0.0F, false));
 				right_arm.cubeList.add(new ModelBox(right_arm, 48, 42, -6.0F, 5.5F, -2.5F, 4, 2, 6, 0.0F, false));
-				bone = new ModelRenderer(this);
-				bone.setRotationPoint(-4.0F, 7.5F, 3.5F);
-				right_arm.addChild(bone);
-				setRotationAngle(bone, -0.2618F, 0.0F, 0.0F);
-				bone.cubeList.add(new ModelBox(bone, 48, 42, -2.0F, 0.0F, -6.0F, 4, 2, 6, 0.0F, false));
-				bone.cubeList.add(new ModelBox(bone, 0, 24, -4.0F, 2.0F, -7.0F, 8, 12, 8, 0.0F, false));
+		
+				right_arm2 = new ModelRenderer(this);
+				right_arm2.setRotationPoint(-4.0F, 7.5F, 3.5F);
+				right_arm.addChild(right_arm2);
+				setRotationAngle(right_arm2, -0.2618F, 0.0F, 0.0F);
+				right_arm2.cubeList.add(new ModelBox(right_arm2, 48, 42, -2.0F, 0.0F, -6.0F, 4, 2, 6, 0.0F, false));
+				right_arm2.cubeList.add(new ModelBox(right_arm2, 0, 24, -4.0F, 2.0F, -7.0F, 8, 12, 8, 0.0F, false));
+		
 				ironGolemLeftArm = new ModelRenderer(this);
-				ironGolemLeftArm.setRotationPoint(8.0F, -10.0F, 0.0F);
+				ironGolemLeftArm.setRotationPoint(8.0F, -10.0F, -2.0F);
+				
+		
 				left_arm = new ModelRenderer(this);
 				left_arm.setRotationPoint(0.0F, 1.0F, 0.0F);
 				ironGolemLeftArm.addChild(left_arm);
 				setRotationAngle(left_arm, 0.0F, 0.5236F, -0.1745F);
 				left_arm.cubeList.add(new ModelBox(left_arm, 24, 42, 0.0F, -2.5F, -3.5F, 8, 8, 8, 0.0F, true));
 				left_arm.cubeList.add(new ModelBox(left_arm, 48, 42, 2.0F, 5.5F, -2.5F, 4, 2, 6, 0.0F, true));
-				bone2 = new ModelRenderer(this);
-				bone2.setRotationPoint(4.0F, 7.5F, 3.5F);
-				left_arm.addChild(bone2);
-				setRotationAngle(bone2, -0.2618F, 0.0F, 0.0F);
-				bone2.cubeList.add(new ModelBox(bone2, 48, 42, -2.0F, 0.0F, -6.0F, 4, 2, 6, 0.0F, true));
-				bone2.cubeList.add(new ModelBox(bone2, 0, 24, -4.0F, 2.0F, -7.0F, 8, 12, 8, 0.0F, true));
+		
+				left_arm2 = new ModelRenderer(this);
+				left_arm2.setRotationPoint(4.0F, 7.5F, 3.5F);
+				left_arm.addChild(left_arm2);
+				setRotationAngle(left_arm2, -0.2618F, 0.0F, 0.0F);
+				left_arm2.cubeList.add(new ModelBox(left_arm2, 48, 42, -2.0F, 0.0F, -6.0F, 4, 2, 6, 0.0F, true));
+				left_arm2.cubeList.add(new ModelBox(left_arm2, 0, 24, -4.0F, 2.0F, -7.0F, 8, 12, 8, 0.0F, true));
+		
 				ironGolemRightLeg = new ModelRenderer(this);
-				ironGolemRightLeg.setRotationPoint(-3.5F, 5.5F, 0.0F);		
+				ironGolemRightLeg.setRotationPoint(-3.5F, 5.5F, 0.0F);
+				
+		
 				right_leg = new ModelRenderer(this);
 				right_leg.setRotationPoint(0.0F, 0.0F, 0.0F);
 				ironGolemRightLeg.addChild(right_leg);
 				setRotationAngle(right_leg, -0.2618F, 0.2618F, 0.0F);
 				right_leg.cubeList.add(new ModelBox(right_leg, 58, 0, -5.5F, 0.0F, -3.0F, 6, 10, 6, -0.2F, false));
+		
 				right_leg2 = new ModelRenderer(this);
 				right_leg2.setRotationPoint(-2.5F, 10.0F, -3.0F);
 				right_leg.addChild(right_leg2);
 				setRotationAngle(right_leg2, 0.2618F, 0.0F, 0.0F);
 				right_leg2.cubeList.add(new ModelBox(right_leg2, 0, 44, -3.0F, 0.0F, 0.0F, 6, 10, 6, 0.2F, false));
+		
 				ironGolemLeftLeg = new ModelRenderer(this);
 				ironGolemLeftLeg.setRotationPoint(3.5F, 5.5F, 0.0F);
+				
+		
 				left_leg = new ModelRenderer(this);
 				left_leg.setRotationPoint(0.0F, 0.0F, 0.0F);
 				ironGolemLeftLeg.addChild(left_leg);
 				setRotationAngle(left_leg, -0.2618F, -0.2618F, 0.0F);
 				left_leg.cubeList.add(new ModelBox(left_leg, 58, 0, -0.5F, 0.0F, -3.0F, 6, 10, 6, -0.2F, true));
+		
 				left_leg2 = new ModelRenderer(this);
 				left_leg2.setRotationPoint(2.5F, 10.0F, -3.0F);
 				left_leg.addChild(left_leg2);

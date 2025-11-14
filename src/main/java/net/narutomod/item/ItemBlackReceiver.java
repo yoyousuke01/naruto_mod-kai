@@ -49,6 +49,7 @@ import net.minecraft.client.renderer.RenderItem;
 
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.potion.PotionHeaviness;
+import net.narutomod.potion.PotionParalysis;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
@@ -188,6 +189,9 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 		int amplifier = 1;
 		if (entity.isPotionActive(PotionHeaviness.potion)) {
 			amplifier += entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier();
+		}
+		if (amplifier > 6) {
+			entity.addPotionEffect(new PotionEffect(PotionParalysis.potion, 300, 1, false, false));
 		}
 		entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 300, amplifier, false, false));
 	}

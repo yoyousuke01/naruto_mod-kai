@@ -230,8 +230,10 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 					this.hitTime = age;
 					if (!this.world.isRemote && this.ecEntity != null) {
 						this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 2.0f * this.ecEntity.potionAmplifier);
-						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, this.ecEntity.potionAmplifier, false, false));
+						if (this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 2.0f * this.ecEntity.potionAmplifier)) {
+							this.hitEntity.addPotionEffect(new ProcedureUtils.JutsuPotionEffect(PotionCorrosion.potion, 100,
+							 this.ecEntity.potionAmplifier, false, false, shooter));
+						}
 					}
 				}
 			} else {

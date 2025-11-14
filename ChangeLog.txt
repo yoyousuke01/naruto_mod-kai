@@ -37,6 +37,8 @@ Jutsus
  - rasenshuriken only sage mode or 6-path variant can be thrown; will hurt user if not thrown; now takes target's chakra
  - sage mode now highlights all entities with chakra in the vicinity
  - adding Sage Transformation kekkei genkai (WIP)
+ - jutsus that afflicts amaterasu/corrosion effects will now give the jutsu caster the appropriate ninjaxp
+ - body replacement jutsu will transfer potion effects to the clone (if hit by an effect) 
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)

@@ -112,7 +112,7 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 			if (!world.isRemote && entitylb instanceof EntityPlayer) {
 				EntityPlayer entity = (EntityPlayer) entitylb;
 				world.playSound(null, entity.posX, entity.posY, entity.posZ,
-						(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.blaze.shoot")),
+						net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.blaze.shoot")),
 						SoundCategory.NEUTRAL, 1.0F, 1.0F);
 				Vec3d vec3d = entity.getPositionEyes(1.0F);
 				Vec3d[] vec3d1 = new Vec3d[3];
@@ -236,6 +236,11 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected float getMotionFactor() {
+			return 1.05f;
+		}
+
+		@Override
 		protected boolean isFireballFiery() {
 			return false;
 		}
@@ -289,6 +294,11 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 						.damageEntities(this.shootingEntity, 100.0F);
 				this.setDead();
 			}
+		}
+
+		@Override
+		protected float getMotionFactor() {
+			return 1.05f;
 		}
 
 		@Override
