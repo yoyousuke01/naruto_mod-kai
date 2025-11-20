@@ -28,6 +28,7 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -117,8 +118,8 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 								entity1 = world.playerEntities.get(rand.nextInt(world.playerEntities.size()));
 							} else {
 								List<EntityLiving> list = world.getEntitiesWithinAABB(EntityLiving.class, EntityCustom.this.getEntityBoundingBox().grow(64, 32, 64), (p)-> {
-									return p instanceof EntityZombie || p instanceof EntityVillager || p instanceof EntityEnderman
-									 || p instanceof EntityNinjaMerchant.Base;
+									return (p instanceof EntityZombie || p instanceof EntityVillager || p instanceof EntityEnderman
+									 || p instanceof EntityNinjaMerchant.Base) && !(p instanceof EntityZombieVillager);
 								});
 								entity1 = !list.isEmpty() ? list.get(rand.nextInt(list.size())) : null;
 							}

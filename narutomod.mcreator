@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "GUI": 73,
     "DIMENSION": 13,
-    "ENTITY": 524
+    "ENTITY": 524,
+    "GUI": 73
   },
   "mod_elements": [
     {
@@ -5317,18 +5317,6 @@
           {
             "name": "itemstack",
             "type": "itemstack"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
           },
           {
             "name": "world",

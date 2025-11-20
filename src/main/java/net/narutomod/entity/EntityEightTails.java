@@ -476,6 +476,8 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone2;
 			private final ModelRenderer bone5;
 			private final ModelRenderer jaw;
+			private final ModelRenderer bone9;
+			private final ModelRenderer bone10;
 			private final ModelRenderer bone8;
 			private final ModelRenderer dick;
 			private final ModelRenderer dick1;
@@ -892,6 +894,18 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 				bipedHead.addChild(jaw);
 				jaw.cubeList.add(new ModelBox(jaw, 24, 0, -1.5F, -0.1112F, -4.0845F, 3, 2, 4, 0.0F, false));
 
+				bone9 = new ModelRenderer(this);
+				bone9.setRotationPoint(-2.5F, 0.8888F, -0.0845F);
+				jaw.addChild(bone9);
+				setRotationAngle(bone9, 0.0F, -0.3491F, 0.0F);
+				bone9.cubeList.add(new ModelBox(bone9, 50, 30, -0.5F, -1.0F, -4.0F, 2, 2, 4, 0.0F, false));
+		
+				bone10 = new ModelRenderer(this);
+				bone10.setRotationPoint(2.5F, 0.8888F, -0.0845F);
+				jaw.addChild(bone10);
+				setRotationAngle(bone10, 0.0F, 0.3491F, 0.0F);
+				bone10.cubeList.add(new ModelBox(bone10, 50, 30, -1.5F, -1.0F, -4.0F, 2, 2, 4, 0.0F, true));
+
 				bone8 = new ModelRenderer(this);
 				bone8.setRotationPoint(0.0F, 1.5F, 1.5F);
 				jaw.addChild(bone8);
@@ -915,21 +929,18 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 				bipedBody.addChild(chest);
 				setRotationAngle(chest, 0.5236F, 0.0F, 0.0F);
 
-
-				chest_r1 = new ModelRenderer(this);
-				chest_r1.setRotationPoint(-1.0F, 14.0262F, -4.0685F);
+				chest_r1 = new ModelRenderer(this);
+				chest_r1.setRotationPoint(3.15F, -6.0888F, -8.0189F);
 				chest.addChild(chest_r1);
-				setRotationAngle(chest_r1, -0.0436F, 0.0F, 0.0F);
-				chest_r1.cubeList.add(new ModelBox(chest_r1, 0, 48, -0.1F, -23.9235F, -5.324F, 8, 8, 1, -0.2F, true));
-				chest_r1.cubeList.add(new ModelBox(chest_r1, 0, 48, -7.9F, -23.9235F, -5.324F, 8, 8, 1, -0.2F, false));
-
+				setRotationAngle(chest_r1, -0.1309F, -0.1745F, 0.0F);
+				chest_r1.cubeList.add(new ModelBox(chest_r1, 0, 48, -4.0F, -4.0F, -0.5F, 8, 8, 1, 0.3F, true));
+		
 				chest_r2 = new ModelRenderer(this);
-				chest_r2.setRotationPoint(-1.0F, 13.0F, -6.4F);
+				chest_r2.setRotationPoint(-5.15F, -6.0888F, -8.0189F);
 				chest.addChild(chest_r2);
-				setRotationAngle(chest_r2, -0.0436F, 0.0F, 0.0F);
-				chest_r2.cubeList.add(new ModelBox(chest_r2, 0, 48, -0.1F, -23.0F, -3.55F, 8, 8, 1, -0.2F, true));
-				chest_r2.cubeList.add(new ModelBox(chest_r2, 0, 48, -7.9F, -23.0F, -3.55F, 8, 8, 1, -0.2F, false));
-
+				setRotationAngle(chest_r2, -0.1309F, 0.1745F, 0.0F);
+				chest_r2.cubeList.add(new ModelBox(chest_r2, 0, 48, -4.0F, -4.0F, -0.5F, 8, 8, 1, 0.3F, false));
+		
 				chest_r3 = new ModelRenderer(this);
 				chest_r3.setRotationPoint(-1.0F, 13.0F, -6.4F);
 				chest.addChild(chest_r3);

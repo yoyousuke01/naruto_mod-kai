@@ -552,11 +552,10 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 				bipedHeadwear = new ModelRenderer(this);
 				bipedHeadwear.setRotationPoint(0.0F, 21.0F, 9.5F);
 				
-		
 				eye = new ModelRenderer(this);
 				eye.setRotationPoint(0.0F, -5.0F, -11.5F);
 				bipedHeadwear.addChild(eye);
-				eye.cubeList.add(new ModelBox(eye, 17, 52, 0.6F, -1.2F, -5.0F, 1, 1, 1, 0.1F, false));
+				eye.cubeList.add(new ModelBox(eye, 17, 52, 0.2F, -1.2F, -5.05F, 2, 1, 1, 0.0F, false));
 		
 				bipedBody = new ModelRenderer(this);
 				bipedBody.setRotationPoint(0.0F, 21.0F, 9.5F);
@@ -574,13 +573,13 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 				hair.cubeList.add(new ModelBox(hair, 42, 32, -0.0733F, -0.8355F, -2.0F, 2, 1, 4, 0.0F, false));
 		
 				bone = new ModelRenderer(this);
-				bone.setRotationPoint(-0.4733F, 0.0645F, 0.0F);
+				bone.setRotationPoint(-0.4733F, 0.0145F, 0.0F);
 				hair.addChild(bone);
 				setRotationAngle(bone, 0.0F, 0.0F, -0.5236F);
 				bone.cubeList.add(new ModelBox(bone, 30, 42, -1.0F, -0.5F, -2.0F, 2, 1, 4, 0.0F, false));
 		
 				bone25 = new ModelRenderer(this);
-				bone25.setRotationPoint(2.3267F, 0.0645F, 0.0F);
+				bone25.setRotationPoint(2.3267F, 0.0145F, 0.0F);
 				hair.addChild(bone25);
 				setRotationAngle(bone25, 0.0F, 0.0F, 0.5236F);
 				bone25.cubeList.add(new ModelBox(bone25, 22, 41, -1.0F, -0.5F, -2.0F, 2, 1, 4, 0.0F, false));
@@ -1267,17 +1266,17 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 				cube_r9.setRotationPoint(-4.4F, 0.15F, 4.0F);
 				shell.addChild(cube_r9);
 				setRotationAngle(cube_r9, -0.2618F, 0.0F, -0.6981F);
-				cube_r9.cubeList.add(new ModelBox(cube_r9, 41, 12, -3.5F, 0.1553F, -0.1739F, 4, 1, 2, 0.0F, false));
-				cube_r9.cubeList.add(new ModelBox(cube_r9, 0, 44, -2.75F, 0.1553F, 1.8261F, 3, 1, 2, 0.0F, false));
-				cube_r9.cubeList.add(new ModelBox(cube_r9, 1, 44, -2.0F, 0.1553F, 3.8261F, 2, 1, 2, 0.0F, false));
+				cube_r9.cubeList.add(new ModelBox(cube_r9, 32, 23, -4.25F, 0.1553F, -0.1739F, 5, 1, 2, 0.0F, false));
+				cube_r9.cubeList.add(new ModelBox(cube_r9, 41, 12, -3.75F, 0.1553F, 1.8261F, 4, 1, 2, 0.0F, false));
+				cube_r9.cubeList.add(new ModelBox(cube_r9, 0, 44, -3.0F, 0.1553F, 3.8261F, 3, 1, 2, 0.0F, false));
 		
 				cube_r10 = new ModelRenderer(this);
 				cube_r10.setRotationPoint(4.6F, 0.15F, 4.0F);
 				shell.addChild(cube_r10);
 				setRotationAngle(cube_r10, -0.2618F, 0.0F, 0.6981F);
-				cube_r10.cubeList.add(new ModelBox(cube_r10, 41, 12, -0.5F, 0.1553F, -0.1739F, 4, 1, 2, 0.0F, true));
-				cube_r10.cubeList.add(new ModelBox(cube_r10, 0, 44, -0.25F, 0.1553F, 1.8261F, 3, 1, 2, 0.0F, true));
-				cube_r10.cubeList.add(new ModelBox(cube_r10, 1, 44, 0.0F, 0.1553F, 3.8261F, 2, 1, 2, 0.0F, true));
+				cube_r10.cubeList.add(new ModelBox(cube_r10, 32, 23, -0.75F, 0.1553F, -0.1739F, 5, 1, 2, 0.0F, true));
+				cube_r10.cubeList.add(new ModelBox(cube_r10, 41, 12, -0.25F, 0.1553F, 1.8261F, 4, 1, 2, 0.0F, true));
+				cube_r10.cubeList.add(new ModelBox(cube_r10, 0, 44, 0.0F, 0.1553F, 3.8261F, 3, 1, 2, 0.0F, true));
 		
 				cube_r11 = new ModelRenderer(this);
 				cube_r11.setRotationPoint(-3.9F, -0.5F, 2.0F);
@@ -1575,25 +1574,25 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 				spike34.setRotationPoint(-3.4F, 0.55F, 5.75F);
 				shell.addChild(spike34);
 				setRotationAngle(spike34, -1.6955F, -1.2662F, 1.4138F);
-				spike34.cubeList.add(new ModelBox(spike34, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.1F, false));
+				spike34.cubeList.add(new ModelBox(spike34, 0, 23, -1.225F, -0.5554F, 0.6299F, 1, 1, 1, -0.1F, false));
 		
 				bone83 = new ModelRenderer(this);
 				bone83.setRotationPoint(0.0F, -0.5F, 0.0F);
 				spike34.addChild(bone83);
 				setRotationAngle(bone83, -0.0873F, 0.0F, 0.0873F);
-				bone83.cubeList.add(new ModelBox(bone83, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.2F, false));
+				bone83.cubeList.add(new ModelBox(bone83, 0, 23, -1.1834F, -0.5943F, 0.6698F, 1, 1, 1, -0.2F, false));
 		
 				bone149 = new ModelRenderer(this);
 				bone149.setRotationPoint(0.0F, -0.5F, 0.0F);
 				bone83.addChild(bone149);
 				setRotationAngle(bone149, -0.0873F, 0.0F, 0.0873F);
-				bone149.cubeList.add(new ModelBox(bone149, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.3F, false));
+				bone149.cubeList.add(new ModelBox(bone149, 0, 23, -1.1455F, -0.6401F, 0.7057F, 1, 1, 1, -0.3F, false));
 		
 				bone150 = new ModelRenderer(this);
 				bone150.setRotationPoint(0.0F, -0.25F, 0.0F);
 				bone149.addChild(bone150);
 				setRotationAngle(bone150, -0.0873F, 0.0F, 0.0873F);
-				bone150.cubeList.add(new ModelBox(bone150, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.4F, false));
+				bone150.cubeList.add(new ModelBox(bone150, 0, 23, -1.1116F, -0.6919F, 0.7373F, 1, 1, 1, -0.4F, false));
 		
 				spike35 = new ModelRenderer(this);
 				spike35.setRotationPoint(0.0F, -0.3F, 0.0F);
@@ -1647,25 +1646,25 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 				spike37.setRotationPoint(3.6F, 0.55F, 5.75F);
 				shell.addChild(spike37);
 				setRotationAngle(spike37, -1.6955F, 1.2662F, -1.4138F);
-				spike37.cubeList.add(new ModelBox(spike37, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.1F, true));
+				spike37.cubeList.add(new ModelBox(spike37, 0, 23, 0.225F, -0.5554F, 0.6299F, 1, 1, 1, -0.1F, true));
 		
 				bone157 = new ModelRenderer(this);
 				bone157.setRotationPoint(0.0F, -0.5F, 0.0F);
 				spike37.addChild(bone157);
 				setRotationAngle(bone157, -0.0873F, 0.0F, -0.0873F);
-				bone157.cubeList.add(new ModelBox(bone157, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.2F, true));
+				bone157.cubeList.add(new ModelBox(bone157, 0, 23, 0.1834F, -0.5943F, 0.6698F, 1, 1, 1, -0.2F, true));
 		
 				bone158 = new ModelRenderer(this);
 				bone158.setRotationPoint(0.0F, -0.5F, 0.0F);
 				bone157.addChild(bone158);
 				setRotationAngle(bone158, -0.0873F, 0.0F, -0.0873F);
-				bone158.cubeList.add(new ModelBox(bone158, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.3F, true));
+				bone158.cubeList.add(new ModelBox(bone158, 0, 23, 0.1455F, -0.6401F, 0.7057F, 1, 1, 1, -0.3F, true));
 		
 				bone159 = new ModelRenderer(this);
 				bone159.setRotationPoint(0.0F, -0.25F, 0.0F);
 				bone158.addChild(bone159);
 				setRotationAngle(bone159, -0.0873F, 0.0F, -0.0873F);
-				bone159.cubeList.add(new ModelBox(bone159, 0, 23, -0.5F, -1.0F, -0.5F, 1, 1, 1, -0.4F, true));
+				bone159.cubeList.add(new ModelBox(bone159, 0, 23, 0.1116F, -0.6919F, 0.7373F, 1, 1, 1, -0.4F, true));
 		
 				spike38 = new ModelRenderer(this);
 				spike38.setRotationPoint(0.0F, -0.3F, 0.0F);

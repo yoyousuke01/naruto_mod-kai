@@ -33,27 +33,12 @@ public class ProcedureZzzRightClickedInAir extends ElementsNarutomodMod.ModEleme
 			System.err.println("Failed to load dependency itemstack for procedure ZzzRightClickedInAir!");
 			return;
 		}
-		if (dependencies.get("x") == null) {
-			System.err.println("Failed to load dependency x for procedure ZzzRightClickedInAir!");
-			return;
-		}
-		if (dependencies.get("y") == null) {
-			System.err.println("Failed to load dependency y for procedure ZzzRightClickedInAir!");
-			return;
-		}
-		if (dependencies.get("z") == null) {
-			System.err.println("Failed to load dependency z for procedure ZzzRightClickedInAir!");
-			return;
-		}
 		if (dependencies.get("world") == null) {
 			System.err.println("Failed to load dependency world for procedure ZzzRightClickedInAir!");
 			return;
 		}
 		Entity entity = (Entity) dependencies.get("entity");
 		ItemStack itemstack = (ItemStack) dependencies.get("itemstack");
-		int x = (int) dependencies.get("x");
-		int y = (int) dependencies.get("y");
-		int z = (int) dependencies.get("z");
 		World world = (World) dependencies.get("world");
 		double id = 0;
 		(entity).extinguish();
@@ -99,13 +84,16 @@ public class ProcedureZzzRightClickedInAir extends ElementsNarutomodMod.ModEleme
 									new TextComponentString((("set target to ") + "" + ((entity1.getDisplayName().getUnformattedText())))), (false));
 						}
 						{
-							List<Entity> _entfound = world.getEntitiesWithinAABB(Entity.class,
-									new AxisAlignedBB(x - (50 / 2d), y - (50 / 2d), z - (50 / 2d), x + (50 / 2d), y + (50 / 2d), z + (50 / 2d)), null)
+							List<Entity> _entfound = world
+									.getEntitiesWithinAABB(Entity.class,
+											new AxisAlignedBB(attacker.posX - (50 / 2d), attacker.posY - (50 / 2d), attacker.posZ - (50 / 2d),
+													attacker.posX + (50 / 2d), attacker.posY + (50 / 2d), attacker.posZ + (50 / 2d)),
+											null)
 									.stream().sorted(new Object() {
 										Comparator<Entity> compareDistOf(double _x, double _y, double _z) {
 											return Comparator.comparing((Function<Entity, Double>) (_entcnd -> _entcnd.getDistanceSq(_x, _y, _z)));
 										}
-									}.compareDistOf(x, y, z)).collect(Collectors.toList());
+									}.compareDistOf(attacker.posX, attacker.posY, attacker.posZ)).collect(Collectors.toList());
 							for (Entity entityiterator : _entfound) {
 								if (entityiterator.getClass() == attacker.getClass()) {
 									((EntityLiving) entityiterator).setAttackTarget((EntityLivingBase) entity1);

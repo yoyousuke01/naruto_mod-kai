@@ -54,6 +54,7 @@ Items:
  - fixed blockable swords can attack while blocking
  - buffed anbu sword damage slightly
  - added 3 more anbu masks
+ - some swords are now sheathed when not held
  
 Entities:
  - improved giant dog summon model
