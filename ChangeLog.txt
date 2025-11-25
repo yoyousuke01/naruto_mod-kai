@@ -55,6 +55,7 @@ Items:
  - buffed anbu sword damage slightly
  - added 3 more anbu masks
  - some swords are now sheathed when not held
+ - Madara's scythe & Kubikiribōchō can do sweeping damage
  
 Entities:
  - improved giant dog summon model

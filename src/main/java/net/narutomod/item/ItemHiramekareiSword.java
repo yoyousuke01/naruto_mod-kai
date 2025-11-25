@@ -247,10 +247,10 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 					EntityLivingBase user = this.getUser();
 					if (user instanceof EntityPlayer && user.swingProgressInt == 1) {
 						double d = ProcedureUtils.getReachDistance(user);
-						Vec3d vec = user.getPositionEyes(1f);
-						for (int i = 2; i < 8; i++) {
+						Vec3d vec = user.getPositionVector();
+						for (int i = 2; i < 10; i++) {
 							EntitySweep.Base sweepParticle = new EntitySweep.Base(user, 0xB06AD1FF, (float)d * 2 - 1.2f * i);
-							sweepParticle.setLocationAndAngles(vec.x, vec.y, vec.z, user.rotationYaw, 0.0f);
+							sweepParticle.setLocationAndAngles(vec.x, vec.y + 1.4d - 0.02d * i, vec.z, user.rotationYaw, 0.0f);
 							this.world.spawnEntity(sweepParticle);
 						}
 						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f);

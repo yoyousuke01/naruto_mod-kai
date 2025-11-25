@@ -191,6 +191,14 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYaw, 0.0f);
 			this.maxAge = 6;
 		}
+
+		@Override
+		protected void renderParticles(Vec3d entityVec, Vec3d relVec, int color, float scale) {
+			Vec3d vec1 = entityVec.add(relVec);
+			Vec3d vec2 = relVec.scale(0.05d);
+			Particles.spawnParticle(this.world, Particles.Types.FLAME, vec1.x, vec1.y, vec1.z,
+			 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, FLAME_COLOR, (int)(scale * (this.rand().nextFloat() * 3.0f + 1.0f)));
+		}
 	}
 
 	@Override
@@ -203,7 +211,6 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void register() {
 			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-			RenderingRegistry.registerEntityRenderingHandler(EntitySweepParticle.class, renderManager -> new RenderSweep(renderManager));
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -225,20 +232,5 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-
-		@SideOnly(Side.CLIENT)
-		public class RenderSweep extends EntitySweep.Renderer.RenderCustom {
-			public RenderSweep(RenderManager renderManagerIn) {
-				super(renderManagerIn);
-			}
-
-			@Override
-			protected void renderParticles(EntitySweep.Base entity, Vec3d entityVec, Vec3d relVec, int color, float scale) {
-				Vec3d vec1 = entityVec.add(relVec);
-				Vec3d vec2 = relVec.scale(0.05d);
-				Particles.spawnParticle(entity.world, Particles.Types.FLAME, vec1.x, vec1.y, vec1.z,
-				 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, FLAME_COLOR, (int)(scale * (entity.rand().nextFloat() * 3.0f + 1.0f)));
-			}
-		}
-	}
+	}
 }
