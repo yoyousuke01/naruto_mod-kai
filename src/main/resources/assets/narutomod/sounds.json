@@ -1204,5 +1204,14 @@
         "stream": false
       }
     ]
+  },
+  "blast_charge": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:blast_charge",
+        "stream": false
+      }
+    ]
   }
 }

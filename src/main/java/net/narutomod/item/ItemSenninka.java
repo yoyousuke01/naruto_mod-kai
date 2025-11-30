@@ -11,16 +11,23 @@ import net.narutomod.Particles;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -43,22 +50,22 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import java.util.UUID;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.init.MobEffects;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
-import javax.annotation.Nullable;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.init.MobEffects;
+
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.List;
+import com.google.common.collect.Lists;
+import net.minecraft.init.SoundEvents;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSenninka extends ElementsNarutomodMod.ModElement {
@@ -70,7 +77,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum BROADAXE = new ItemJutsu.JutsuEnum(0, "item.senninka_broadaxe.name", 'S', 150, 50d, new Broadaxe());
 	public static final ItemJutsu.JutsuEnum PISTONFIST = new ItemJutsu.JutsuEnum(1, "item.senninka.pistonfist", 'S', 150, 50d, new PistonFist());
 	public static final ItemJutsu.JutsuEnum STAGE2 = new ItemJutsu.JutsuEnum(2, "item.senninka.stage2", 'S', 150, 50d, new Stage2());
-	public static final ItemJutsu.JutsuEnum CANNON = new ItemJutsu.JutsuEnum(3, "entitysennikacannon", 'S', 150, 300d, new EntityMultiCannon.Jutsu());
+	public static final ItemJutsu.JutsuEnum CANNON = new ItemJutsu.JutsuEnum(3, "entitysennikacannon", 'S', 150, 100d, new EntityMultiCannon.Jutsu());
+	public static final ItemJutsu.JutsuEnum ABSORB = new ItemJutsu.JutsuEnum(4, "item.senninka.absorb", 'S', 150, 50d, new Absorption());
 
 	public ItemSenninka(ElementsNarutomodMod instance) {
 		super(instance, 939);
@@ -78,7 +86,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(BROADAXE, PISTONFIST, STAGE2, CANNON));
+		elements.items.add(() -> new RangedItem(BROADAXE, PISTONFIST, STAGE2, CANNON, ABSORB));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityMultiCannon.class)
 				.id(new ResourceLocation("narutomod", "entitysennikacannon"), ENTITYID).name("entitysennikacannon").tracker(64, 1, true).build());
 	}
@@ -87,6 +95,11 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:senninka", "inventory"));
+	}
+
+	@Override
+	public void init(FMLInitializationEvent event) {
+		ProcedureOnLeftClickEmpty.addQualifiedItem(block, EnumHand.MAIN_HAND);
 	}
 
 	public static class RangedItem extends ItemJutsu.Base implements ItemOnBody.Interface {
@@ -101,6 +114,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			this.defaultCooldownMap[BROADAXE.index] = 0;
 			this.defaultCooldownMap[PISTONFIST.index] = 0;
 			this.defaultCooldownMap[STAGE2.index] = 0;
+			this.defaultCooldownMap[ABSORB.index] = 0;
 		}
 
 		@Override
@@ -114,6 +128,20 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
+		}
+
+		@Override
+		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
+			if (attacker.equals(target)) {
+				for (ItemJutsu.JutsuEnum jutsuEnum : this.getAllJutsus(itemstack)) {
+					if (jutsuEnum.jutsu instanceof SenninkaJutsu
+				 	 && ((RangedItem)itemstack.getItem()).canUseJutsu(itemstack, jutsuEnum, attacker)
+				 	 && jutsuEnum.jutsu.isActivated(itemstack)) {
+						((SenninkaJutsu)jutsuEnum.jutsu).onLeftClickEmpty(itemstack, attacker);
+					}
+				}
+			}
+			return super.onLeftClickEntity(itemstack, attacker, target);
 		}
 
 		@Override
@@ -148,11 +176,33 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static abstract class SenninkaJutsu implements ItemJutsu.IJutsuCallback {
+		private static final List<SenninkaJutsu> list = Lists.newArrayList();
+		
+		public SenninkaJutsu() {
+			list.add(this);
+		}
+
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+		}
+
+		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
 		}
 
 		@SideOnly(Side.CLIENT)
 		public abstract boolean setModelVisibility(EntityLivingBase living, ItemStack stack, Renderer.ModelJugo model);
+
+		public boolean isActivated(EntityLivingBase entity, ItemStack stack) {
+			return this.isActivated(stack);
+		}
+
+		public boolean anyOtherActivated(EntityLivingBase entity, ItemStack stack) {
+			for (SenninkaJutsu jutsu : list) {
+				if (jutsu != this && jutsu.isActivated(entity, stack)) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	public static class Broadaxe extends SenninkaJutsu {
@@ -173,6 +223,22 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				return true;
 			}
 			return false;
+		}
+
+		@Override
+		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+			if (!world.isRemote && entity instanceof EntityLivingBase && !this.anyOtherActivated((EntityLivingBase)entity, stack)) {
+				if (this.isActivated((EntityLivingBase)entity, stack)) {
+					ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.getEntityData().getInteger(START_TIME) + 1);
+				} else if (entity.getEntityData().hasKey(START_TIME)) {
+					ProcedureSync.EntityNBTTag.removeAndSync(entity, START_TIME);
+				}
+			}
+		}
+
+		@Override
+		public boolean isActivated(EntityLivingBase entity, ItemStack stack) {
+			return entity.getHeldItemMainhand().getItem() == ItemSenninkaBroadaxe.block;
 		}
 
 		@Override
@@ -210,7 +276,6 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				STAGE2.jutsu.deactivate(entity);
 				stack.getTagCompound().setBoolean(this.idKey, true);
-				ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.ticksExisted + 3);
 				for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
 					if (attr != null) {
@@ -222,6 +287,35 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				this.deactivate(entity);
 			}
 			return false;
+		}
+
+		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			if (!world.isRemote && this.isActivated(itemstack)) {
+				ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.getEntityData().getInteger(START_TIME) + 1);
+			}
+		}
+
+		@Override
+		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
+			Entity target = ProcedureUtils.objectEntityLookingAt(attacker, 16d, 3d).entityHit;
+			if (target instanceof EntityLivingBase) {
+				target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
+				SoundCategory.NEUTRAL, 1.0F, attacker.getRNG().nextFloat() * 0.5F + 0.5F);
+				Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
+				Particles.Renderer particles = new Particles.Renderer(attacker.world);
+				for (int i = 1, j = 25; i <= j; i++) {
+					Vec3d vec1 = vec.scale(-0.06d * i);
+					particles.spawnParticles(Particles.Types.SONIC_BOOM, attacker.posX, attacker.posY+1.4d, attacker.posZ,
+					 1, 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x00ffffff | ((int)((1f-(float)i/j)*0x40)<<24),
+					 i * 2, (int)(5f * (1f + ((float)i/j) * 0.5f)));
+				}
+				particles.send();
+				attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
+				attacker.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
+				attacker.setPositionAndUpdate(target.posX - vec.x, target.posY - vec.y + 0.5d, target.posZ - vec.z);
+				attacker.attackTargetEntityWithCurrentItem(target);
+			}
 		}
 
 		@Override
@@ -239,6 +333,9 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				model.isSneak = living.isSneaking();
 				model.isRiding = living.isRiding();
 				model.isChild = living.isChild();
+				if (ItemJutsu.getCurrentJutsu(stack) == ABSORB && living.isHandActive()) {
+					((Absorption)ABSORB.jutsu).showNeedle(living, model);
+				}
 				return true;
 			}
 			return false;
@@ -281,7 +378,6 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				PISTONFIST.jutsu.deactivate(entity);
 				stack.getTagCompound().setBoolean(this.idKey, true);
-				ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.ticksExisted + 3);
 				for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
 					if (attr != null && !attr.hasModifier(entry.getValue())) {
@@ -302,38 +398,68 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 					if (entity.ticksExisted % 20 == 3) {
 						((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 8, false, false));
 					}
-					if (entity.ticksExisted > entity.getEntityData().getInteger(START_TIME) + 40) {
+					EntityLivingBase living = (EntityLivingBase)entity;
+					int weartime = entity.getEntityData().getInteger(START_TIME);
+					if (weartime > 40) {
 						Vec3d vec = new Vec3d(-0.365625d, 0.884375d, -0.440625d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F)
 						 .add(entity.getPositionVector());
 						Vec3d vec1 = new Vec3d(-0.25d, -0.0625d, -0.25d).scale(1.4d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F);
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F);
 						Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
 						 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
 						vec = new Vec3d(-0.365625d, 0.61875d, -0.409375d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F)
 						 .add(entity.getPositionVector());
 						Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
 						 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
 						vec = new Vec3d(0.365625d, 0.884375d, -0.440625d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F)
 						 .add(entity.getPositionVector());
 						vec1 = new Vec3d(0.25d, -0.0625d, -0.25d).scale(1.4d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F);
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F);
 						Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
 						 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
 						vec = new Vec3d(0.365625d, 0.61875d, -0.409375d)
-						 .rotateYaw(-((EntityLivingBase)entity).renderYawOffset * (float)Math.PI / 180F)
+						 .rotateYaw(-living.renderYawOffset * (float)Math.PI / 180F)
 						 .add(entity.getPositionVector());
 						Particles.spawnParticle(world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 20,
 						 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x20FFFFFF, 10, 3, 0xF0, entity.getEntityId());
+					}
+					if (ItemJutsu.getCurrentJutsu(itemstack) == CANNON && living.isHandActive() && living.getItemInUseMaxCount() % 20 == 1) {
+						entity.world.playSound(null, entity.posX, entity.posY + 2.0d, entity.posZ,
+						 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:blast_charge")),
+						 SoundCategory.PLAYERS, 2.0f, 1.0f + (float)living.getItemInUseMaxCount() / 20 * 0.1f);
 					}
 					if (!((RangedItem)itemstack.getItem()).isJutsuEnabled(itemstack, CANNON)) {
 						((RangedItem)itemstack.getItem()).enableJutsu(itemstack, CANNON, true);
 					}
+					ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, weartime + 1);
 				} else if (((RangedItem)itemstack.getItem()).isJutsuEnabled(itemstack, CANNON)) {
 					((RangedItem)itemstack.getItem()).enableJutsu(itemstack, CANNON, false);
 				}
+			}
+		}
+
+		@Override
+		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
+			Entity target = ProcedureUtils.objectEntityLookingAt(attacker, 18d, 3d).entityHit;
+			if (target instanceof EntityLivingBase) {
+				target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
+				 SoundCategory.NEUTRAL, 1.0F, attacker.getRNG().nextFloat() * 0.5F + 0.5F);
+				Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
+				Particles.Renderer particles = new Particles.Renderer(attacker.world);
+				for (int i = 1, j = 25; i <= j; i++) {
+					Vec3d vec1 = vec.scale(-0.06d * i);
+					particles.spawnParticles(Particles.Types.SONIC_BOOM, attacker.posX, attacker.posY+1.4d, attacker.posZ,
+					 1, 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x00ffffff | ((int)((1f-(float)i/j)*0x40)<<24),
+					 i * 2, (int)(5f * (1f + ((float)i/j) * 0.5f)));
+				}
+				particles.send();
+				attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
+				attacker.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
+				attacker.setPositionAndUpdate(target.posX - vec.x, target.posY - vec.y + 0.5d, target.posZ - vec.z);
+				attacker.attackTargetEntityWithCurrentItem(target);
 			}
 		}
 
@@ -352,8 +478,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				model.rightArmSpikes.rotateAngleX = 0.0F;
 				model.bipedBody.showModel = true;
 				model.bodyStage2.showModel = true;
-				long cd = ((RangedItem)stack.getItem()).getJutsuCooldown(stack, CANNON) - living.world.getTotalWorldTime();
-				if (cd > 200 && cd <= 300) {
+				ItemJutsu.JutsuEnum jutsu = ItemJutsu.getCurrentJutsu(stack);
+				if ((jutsu == CANNON && living.isHandActive()) || CANNON.jutsu.isActivated(stack)) {
 					model.exhaustExtension1.showModel = true;
 					model.exhaustExtension2.showModel = true;
 					model.exhaustExtension3.showModel = true;
@@ -362,9 +488,10 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 					model.exhaustExtension6.showModel = true;
 					model.exhaustExtension7.showModel = true;
 					model.exhaustExtension8.showModel = true;
-					if (cd > 210) {
-						model.blasts.showModel = true;
-					}
+					model.blasts.showModel = true;
+				}
+				if (jutsu == ABSORB && living.isHandActive()) {
+					((Absorption)ABSORB.jutsu).showNeedle(living, model);
 				}
 				model.isSneak = living.isSneaking();
 				model.isRiding = living.isRiding();
@@ -396,7 +523,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityMultiCannon extends EntityBeamBase.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 20;
+		private final int duration = 100;
 		private final AirPunch beam = new AirPunch();
 		private float power;
 		
@@ -429,36 +556,43 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (!this.world.isRemote) {
-				if (this.shootingEntity == null || this.ticksAlive > 100 + this.growTime) {
+				if (this.shootingEntity == null || this.ticksAlive > this.duration) {
 					this.setDead();
 				} else {
 					this.shoot(this.power);
-					if (this.ticksAlive > this.growTime) {
-						this.beam.execute2(this.shootingEntity, (double)this.getBeamLength(), 3.0f);
+					if (this.ticksAlive > 5) {
+						this.beam.execute(this.shootingEntity, (double)this.getBeamLength(), this.power * 0.35f);
 					}
 				}
+			}
+		}
+
+		@Override
+		public void setDead() {
+			super.setDead();
+			if (!this.world.isRemote && this.getShooter() != null) {
+				Jutsu.deactivateCleanup(this.getShooter());
 			}
 		}
 
 		public class AirPunch extends ProcedureAirPunch {
 			public AirPunch() {
 				this.blockDropChance = -1.0F;
-				this.blockHardnessLimit = 100f;
 				this.particlesPre = null;
 			}
 			
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.hurtResistantTime = 10;
-				target.attackEntityFrom(ItemJutsu.causeSenjutsuDamage(EntityMultiCannon.this, player), EntityMultiCannon.this.power * 0.6f);
+				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EntityMultiCannon.this, player), EntityMultiCannon.this.power * 0.25f);
 			}
 
 			@Nullable
 			protected net.minecraft.entity.item.EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				if (EntityMultiCannon.this.rand.nextFloat() < 0.005f) {
 					player.world.playSound(null, pos,
-					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:explosion")),
-					 net.minecraft.util.SoundCategory.BLOCKS, 4.0f, EntityMultiCannon.this.rand.nextFloat() * 0.5f + 0.75f);
+					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:explosion")),
+					 SoundCategory.BLOCKS, 4.0f, EntityMultiCannon.this.rand.nextFloat() * 0.5f + 0.75f);
 				}
 				return super.processAffectedBlock(player, pos, facing);
 			}
@@ -466,23 +600,27 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void breakBlockParticles(World world, BlockPos pos) {
 				Particles.spawnParticle(world, Particles.Types.SMOKE, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-				 1, 0D, 0D, 0D, 0D, 0D, 0D, 0x80000000, 60);
+				 1, 0D, 0D, 0D, 0D, 0D, 0D, 0x80000000, 40 + world.rand.nextInt(30));
 			}
 
 			@Override
 			protected float getBreakChance(BlockPos pos, Entity player, double range) {
-				return 1.0F;
+				return (1f - (float)(MathHelper.sqrt(player.getDistanceSqToCenter(pos)) / range)) * 0.05f;
 			}
 		}
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
+			private static final String ID_KEY = "MultiCannonActivated";
+
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (STAGE2.jutsu.isActivated(stack)) {
-					entity.world.spawnEntity(new EntityMultiCannon(entity, power));
+				if (STAGE2.jutsu.isActivated(stack) && power >= 10f) {
+					EntityMultiCannon jutsuEntity = new EntityMultiCannon(entity, power);
+					entity.world.spawnEntity(jutsuEntity);
+					stack.getTagCompound().setBoolean(ID_KEY, true);
 					entity.world.playSound(null, entity.posX, entity.posY + 2.0d, entity.posZ,
-					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:laser")),
-					 net.minecraft.util.SoundCategory.PLAYERS, 4.0f, 1.0f);
+					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:explosion")),
+					 SoundCategory.BLOCKS, 5.0f, 1.0f);
 					ItemJutsu.setCurrentJutsuCooldown(stack, 300);
 					return true;
 				}
@@ -496,13 +634,100 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 5.0f;
+				return 20.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 200.0f;
+				return 40.0f;
 			}
+
+			@Override
+			public boolean isActivated(ItemStack stack) {
+				return stack.hasTagCompound() ? stack.getTagCompound().getBoolean(ID_KEY) : false;
+			}
+
+			protected static void deactivateCleanup(EntityLivingBase entity) {
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+				if (stack != null && stack.hasTagCompound()) {
+					stack.getTagCompound().removeTag(ID_KEY);
+				}
+			}
+		}
+	}
+
+	public static class Absorption extends SenninkaJutsu {
+		private static final String ID_KEY = "SenninkaAbsorbing";
+
+		@Override
+		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+			return true;
+		}
+
+		@Override
+		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+			if (!world.isRemote && entity instanceof EntityLivingBase) {
+				boolean flag = this.isActivated((EntityLivingBase)entity, stack);
+				if (flag) {
+				 	Entity entity1 = ProcedureUtils.objectEntityLookingAt(entity, 2.2d).entityHit;
+				 	if (entity1 instanceof EntityLivingBase && entity1.isEntityAlive()) {
+				 		((EntityLivingBase)entity1).setRevengeTarget((EntityLivingBase)entity);
+				 		((EntityLivingBase)entity1).setHealth(((EntityLivingBase)entity1).getHealth() - 0.25f);
+				 		((EntityLivingBase)entity).heal(0.25f);
+				 		if (entity.ticksExisted % 20 == 2) {
+							entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
+							 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")),
+							 SoundCategory.PLAYERS, 0.5f, 1f - MathHelper.sin(0.02f * entity.ticksExisted) * 0.3f);
+				 		}
+				 		if (!entity.getEntityData().getBoolean(ID_KEY)) {
+				 			ProcedureSync.EntityNBTTag.setAndSync(entity, ID_KEY, true);
+				 		}
+				 	} else if (entity.getEntityData().getBoolean(ID_KEY)) {
+				 		ProcedureSync.EntityNBTTag.removeAndSync(entity, ID_KEY);
+				 	}
+				}
+				if (!this.anyOtherActivated((EntityLivingBase)entity, stack)) {
+					if (flag) {
+						ProcedureSync.EntityNBTTag.setAndSync(entity, START_TIME, entity.getEntityData().getInteger(START_TIME) + 1);
+					} else if (entity.getEntityData().hasKey(START_TIME)) {
+						ProcedureSync.EntityNBTTag.removeAndSync(entity, START_TIME);
+					}
+				}
+			}
+		}
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public boolean setModelVisibility(EntityLivingBase living, ItemStack stack, Renderer.ModelJugo model) {
+			if (this.isActivated(living, stack) && !this.anyOtherActivated(living, stack)) {
+				model.setVisible(false);
+				model.bipedHead.showModel = true;
+				model.headStage1.showModel = true;
+				model.bipedRightArm.showModel = true;
+				model.rightArmSpikes.rotateAngleX = 3.1416F;
+				model.bipedBody.showModel = true;
+				model.bodyStage1.showModel = true;
+				model.isSneak = living.isSneaking();
+				model.isRiding = living.isRiding();
+				model.isChild = living.isChild();
+				this.showNeedle(living, model);
+				return true;
+			}
+			return false;
+		}
+
+		@SideOnly(Side.CLIENT)
+		protected void showNeedle(EntityLivingBase living, Renderer.ModelJugo model) {
+			model.needle.showModel = true;
+			if (living.getEntityData().getBoolean(ID_KEY)) {
+				model.bulge.showModel = true;
+				model.bulge.rotationPointY = 16 - (living.getEntityData().getInteger(START_TIME) % 16);
+			}
+		}
+
+		@Override
+		public boolean isActivated(EntityLivingBase entity, ItemStack stack) {
+			return ItemJutsu.getCurrentJutsu(stack) == ABSORB && entity.isHandActive();
 		}
 	}
 
@@ -535,51 +760,41 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			public void doRender(EntityMultiCannon bullet, double x, double y, double z, float yaw, float pt) {
 				float age = (float)bullet.ticksExisted + pt;
 				float f = age * 0.01F;
-				double max_l = bullet.getBeamLength();
+				float max_l = (float)bullet.getBeamLength();
 				this.bindEntityTexture(bullet);
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y, z);
 				GlStateManager.rotate(ProcedureUtils.interpolateRotation(bullet.prevRotationYaw, bullet.rotationYaw, pt), 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(90.0F - bullet.prevRotationPitch - (bullet.rotationPitch - bullet.prevRotationPitch) * pt, 1.0F, 0.0F, 0.0F);
-				//GlStateManager.rotate(age * 90F, 0.0F, 1.0F, 0.0F);
-				Tessellator tessellator = Tessellator.getInstance();
-				BufferBuilder bufferbuilder = tessellator.getBuffer();
+				GlStateManager.rotate(age * 90F, 0.0F, 1.0F, 0.0F);
 				GlStateManager.enableBlend();
+				GlStateManager.alphaFunc(0x204, 0.001f);
 				GlStateManager.disableCull();
 				GlStateManager.shadeModel(0x1D01);
 				GlStateManager.disableLighting();
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 				float f5 = 0.0F - f;
-				float f6 = (float) max_l / 32.0F - f;
-				float f10 = Math.min(age / (float)bullet.growTime, 1.0F);
-				f10 *= f10;
-				float f11 = 1.5F + (1.0F - f10) * 10.0F;
+				float f6 = max_l / 32.0F - f;
+				float f10 = Math.min(age / (float)bullet.duration, 1.0F);
+				float f13 = f10 - 0.5F;
+				float f11 = 1f - f13 * f13 * f13 * f13 * 15.0F;
+				Tessellator tessellator = Tessellator.getInstance();
+				BufferBuilder bufferbuilder = tessellator.getBuffer();
 				bufferbuilder.begin(5, DefaultVertexFormats.POSITION_TEX_COLOR);
-				for (int j = 0; j <= 8; j++) {
-					float f7 = MathHelper.sin((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.5F;
-					float f8 = MathHelper.cos((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.5F;
-					float f9 = (j % 8) / 8.0F;
-					bufferbuilder.pos(f7, 0.0F, f8).tex(f9, f5).color(1.0f, 1.0f, 1.0f, 0.7f).endVertex();
-					bufferbuilder.pos(f7 * f11, (float) max_l * f10, f8 * f11).tex(f9, f6).color(1.0f, 1.0f, 1.0f, 0.7f * f10).endVertex();
-				}
-				for (int j = 0; f10 > 0.98F && j <= 8; j++) {
-					float f7 = MathHelper.sin((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.5F;
-					float f8 = MathHelper.cos((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.5F;
-					float f9 = (j % 8) / 8.0F;
-					bufferbuilder.pos(f7 * f11, (float)max_l * f10, f8 * f11).tex(f9, f6).color(1.0f, 1.0f, 1.0f, 0.7f * f10).endVertex();
-					bufferbuilder.pos(f7 * 0.1F, (float)max_l * f10 + 2.0F, f8 * 0.1F).tex(f9, f5).color(1.0f, 1.0f, 1.0f, 0.7f * f10).endVertex();
-				}
-				for (int j = 0; f10 > 0.98F && j <= 8; j++) {
-					float f7 = MathHelper.sin((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.6F;
-					float f8 = MathHelper.cos((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 0.6F;
-					float f9 = (j % 8) / 8.0F;
-					bufferbuilder.pos(f7, 0.0F, f8).tex(f9, f5).color(1.0f, 1.0f, 1.0f, 0.11f).endVertex();
-					bufferbuilder.pos(f7 * f11, (float) max_l * f10, f8 * f11).tex(f9, f6).color(1.0f, 1.0f, 1.0f, 0.11f).endVertex();
+				for (float f12 = 0.0F; f12 < f11; f12 += 0.05F) {
+					for (int j = 0; j <= 8; j++) {
+						float f7 = MathHelper.sin((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 1.0F;
+						float f8 = MathHelper.cos((j % 8) * ((float) Math.PI * 2F) / 8.0F) * 1.0F;
+						float f9 = (j % 8) / 8.0F;
+						bufferbuilder.pos(f7, 0.0F, f8).tex(f9, f5).color(1.0f, 1.0f, 1.0f, 0.15f).endVertex();
+						bufferbuilder.pos(f7 * f12 * max_l * 0.5F, max_l * f11, f8 * f12 * max_l * 0.5F).tex(f9, f6).color(1.0f, 1.0f, 1.0f, 0.0f).endVertex();
+					}
 				}
 				tessellator.draw();
 				GlStateManager.enableLighting();
 				GlStateManager.enableCull();
+				GlStateManager.alphaFunc(0x204, 0.1f);
 				GlStateManager.disableBlend();
 				GlStateManager.shadeModel(0x1D00);
 				GlStateManager.popMatrix();
@@ -738,6 +953,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone110;
 			private final ModelRenderer bone107;
 			private final ModelRenderer bone108;
+			private final ModelRenderer needle;
+			private final ModelRenderer bulge;
 			//private final ModelRenderer bipedLeftArm;
 			private final ModelRenderer leftArmSpikes;
 			private final ModelRenderer bone19;
@@ -1638,6 +1855,23 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(bone108, -0.7646F, -0.8326F, 0.018F);
 				bone108.cubeList.add(new ModelBox(bone108, 0, 0, -1.0F, -6.0F, -1.0F, 2, 6, 2, 0.2F, false));
 		
+				needle = new ModelRenderer(this);
+				needle.setRotationPoint(0.0F, 10.0F, 0.0F);
+				bipedRightArm.addChild(needle);
+				setRotationAngle(needle, 0.0F, -0.7854F, 0.0F);
+				needle.cubeList.add(new ModelBox(needle, 56, 16, -0.5F, 0.0F, -0.5F, 1, 8, 1, 0.0F, false));
+				needle.cubeList.add(new ModelBox(needle, 56, 16, -0.5F, 7.75F, -0.5F, 1, 4, 1, -0.1F, false));
+				needle.cubeList.add(new ModelBox(needle, 56, 16, -0.5F, 11.25F, -0.5F, 1, 2, 1, -0.2F, false));
+				needle.cubeList.add(new ModelBox(needle, 56, 16, -0.5F, 12.75F, -0.5F, 1, 2, 1, -0.3F, false));
+				needle.cubeList.add(new ModelBox(needle, 56, 16, -0.5F, 13.75F, -0.5F, 1, 2, 1, -0.4F, false));
+		
+				bulge = new ModelRenderer(this);
+				bulge.setRotationPoint(-0.5F, 16.0F, 0.5F);
+				needle.addChild(bulge);
+				bulge.cubeList.add(new ModelBox(bulge, 56, 17, 0.0F, -2.0F, -1.0F, 1, 2, 1, 0.4F, false));
+				bulge.cubeList.add(new ModelBox(bulge, 56, 17, 0.0F, -3.0F, -1.0F, 1, 4, 1, 0.2F, false));
+				bulge.cubeList.add(new ModelBox(bulge, 56, 17, 0.0F, -4.0F, -1.0F, 1, 6, 1, 0.0F, false));
+
 				bipedLeftArm = new ModelRenderer(this);
 				bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
 				setRotationAngle(bipedLeftArm, 0.3927F, 0.0F, 0.0F);
@@ -1959,6 +2193,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				exhaustExtension7.showModel = visible;
 				exhaustExtension8.showModel = visible;
 				blasts.showModel = visible;
+				needle.showModel = visible;
+				bulge.showModel = visible;
 			}
 
 			@Override
@@ -1982,7 +2218,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 					copyModelAngles(this.wearerModel.bipedLeftLeg, this.bipedLeftLeg);
 					copyModelAngles(this.wearerModel.bipedRightLeg, this.bipedRightLeg);
 				}
-				float f6 = f2 - entity.getEntityData().getInteger(START_TIME);
+				float f6 = (float)entity.getEntityData().getInteger(START_TIME) + f2 - (float)entity.ticksExisted;
 				if (f6 <= 40F) {
 					float gb = f6 >= 20F ? MathHelper.clamp((f6 - 20F) / 20F, 0.0F, 1.0F) : 0.0F;
 					float a = MathHelper.clamp(f6 / 20F, 0F, 1.0F);

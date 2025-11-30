@@ -245,7 +245,7 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-			if (player.world.isRemote && !this.isThrown(stack)) {
+			if (!player.world.isRemote && !this.isThrown(stack)) {
 				if (!stack.hasTagCompound()) {
 					stack.setTagCompound(new NBTTagCompound());
 				}

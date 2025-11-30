@@ -1,8 +1,8 @@
 {
   "id_map": {
-    "ENTITY": 524,
+    "GUI": 73,
     "DIMENSION": 13,
-    "GUI": 73
+    "ENTITY": 524
   },
   "mod_elements": [
     {
@@ -9114,6 +9114,14 @@
       ],
       "category": "master",
       "subtitle": ""
+    },
+    {
+      "name": "blast_charge",
+      "files": [
+        "blast_charge"
+      ],
+      "category": "master",
+      "subtitle": ""
     }
   ],
   "language_map": {
@@ -9333,8 +9341,8 @@
       "entity.jintoncube.name": "Dust Release: Boundary Dismantling Jutsu - Cube",
       "item.suiton.name": "Water Release",
       "potion.effect.feather_falling": "Feather Falling",
-      "item.doton.name": "Earth Release",
       "entity.whitezetsu.name": "White Zetsu",
+      "item.doton.name": "Earth Release",
       "advancements.ranton_acquired.descr": "Storm Release (Ranton, \"Gale Style\" or \"Storm Style\") is a nature transformation kekkei genkai, a combination of lightning and water.",
       "item.bone_armorbody.name": "Bone Armor",
       "entity.entitybrackendance.name": "Bracken Dance",
@@ -9701,6 +9709,7 @@
       "subtitles.dojutsu": "",
       "item.ninja_armor.name": "Ninja Armor",
       "lingering_potion.effect.reach": "Lingering Reach",
+      "item.senninka.absorb": "Cellular Regeneration Absorption",
       "entity.c_1.name": "Explosive Clay ([Left click] to set target)",
       "item.byakurinnesharinganboots.name": "",
       "item.clothes_kazekageboots.name": "",
@@ -9752,6 +9761,7 @@
       "item.scroll_sanshouo.name": "Sansh?uo Puppet Scroll",
       "potion.effect.chakra_enhanced_strength": "Chakra Enhanced Strength",
       "item.scroll_rasengan.name": "Rasengan",
+      "subtitles.blast_charge": "",
       "advancements.sharinganopened.descr": "Practice and practice and practice your ninja skills",
       "entity.anbu.name": "Anbu",
       "subtitles.ice_shoot": "",

@@ -108,9 +108,11 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(flag ? 8d : 5d))) {
-						if (!entity.equals(this.user)) {
-							entity.hurtResistantTime = 10;
-							entity.attackEntityFrom(DamageSource.HOT_FLOOR, 1.5f);
+						if (!entity.equals(this.user) && ItemJutsu.canTarget(entity)) {
+							if (entity.hurtResistantTime > 14) {
+								entity.hurtResistantTime = 14;
+							}
+							entity.attackEntityFrom(DamageSource.HOT_FLOOR, 1.0f);
 						}
 					}
 				} else {

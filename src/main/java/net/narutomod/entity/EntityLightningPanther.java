@@ -481,39 +481,31 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer joint8;
 			private final ModelRenderer foot1;
 			private final ModelRenderer cube_r44;
-			private final ModelRenderer cube_r45;
 			private final ModelRenderer cube_r46;
 			private final ModelRenderer cube_r47;
-			private final ModelRenderer cube_r60;
 			private final ModelRenderer leg2;
 			private final ModelRenderer joint2;
 			private final ModelRenderer joint5;
 			private final ModelRenderer foot2;
 			private final ModelRenderer cube_r42;
-			private final ModelRenderer cube_r43;
 			private final ModelRenderer cube_r48;
 			private final ModelRenderer cube_r49;
-			private final ModelRenderer cube_r50;
 			private final ModelRenderer leg3;
 			private final ModelRenderer joint3;
 			private final ModelRenderer joint4;
 			private final ModelRenderer bone6;
 			private final ModelRenderer foot3;
 			private final ModelRenderer cube_r40;
-			private final ModelRenderer cube_r54;
 			private final ModelRenderer cube_r55;
 			private final ModelRenderer cube_r56;
-			private final ModelRenderer cube_r58;
 			private final ModelRenderer leg4;
 			private final ModelRenderer joint6;
 			private final ModelRenderer joint9;
 			private final ModelRenderer bone5;
 			private final ModelRenderer foot4;
+			private final ModelRenderer cube_r51;
+			private final ModelRenderer cube_r53;
 			private final ModelRenderer cube_r57;
-			private final ModelRenderer cube_r62;
-			private final ModelRenderer cube_r63;
-			private final ModelRenderer cube_r64;
-			private final ModelRenderer cube_r65;
 			private final ModelRenderer[] tail = new ModelRenderer[7];
 			private final float tailSwayX[] = new float[7];
 			private final float tailSwayY[] = new float[7];
@@ -525,7 +517,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				textureHeight = 128;
 		
 				head = new ModelRenderer(this);
-				head.setRotationPoint(0.0F, 3.0F, -6.0F);
+				head.setRotationPoint(0.0F, 4.0F, -7.0F);
 				
 		
 				cube_r1 = new ModelRenderer(this);
@@ -889,7 +881,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				cube_r38.cubeList.add(new ModelBox(cube_r38, 52, 14, -3.193F, -0.25F, 18.4824F, 5, 1, 0, 0.0F, false));
 		
 				eyes = new ModelRenderer(this);
-				eyes.setRotationPoint(0.0F, 3.0F, -6.0F);
+				eyes.setRotationPoint(0.0F, 4.0F, -7.0F);
 				eyes.cubeList.add(new ModelBox(eyes, 76, 0, -4.0F, -3.0F, -9.8F, 8, 2, 0, 0.0F, false));
 		
 				body = new ModelRenderer(this);
@@ -897,18 +889,19 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				
 		
 				cube_r39 = new ModelRenderer(this);
-				cube_r39.setRotationPoint(6.0F, 8.0F, 4.25F);
+				cube_r39.setRotationPoint(0.0F, -1.0F, 14.25F);
 				body.addChild(cube_r39);
-				cube_r39.cubeList.add(new ModelBox(cube_r39, 0, 31, -13.0F, -13.0F, 3.0F, 14, 12, 18, 0.0F, false));
+				setRotationAngle(cube_r39, -0.1745F, 0.0F, 0.0F);
+				cube_r39.cubeList.add(new ModelBox(cube_r39, 0, 31, -7.0F, -6.2F, -8.5F, 14, 12, 18, 0.0F, false));
 		
 				cube_r41 = new ModelRenderer(this);
-				cube_r41.setRotationPoint(6.0F, 8.0F, -13.5F);
+				cube_r41.setRotationPoint(0.0F, 0.6658F, 1.1916F);
 				body.addChild(cube_r41);
-				setRotationAngle(cube_r41, -0.0873F, 0.0F, 0.0F);
-				cube_r41.cubeList.add(new ModelBox(cube_r41, 0, 0, -15.0F, -16.0F, 5.0F, 18, 15, 16, 0.0F, false));
+				setRotationAngle(cube_r41, 0.2618F, 0.0F, 0.0F);
+				cube_r41.cubeList.add(new ModelBox(cube_r41, 0, 0, -9.0F, -7.5F, -8.0F, 18, 15, 16, 0.0F, false));
 		
 				tail[0] = new ModelRenderer(this);
-				tail[0].setRotationPoint(0.0F, -2.0F, 25.0F);
+				tail[0].setRotationPoint(0.0F, -2.0F, 24.0F);
 				body.addChild(tail[0]);
 				setRotationAngle(tail[0], -1.309F, 0.0F, 0.0F);
 				tail[0].cubeList.add(new ModelBox(tail[0], 52, 0, -3.0F, -7.0F, -3.0F, 6, 8, 6, 0.0F, false));
@@ -950,37 +943,33 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				tail[6].cubeList.add(new ModelBox(tail[6], 52, 0, -3.0F, -7.0F, -3.0F, 6, 8, 6, -0.9F, false));
 		
 				leg1 = new ModelRenderer(this);
-				leg1.setRotationPoint(-4.75F, 4.0F, -1.0F);
+				leg1.setRotationPoint(-4.75F, 4.0F, -2.0F);
 				
 		
 				joint7 = new ModelRenderer(this);
 				joint7.setRotationPoint(0.0F, 0.25F, 0.0F);
 				leg1.addChild(joint7);
-				setRotationAngle(joint7, 0.1745F, 0.0F, 0.1745F);
+				setRotationAngle(joint7, 0.1745F, 0.0F, 0.2618F);
 				joint7.cubeList.add(new ModelBox(joint7, 28, 66, -6.3472F, -2.1133F, -4.8929F, 6, 14, 8, 0.0F, false));
 		
 				joint8 = new ModelRenderer(this);
-				joint8.setRotationPoint(-3.2222F, 12.8867F, 0.1071F);
+				joint8.setRotationPoint(-3.2222F, 12.3867F, 0.1071F);
 				joint7.addChild(joint8);
-				setRotationAngle(joint8, -0.517F, -0.0869F, -0.1515F);
-				joint8.cubeList.add(new ModelBox(joint8, 0, 82, -2.625F, -2.25F, -3.75F, 5, 10, 5, 0.0F, false));
+				setRotationAngle(joint8, -0.8224F, -0.0869F, -0.2388F);
+				joint8.cubeList.add(new ModelBox(joint8, 0, 82, -2.625F, -2.25F, -3.75F, 5, 14, 5, 0.0F, false));
 		
 				foot1 = new ModelRenderer(this);
-				foot1.setRotationPoint(-0.125F, 5.8875F, 1.0375F);
+				foot1.setRotationPoint(-0.125F, 9.1375F, 0.2875F);
 				joint8.addChild(foot1);
-				setRotationAngle(foot1, 0.3491F, 0.0F, 0.0F);
-				
+				setRotationAngle(foot1, 0.6109F, 0.0F, 0.0F);
+				foot1.cubeList.add(new ModelBox(foot1, 78, 76, -2.5F, -0.0375F, -5.9375F, 5, 2, 6, 0.0F, false));
+				foot1.cubeList.add(new ModelBox(foot1, 6, 39, -0.5F, 0.2125F, -6.9375F, 1, 2, 1, 0.1F, false));
 		
 				cube_r44 = new ModelRenderer(this);
 				cube_r44.setRotationPoint(2.0F, 0.2125F, -0.6875F);
 				foot1.addChild(cube_r44);
 				setRotationAngle(cube_r44, -0.5236F, -1.0472F, 0.0F);
 				cube_r44.cubeList.add(new ModelBox(cube_r44, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
-		
-				cube_r45 = new ModelRenderer(this);
-				cube_r45.setRotationPoint(0.0F, 1.2125F, -5.9375F);
-				foot1.addChild(cube_r45);
-				cube_r45.cubeList.add(new ModelBox(cube_r45, 6, 39, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
 		
 				cube_r46 = new ModelRenderer(this);
 				cube_r46.setRotationPoint(2.0F, 1.2125F, -5.6875F);
@@ -994,43 +983,34 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(cube_r47, 0.0F, 0.2618F, 0.0F);
 				cube_r47.cubeList.add(new ModelBox(cube_r47, 12, 45, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
 		
-				cube_r60 = new ModelRenderer(this);
-				cube_r60.setRotationPoint(4.5F, 1.9625F, -15.9375F);
-				foot1.addChild(cube_r60);
-				cube_r60.cubeList.add(new ModelBox(cube_r60, 78, 76, -7.0F, -2.0F, 10.0F, 5, 2, 6, 0.0F, false));
-		
 				leg2 = new ModelRenderer(this);
-				leg2.setRotationPoint(4.75F, 4.0F, -1.0F);
+				leg2.setRotationPoint(4.75F, 4.0F, -2.0F);
 				
 		
 				joint2 = new ModelRenderer(this);
 				joint2.setRotationPoint(0.0F, 0.25F, 0.0F);
 				leg2.addChild(joint2);
-				setRotationAngle(joint2, 0.1745F, 0.0F, -0.1745F);
+				setRotationAngle(joint2, 0.1745F, 0.0F, -0.2618F);
 				joint2.cubeList.add(new ModelBox(joint2, 28, 66, 0.3472F, -2.1133F, -4.8929F, 6, 14, 8, 0.0F, true));
 		
 				joint5 = new ModelRenderer(this);
-				joint5.setRotationPoint(3.2222F, 12.8867F, 0.1071F);
+				joint5.setRotationPoint(3.2222F, 12.3867F, 0.1071F);
 				joint2.addChild(joint5);
-				setRotationAngle(joint5, -0.517F, 0.0869F, 0.1515F);
-				joint5.cubeList.add(new ModelBox(joint5, 0, 82, -2.375F, -2.25F, -3.75F, 5, 10, 5, 0.0F, true));
+				setRotationAngle(joint5, -0.8224F, 0.0869F, 0.2388F);
+				joint5.cubeList.add(new ModelBox(joint5, 0, 82, -2.375F, -2.25F, -3.75F, 5, 14, 5, 0.0F, true));
 		
 				foot2 = new ModelRenderer(this);
-				foot2.setRotationPoint(0.125F, 5.8875F, 1.0375F);
+				foot2.setRotationPoint(0.125F, 9.1375F, 0.2875F);
 				joint5.addChild(foot2);
-				setRotationAngle(foot2, 0.3491F, 0.0F, 0.0F);
-				
+				setRotationAngle(foot2, 0.6109F, 0.0F, 0.0F);
+				foot2.cubeList.add(new ModelBox(foot2, 78, 76, -2.5F, -0.0375F, -5.9375F, 5, 2, 6, 0.0F, true));
+				foot2.cubeList.add(new ModelBox(foot2, 6, 39, -0.5F, 0.2125F, -6.9375F, 1, 2, 1, 0.1F, true));
 		
 				cube_r42 = new ModelRenderer(this);
 				cube_r42.setRotationPoint(-2.0F, 0.2125F, -0.6875F);
 				foot2.addChild(cube_r42);
 				setRotationAngle(cube_r42, -0.5236F, 1.0472F, 0.0F);
 				cube_r42.cubeList.add(new ModelBox(cube_r42, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
-		
-				cube_r43 = new ModelRenderer(this);
-				cube_r43.setRotationPoint(0.0F, 1.2125F, -5.9375F);
-				foot2.addChild(cube_r43);
-				cube_r43.cubeList.add(new ModelBox(cube_r43, 6, 39, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
 		
 				cube_r48 = new ModelRenderer(this);
 				cube_r48.setRotationPoint(-2.0F, 1.2125F, -5.6875F);
@@ -1044,49 +1024,40 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(cube_r49, 0.0F, -0.2618F, 0.0F);
 				cube_r49.cubeList.add(new ModelBox(cube_r49, 12, 45, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
 		
-				cube_r50 = new ModelRenderer(this);
-				cube_r50.setRotationPoint(-4.5F, 1.9625F, -15.9375F);
-				foot2.addChild(cube_r50);
-				cube_r50.cubeList.add(new ModelBox(cube_r50, 78, 76, 2.0F, -2.0F, 10.0F, 5, 2, 6, 0.0F, true));
-		
 				leg3 = new ModelRenderer(this);
-				leg3.setRotationPoint(-5.5F, 7.0F, 21.5F);
+				leg3.setRotationPoint(-3.5F, 7.0F, 21.5F);
 				
 		
 				joint3 = new ModelRenderer(this);
 				joint3.setRotationPoint(-2.75F, 0.0F, 0.0F);
 				leg3.addChild(joint3);
-				setRotationAngle(joint3, -0.2618F, 0.0F, 0.0873F);
+				setRotationAngle(joint3, 0.0F, 0.0F, 0.1745F);
 				joint3.cubeList.add(new ModelBox(joint3, 0, 60, -3.0F, -4.8536F, -4.568F, 6, 10, 8, 0.2F, false));
 		
 				joint4 = new ModelRenderer(this);
 				joint4.setRotationPoint(-0.5F, 5.1645F, -4.6245F);
 				joint3.addChild(joint4);
-				setRotationAngle(joint4, 1.0472F, 0.0F, -0.0436F);
+				setRotationAngle(joint4, 0.8727F, 0.0F, -0.0873F);
 				joint4.cubeList.add(new ModelBox(joint4, 56, 74, -2.5F, 0.0F, 0.0F, 5, 12, 5, 0.0F, false));
 		
 				bone6 = new ModelRenderer(this);
 				bone6.setRotationPoint(0.0F, 12.0F, 5.0F);
 				joint4.addChild(bone6);
-				setRotationAngle(bone6, -1.0036F, 0.0F, 0.0F);
+				setRotationAngle(bone6, -1.2218F, 0.0F, -0.0873F);
 				bone6.cubeList.add(new ModelBox(bone6, -6, -3, -2.5F, 0.0F, -5.0F, 5, 8, 5, 0.0F, true));
 		
 				foot3 = new ModelRenderer(this);
-				foot3.setRotationPoint(0.0F, 6.973F, -0.088F);
+				foot3.setRotationPoint(0.0F, 6.473F, -0.088F);
 				bone6.addChild(foot3);
-				setRotationAngle(foot3, 0.2182F, 0.0F, 0.0F);
-				
+				setRotationAngle(foot3, 0.3491F, 0.0F, 0.0F);
+				foot3.cubeList.add(new ModelBox(foot3, 78, 76, -2.5F, -0.0375F, -5.9375F, 5, 2, 6, 0.0F, false));
+				foot3.cubeList.add(new ModelBox(foot3, 6, 39, -0.5F, 0.2125F, -6.9375F, 1, 2, 1, 0.1F, false));
 		
 				cube_r40 = new ModelRenderer(this);
 				cube_r40.setRotationPoint(2.0F, 0.2125F, -0.6875F);
 				foot3.addChild(cube_r40);
 				setRotationAngle(cube_r40, -0.5236F, -1.0472F, 0.0F);
 				cube_r40.cubeList.add(new ModelBox(cube_r40, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
-		
-				cube_r54 = new ModelRenderer(this);
-				cube_r54.setRotationPoint(0.0F, 1.2125F, -5.9375F);
-				foot3.addChild(cube_r54);
-				cube_r54.cubeList.add(new ModelBox(cube_r54, 6, 39, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
 		
 				cube_r55 = new ModelRenderer(this);
 				cube_r55.setRotationPoint(2.0F, 1.2125F, -5.6875F);
@@ -1100,66 +1071,52 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				setRotationAngle(cube_r56, 0.0F, 0.2618F, 0.0F);
 				cube_r56.cubeList.add(new ModelBox(cube_r56, 12, 45, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, false));
 		
-				cube_r58 = new ModelRenderer(this);
-				cube_r58.setRotationPoint(4.5F, 1.9625F, -15.9375F);
-				foot3.addChild(cube_r58);
-				cube_r58.cubeList.add(new ModelBox(cube_r58, 78, 76, -7.0F, -2.0F, 10.0F, 5, 2, 6, 0.0F, false));
-		
 				leg4 = new ModelRenderer(this);
-				leg4.setRotationPoint(5.5F, 7.0F, 21.5F);
+				leg4.setRotationPoint(3.5F, 7.0F, 21.5F);
 				
 		
 				joint6 = new ModelRenderer(this);
 				joint6.setRotationPoint(2.75F, 0.0F, 0.0F);
 				leg4.addChild(joint6);
-				setRotationAngle(joint6, -0.2618F, 0.0F, -0.0873F);
+				setRotationAngle(joint6, 0.0F, 0.0F, -0.1745F);
 				joint6.cubeList.add(new ModelBox(joint6, 0, 60, -3.0F, -4.8536F, -4.568F, 6, 10, 8, 0.2F, true));
 		
 				joint9 = new ModelRenderer(this);
 				joint9.setRotationPoint(0.5F, 5.1645F, -4.6245F);
 				joint6.addChild(joint9);
-				setRotationAngle(joint9, 1.0472F, 0.0F, 0.0436F);
+				setRotationAngle(joint9, 0.8727F, 0.0F, 0.0873F);
 				joint9.cubeList.add(new ModelBox(joint9, 56, 74, -2.5F, 0.0F, 0.0F, 5, 12, 5, 0.0F, true));
 		
 				bone5 = new ModelRenderer(this);
 				bone5.setRotationPoint(0.0F, 12.0F, 5.0F);
 				joint9.addChild(bone5);
-				setRotationAngle(bone5, -1.0036F, 0.0F, 0.0F);
+				setRotationAngle(bone5, -1.2218F, 0.0F, 0.0873F);
 				bone5.cubeList.add(new ModelBox(bone5, -6, -3, -2.5F, 0.0F, -5.0F, 5, 8, 5, 0.0F, false));
 		
 				foot4 = new ModelRenderer(this);
-				foot4.setRotationPoint(0.0F, 6.973F, -0.088F);
+				foot4.setRotationPoint(0.0F, 6.473F, -0.088F);
 				bone5.addChild(foot4);
-				setRotationAngle(foot4, 0.2182F, 0.0F, 0.0F);
-				
+				setRotationAngle(foot4, 0.3491F, 0.0F, 0.0F);
+				foot4.cubeList.add(new ModelBox(foot4, 78, 76, -2.5F, -0.0375F, -5.9375F, 5, 2, 6, 0.0F, true));
+				foot4.cubeList.add(new ModelBox(foot4, 6, 39, -0.5F, 0.2125F, -6.9375F, 1, 2, 1, 0.1F, true));
+		
+				cube_r51 = new ModelRenderer(this);
+				cube_r51.setRotationPoint(-2.0F, 0.2125F, -0.6875F);
+				foot4.addChild(cube_r51);
+				setRotationAngle(cube_r51, -0.5236F, 1.0472F, 0.0F);
+				cube_r51.cubeList.add(new ModelBox(cube_r51, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
+		
+				cube_r53 = new ModelRenderer(this);
+				cube_r53.setRotationPoint(-2.0F, 1.2125F, -5.6875F);
+				foot4.addChild(cube_r53);
+				setRotationAngle(cube_r53, 0.0F, 0.2618F, 0.0F);
+				cube_r53.cubeList.add(new ModelBox(cube_r53, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
 		
 				cube_r57 = new ModelRenderer(this);
-				cube_r57.setRotationPoint(-2.0F, 0.2125F, -0.6875F);
+				cube_r57.setRotationPoint(2.0F, 1.2125F, -5.6875F);
 				foot4.addChild(cube_r57);
-				setRotationAngle(cube_r57, -0.5236F, 1.0472F, 0.0F);
-				cube_r57.cubeList.add(new ModelBox(cube_r57, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
-		
-				cube_r62 = new ModelRenderer(this);
-				cube_r62.setRotationPoint(0.0F, 1.2125F, -5.9375F);
-				foot4.addChild(cube_r62);
-				cube_r62.cubeList.add(new ModelBox(cube_r62, 6, 39, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
-		
-				cube_r63 = new ModelRenderer(this);
-				cube_r63.setRotationPoint(-2.0F, 1.2125F, -5.6875F);
-				foot4.addChild(cube_r63);
-				setRotationAngle(cube_r63, 0.0F, 0.2618F, 0.0F);
-				cube_r63.cubeList.add(new ModelBox(cube_r63, 12, 42, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
-		
-				cube_r64 = new ModelRenderer(this);
-				cube_r64.setRotationPoint(2.0F, 1.2125F, -5.6875F);
-				foot4.addChild(cube_r64);
-				setRotationAngle(cube_r64, 0.0F, -0.2618F, 0.0F);
-				cube_r64.cubeList.add(new ModelBox(cube_r64, 12, 45, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
-		
-				cube_r65 = new ModelRenderer(this);
-				cube_r65.setRotationPoint(-4.5F, 1.9625F, -15.9375F);
-				foot4.addChild(cube_r65);
-				cube_r65.cubeList.add(new ModelBox(cube_r65, 78, 76, 2.0F, -2.0F, 10.0F, 5, 2, 6, 0.0F, true));
+				setRotationAngle(cube_r57, 0.0F, -0.2618F, 0.0F);
+				cube_r57.cubeList.add(new ModelBox(cube_r57, 12, 45, -0.5F, -1.0F, -1.0F, 1, 2, 1, 0.1F, true));
 
 				for (int j = 1; j < tailSwayX.length; j++) {
 					tailSwayX[j] = (rand.nextFloat() * 0.2618F + 0.1745F) * (rand.nextBoolean() ? -1F : 1F);
