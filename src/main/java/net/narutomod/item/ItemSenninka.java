@@ -58,21 +58,21 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import java.util.List;
-import com.google.common.collect.Lists;
-import net.minecraft.init.SoundEvents;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:senninka")
 	public static final Item block = null;
 	public static final int ENTITYID = 524;
-	private static final String CHAKRA_BEFORE = "ChakraAmountB4Activation";
+	//private static final String CHAKRA_BEFORE = "ChakraAmountB4Activation";
 	private static final String START_TIME = "SenninkaStartTime";
 	public static final ItemJutsu.JutsuEnum BROADAXE = new ItemJutsu.JutsuEnum(0, "item.senninka_broadaxe.name", 'S', 150, 50d, new Broadaxe());
 	public static final ItemJutsu.JutsuEnum PISTONFIST = new ItemJutsu.JutsuEnum(1, "item.senninka.pistonfist", 'S', 150, 50d, new PistonFist());
@@ -118,6 +118,14 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected boolean executeJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+			if (ItemSenjutsu.isSageModeActivated(entity)) {
+				ItemSenjutsu.deactivateSageMode(entity);
+			}
+			return super.executeJutsu(stack, entity, power);
+		}
+
+		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (entity instanceof EntityLivingBase) {
@@ -132,13 +140,11 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
-			if (attacker.equals(target)) {
-				for (ItemJutsu.JutsuEnum jutsuEnum : this.getAllJutsus(itemstack)) {
-					if (jutsuEnum.jutsu instanceof SenninkaJutsu
-				 	 && ((RangedItem)itemstack.getItem()).canUseJutsu(itemstack, jutsuEnum, attacker)
-				 	 && jutsuEnum.jutsu.isActivated(itemstack)) {
-						((SenninkaJutsu)jutsuEnum.jutsu).onLeftClickEmpty(itemstack, attacker);
-					}
+			for (ItemJutsu.JutsuEnum jutsuEnum : this.getAllJutsus(itemstack)) {
+				if (jutsuEnum.jutsu instanceof SenninkaJutsu
+			 	 && ((RangedItem)itemstack.getItem()).canUseJutsu(itemstack, jutsuEnum, attacker)
+			 	 && jutsuEnum.jutsu.isActivated(itemstack)) {
+					((SenninkaJutsu)jutsuEnum.jutsu).onLeftClickEntity(itemstack, attacker, target);
 				}
 			}
 			return super.onLeftClickEntity(itemstack, attacker, target);
@@ -185,7 +191,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 		}
 
-		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
+		public void onLeftClickEntity(ItemStack stack, EntityPlayer attacker, Entity target) {
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -203,6 +209,17 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			}
 			return false;
 		}
+
+		public static void deactivateAll(EntityLivingBase entity) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			if (stack != null) {
+				for (SenninkaJutsu jutsu : list) {
+					if (jutsu.isActivated(entity, stack)) {
+						jutsu.deactivate(entity);
+					}
+				}
+			}
+		}
 	}
 
 	public static class Broadaxe extends SenninkaJutsu {
@@ -211,13 +228,6 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 			if (entity instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)entity, ItemSenninkaBroadaxe.block)) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
-				//Chakra.Pathway cp = Chakra.pathway(entity);
-				//stack.getTagCompound().setDouble(CHAKRA_BEFORE, cp.getAmount());
-				//float f = ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity);
-				//cp.consume(-0.5f / f, true);
-				//if (entity instanceof EntityPlayerMP) {
-				//	OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
-				//}
 				ItemStack itemstack = new ItemStack(ItemSenninkaBroadaxe.block);
 				ProcedureUtils.swapItemToSlot((EntityPlayer)entity, EntityEquipmentSlot.MAINHAND, itemstack);
 				return true;
@@ -239,6 +249,13 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean isActivated(EntityLivingBase entity, ItemStack stack) {
 			return entity.getHeldItemMainhand().getItem() == ItemSenninkaBroadaxe.block;
+		}
+
+		@Override
+		public void deactivate(EntityLivingBase entity) {
+			if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+				((EntityPlayer)entity).inventory.clearMatchingItems(ItemSenninkaBroadaxe.block, -1, -1, null);
+			}
 		}
 
 		@Override
@@ -265,8 +282,8 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	public static class PistonFist extends SenninkaJutsu {
 		private final String idKey = "PistonFistStackKey";
 		private final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.RangedItem.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 50.0d, 0))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(ItemSenjutsu.RangedItem.MOVEMENT_SPEED_MODIFIER, "senninka.movement", 1.5d, 1))
+			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 50.0d, 0))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(ItemSenjutsu.MOVEMENT_SPEED_MODIFIER, "senninka.movement", 1.5d, 1))
 			.build();
 
 		@Override
@@ -275,10 +292,17 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")), SoundCategory.PLAYERS, 1f, 1f);
 				STAGE2.jutsu.deactivate(entity);
+				//Chakra.Pathway cp = Chakra.pathway(entity);
+				//stack.getTagCompound().setDouble(CHAKRA_BEFORE, cp.getAmount());
+				//float f = ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity);
+				//cp.consume(-0.5f / f, true);
+				//if (entity instanceof EntityPlayerMP) {
+				//	OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
+				//}
 				stack.getTagCompound().setBoolean(this.idKey, true);
 				for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
-					if (attr != null) {
+					if (attr != null && !attr.hasModifier(entry.getValue())) {
 						attr.applyModifier(entry.getValue());
 					}
 				}
@@ -297,9 +321,13 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
-			Entity target = ProcedureUtils.objectEntityLookingAt(attacker, 16d, 3d).entityHit;
-			if (target instanceof EntityLivingBase) {
+		public void onLeftClickEntity(ItemStack stack, EntityPlayer attacker, Entity target) {
+			if (attacker.equals(target)) {
+				target = ProcedureUtils.objectEntityLookingAt(attacker, 16d, 3d).entityHit;
+				if (target instanceof EntityLivingBase) {
+					attacker.attackTargetEntityWithCurrentItem(target);
+				}
+			} else if (target instanceof EntityLivingBase) {
 				target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
 				SoundCategory.NEUTRAL, 1.0F, attacker.getRNG().nextFloat() * 0.5F + 0.5F);
 				Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
@@ -314,7 +342,6 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
 				attacker.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
 				attacker.setPositionAndUpdate(target.posX - vec.x, target.posY - vec.y + 0.5d, target.posZ - vec.z);
-				attacker.attackTargetEntityWithCurrentItem(target);
 			}
 		}
 
@@ -350,7 +377,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public void deactivate(EntityLivingBase entity) {
 			for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 				IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
-				if (attr != null) {
+				if (attr != null && attr.hasModifier(entry.getValue())) {
 					attr.removeModifier(entry.getValue());
 				}
 			}
@@ -365,10 +392,10 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 	public static class Stage2 extends SenninkaJutsu {
 		private final String idKey = "Stage2StackKey";
 		private final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.RangedItem.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 60.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(ItemSenjutsu.RangedItem.ATTACK_SPEED_MODIFIER, "senninka.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(ItemSenjutsu.RangedItem.MOVEMENT_SPEED_MODIFIER, "senninka.movement", 1.8d, 1))
-			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(ItemSenjutsu.RangedItem.MAX_HEALTH_MODIFIER, "senninka.health", 80.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ItemSenjutsu.ATTACK_DAMAGE_MODIFIER, "senninka.damage", 60.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(ItemSenjutsu.ATTACK_SPEED_MODIFIER, "senninka.damagespeed", 2.0d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(ItemSenjutsu.MOVEMENT_SPEED_MODIFIER, "senninka.movement", 1.8d, 1))
+			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(ItemSenjutsu.MAX_HEALTH_MODIFIER, "senninka.health", 80.0d, 0))
 			.build();
 
 		@Override
@@ -442,11 +469,15 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onLeftClickEmpty(ItemStack stack, EntityPlayer attacker) {
-			Entity target = ProcedureUtils.objectEntityLookingAt(attacker, 18d, 3d).entityHit;
-			if (target instanceof EntityLivingBase) {
+		public void onLeftClickEntity(ItemStack stack, EntityPlayer attacker, Entity target) {
+			if (attacker.equals(target)) {
+				target = ProcedureUtils.objectEntityLookingAt(attacker, 16d, 3d).entityHit;
+				if (target instanceof EntityLivingBase) {
+					attacker.attackTargetEntityWithCurrentItem(target);
+				}
+			} else if (target instanceof EntityLivingBase) {
 				target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
-				 SoundCategory.NEUTRAL, 1.0F, attacker.getRNG().nextFloat() * 0.5F + 0.5F);
+				SoundCategory.NEUTRAL, 1.0F, attacker.getRNG().nextFloat() * 0.5F + 0.5F);
 				Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
 				Particles.Renderer particles = new Particles.Renderer(attacker.world);
 				for (int i = 1, j = 25; i <= j; i++) {
@@ -459,7 +490,6 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 				attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
 				attacker.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
 				attacker.setPositionAndUpdate(target.posX - vec.x, target.posY - vec.y + 0.5d, target.posZ - vec.z);
-				attacker.attackTargetEntityWithCurrentItem(target);
 			}
 		}
 
@@ -510,7 +540,7 @@ public class ItemSenninka extends ElementsNarutomodMod.ModElement {
 		public void deactivate(EntityLivingBase entity) {
 			for (Map.Entry<IAttribute, AttributeModifier> entry : this.buffMap.entrySet()) {
 				IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
-				if (attr != null) {
+				if (attr != null && attr.hasModifier(entry.getValue())) {
 					attr.removeModifier(entry.getValue());
 				}
 			}

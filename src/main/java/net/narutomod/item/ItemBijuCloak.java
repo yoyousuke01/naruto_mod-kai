@@ -106,7 +106,9 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 				super.onUpdate(itemstack, world, entity, par4, par5);
 				if (!world.isRemote && entity instanceof EntityPlayer) {
 					int cloakLevel = EntityBijuManager.cloakLevel((EntityPlayer)entity);
-					if (cloakLevel <= 0) {
+				 	ItemStack legStack = ((EntityPlayer)entity).getItemStackFromSlot(EntityEquipmentSlot.LEGS);
+				 	ItemStack chestStack = ((EntityPlayer)entity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+					if (cloakLevel <= 0 || legStack.getItem() != legs || chestStack.getItem() != body) {
 						itemstack.shrink(1);
 					}
 				}
@@ -157,7 +159,8 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 				 	if (cloakLevel > 0) {
 				 		ItemStack helmetStack = livingEntity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				 		ItemStack legStack = livingEntity.getItemStackFromSlot(EntityEquipmentSlot.LEGS);
-						if (helmetStack.getItem() == helmet && itemstack.getItem() == body && legStack.getItem() == legs) {
+				 		ItemStack chestStack = livingEntity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+						if (helmetStack.getItem() == helmet && chestStack.equals(itemstack) && legStack.getItem() == legs) {
 					 	 	setWearingFullSet(itemstack, true);
 							if (!world.isRemote) {
 								if (getCloakLevel(itemstack) != cloakLevel) {
@@ -192,11 +195,12 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 						 	 			revertOriginal(livingEntity, itemstack);
 						 	 		}
 						 	 		EntityBijuManager.toggleBijuCloak(livingEntity);
-						 	 		itemstack.shrink(1);
+						 	 		//itemstack.shrink(1);
 						 	 	}
 							}
 					 	 } else {
 					 	 	setWearingFullSet(itemstack, false);
+					 	 	EntityBijuManager.toggleBijuCloak(livingEntity);
 					 	 }
 					} else if (!world.isRemote) {
 						itemstack.shrink(1);
@@ -267,8 +271,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 				super.onUpdate(itemstack, world, entity, par4, par5);
 				if (!world.isRemote && entity instanceof EntityPlayer) {
-					int cloakLevel = EntityBijuManager.cloakLevel((EntityPlayer)entity);
-					if (cloakLevel <= 0) {
+					if (EntityBijuManager.cloakLevel((EntityPlayer)entity) <= 0) {
 						itemstack.shrink(1);
 					}
 				}

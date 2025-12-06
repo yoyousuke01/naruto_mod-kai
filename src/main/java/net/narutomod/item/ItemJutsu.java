@@ -195,10 +195,12 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 
 		public float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
 			JutsuEnum jutsuEnum = this.getCurrentJutsu(stack);
-			if (jutsuEnum.jutsu.getPowerupDelay() > 0.0f) {
-				return this.getPower(stack, entity, timeLeft, jutsuEnum.jutsu.getBasePower(), jutsuEnum.jutsu.getPowerupDelay());
+			float base = jutsuEnum.jutsu.getBasePower();
+			float delay = jutsuEnum.jutsu.getPowerupDelay(stack, entity);
+			if (delay > 0.0f) {
+				return this.getPower(stack, entity, timeLeft, base, delay);
 			}
-			return jutsuEnum.jutsu.getBasePower();
+			return base;
 		}
 
 		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft, float basePower, float powerupDelay) {
@@ -650,8 +652,13 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			return 1.0f;
 		}
 
+		@Deprecated // use entity sensitive version below
 		default float getPowerupDelay() {
 			return 0.0f;
+		}
+
+		default float getPowerupDelay(ItemStack stack, EntityLivingBase entity) {
+			return this.getPowerupDelay();
 		}
 		
 		@Deprecated // use entity sensitive version below
@@ -664,7 +671,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 
 		default void onUsingTick(ItemStack stack, EntityLivingBase player, float power) {
-			if (this.getPowerupDelay() > 0.0f) {
+			if (this.getPowerupDelay(stack, player) > 0.0f) {
 				if (player instanceof EntityPlayer) {
 					ProcedureUtils.sendStatusMessage((EntityPlayer)player, String.format("%.1f", power), true);
 				}

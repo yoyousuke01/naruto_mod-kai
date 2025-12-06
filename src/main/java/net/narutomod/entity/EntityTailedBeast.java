@@ -876,6 +876,13 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void playLivingSound() {
+			if (!this.isFaceDown()) {
+				super.playLivingSound();
+			}
+		}
+
+		@Override
 		public void readEntityFromNBT(NBTTagCompound compound) {
 			super.readEntityFromNBT(compound);
 			this.setAge(compound.getInteger("age"));

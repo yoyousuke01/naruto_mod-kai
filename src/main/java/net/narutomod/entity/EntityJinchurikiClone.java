@@ -86,7 +86,7 @@ public class EntityJinchurikiClone extends ElementsNarutomodMod.ModElement {
 			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityLivingBase.class, false, false) {
 				@Override
 				protected AxisAlignedBB getTargetableArea(double targetDistance) {
-					return EntityCustom.this. getEntityBoundingBox().grow(targetDistance, 14.0D, targetDistance);
+					return EntityCustom.this.getEntityBoundingBox().grow(targetDistance, 14.0D, targetDistance);
 				}
 			});
 			this.tasks.addTask(0, new EntityAISwimming(this));
