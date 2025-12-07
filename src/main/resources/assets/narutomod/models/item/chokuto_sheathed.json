@@ -1,0 +1,6 @@
+{
+  "parent": "narutomod:custom/kusanagisasuke_sheathed",
+  "textures": {
+    "2": "narutomod:blocks/kusanag512"
+  }
+}

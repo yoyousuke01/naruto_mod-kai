@@ -8,15 +8,20 @@ import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
+import net.minecraft.world.World;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.nbt.NBTTagCompound;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -30,6 +35,7 @@ import com.google.common.collect.HashMultimap;
 public class ItemAnbuSword extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:anbu_sword")
 	public static final Item block = null;
+	private static final String CUSTOM_MODEL_KEY = "CustomRenderedModel";
 
 	public ItemAnbuSword(ElementsNarutomodMod instance) {
 		super(instance, 747);
@@ -58,6 +64,25 @@ public class ItemAnbuSword extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+			super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+			if (stack.getTagCompound() == null) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			if (isSelected) {
+				if (!stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+					stack.getTagCompound().setBoolean(CUSTOM_MODEL_KEY, true);
+					worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
+					 SoundEvents.ITEM_ARMOR_EQUIP_IRON, net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 1.6f);
+				}
+			} else if (stack.getTagCompound().hasKey(CUSTOM_MODEL_KEY)) {
+				stack.getTagCompound().removeTag(CUSTOM_MODEL_KEY);
+				worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
+				 SoundEvents.ITEM_ARMOR_EQUIP_IRON, net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 0.8f);
+			}
+		}
+
+		@Override
 		public Set<String> getToolClasses(ItemStack stack) {
 			HashMap<String, Integer> ret = new HashMap<String, Integer>();
 			ret.put("sword", 1);
@@ -70,9 +95,24 @@ public class ItemAnbuSword extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:anbu_sword", "inventory"));
+		class MeshDef implements ItemMeshDefinition {
+			final ModelResourceLocation[] resources = {
+		   	    new ModelResourceLocation("narutomod:anbu_sword", "inventory"),
+		   	    new ModelResourceLocation("narutomod:anbu_sword_sheathed", "inventory")
+			};
+	        @Override
+	        public ModelResourceLocation getModelLocation(ItemStack stack) {
+	            if (stack.hasTagCompound() && stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+	                return this.resources[0];
+	            }
+	            return this.resources[1];
+	        }
+	    }
+	    MeshDef meshDef = new MeshDef();
+   	    ModelBakery.registerItemVariants(block, meshDef.resources);
+	    ModelLoader.setCustomMeshDefinition(block, meshDef);
 	}
 }

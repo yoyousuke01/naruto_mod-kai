@@ -31,6 +31,7 @@ import net.narutomod.Chakra;
 public class ItemMilitaryRationsPill extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:military_rations_pill")
 	public static final Item block = null;
+
 	public ItemMilitaryRationsPill(ElementsNarutomodMod instance) {
 		super(instance, 398);
 	}

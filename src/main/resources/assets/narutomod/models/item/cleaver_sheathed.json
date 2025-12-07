@@ -1,0 +1,6 @@
+{
+  "parent": "narutomod:custom/cleaver_sheathed",
+  "textures": {
+    "0": "narutomod:blocks/cleaver"
+  }
+}

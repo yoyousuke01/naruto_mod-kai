@@ -1,8 +1,10 @@
 
 package net.narutomod.potion;
 
-import net.narutomod.procedure.ProcedureCorrosionOnPotionActiveTick;
+//import net.narutomod.procedure.ProcedureCorrosionOnPotionActiveTick;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.Particles;
+import net.narutomod.procedure.ProcedureUtils;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -10,19 +12,24 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.Potion;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.SoundEvents;
 
 import java.util.Map;
 import java.util.HashMap;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PotionCorrosion extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:corrosion")
 	public static final Potion potion = null;
+
 	public PotionCorrosion(ElementsNarutomodMod instance) {
 		super(instance, 601);
 	}
@@ -31,6 +38,7 @@ public class PotionCorrosion extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		elements.potions.add(() -> new PotionCustom());
 	}
+
 	public static class PotionCustom extends Potion {
 		private final ResourceLocation potionIcon;
 		public PotionCustom() {
@@ -56,17 +64,18 @@ public class PotionCorrosion extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void performEffect(EntityLivingBase entity, int amplifier) {
-			World world = entity.world;
-			int x = (int) entity.posX;
-			int y = (int) entity.posY;
-			int z = (int) entity.posZ;
-			{
-				Map<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("entity", entity);
-				$_dependencies.put("amplifier", amplifier);
-				$_dependencies.put("world", world);
-				ProcedureCorrosionOnPotionActiveTick.executeProcedure($_dependencies);
+		public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource, EntityLivingBase entity, int amplifier, double health) {
+			if (source != null) {
+				entity.getEntityData().setBoolean("TempData_disableKnockback", true);
+				entity.attackEntityFrom(new ProcedureUtils.JutsuEffectDamageSource(potion).setCaster(source), (float) (amplifier + 1));
+			} else {
+				entity.attackEntityFrom(ProcedureUtils.CORROSION, (float) amplifier + 1f);
+			}
+			Particles.spawnParticle(entity.world, Particles.Types.SMOKE, entity.posX, entity.posY + entity.height * 0.5, entity.posZ, 10, entity.width * 0.3,
+					entity.height * 0.3, entity.width * 0.3, 0d, 0d, 0d, 0x20FFFFFF);
+			if (entity.getRNG().nextFloat() <= 0.5f) {
+				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.BLOCK_FIRE_EXTINGUISH,
+						SoundCategory.NEUTRAL, 0.8f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 			}
 		}
 

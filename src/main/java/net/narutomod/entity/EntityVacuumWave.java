@@ -9,8 +9,6 @@ import net.narutomod.ElementsNarutomodMod;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
@@ -19,7 +17,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -42,6 +39,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntitySweep.Base implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> SERIAL_INDEX = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
+
 		public EC(World world) {
 			super(world);
 		}
@@ -112,6 +110,14 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+
+		@Override
+		protected void renderParticles(Vec3d entityVec, Vec3d relVec, int color, float scale) {
+			Vec3d vec1 = entityVec.add(relVec);
+			Vec3d vec2 = relVec.scale(0.15d);
+			Particles.spawnParticle(this.world, Particles.Types.SMOKE, vec1.x, vec1.y, vec1.z,
+			 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, (0x10 << 24) | (color & 0x00FFFFFF), (int)(scale * 5), (int)(8.0d / (this.rand().nextDouble() * 0.8d + 0.2d)));
+		}
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
@@ -129,44 +135,16 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 			public float getBasePower() {
 				return 0.9f;
 			}
+	
 			@Override
 			public float getPowerupDelay() {
 				return 60.0f;
 			}
-			
+	
 			@Override
 			public float getMaxPower() {
 				return 10.0f;
 			}
 		}
 	}
-	
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		new Renderer().register();
-	}
-	
-	public static class Renderer extends EntityRendererRegister {
-		@SideOnly(Side.CLIENT)
-		@Override
-		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-		}
-
-		@SideOnly(Side.CLIENT)
-		public class RenderCustom extends EntitySweep.Renderer.RenderCustom {
-			public RenderCustom(RenderManager renderManagerIn) {
-				super(renderManagerIn);
-			}
-
-			@Override
-			protected void renderParticles(EntitySweep.Base entity, Vec3d entityVec, Vec3d relVec, int color, float scale) {
-				Vec3d vec1 = entityVec.add(relVec);
-				Vec3d vec2 = relVec.scale(0.15d);
-				Particles.spawnParticle(entity.world, Particles.Types.SMOKE, vec1.x, vec1.y, vec1.z,
-				 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, (0x10 << 24) | (color & 0x00FFFFFF), (int)(scale * 5), (int)(8.0d / (entity.rand().nextDouble() * 0.8d + 0.2d)));
-
-			}
-		}
-	}
-}
+}

@@ -141,7 +141,7 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 	    });
 	}
 
-	public static class RangedItem extends Item implements ItemOnBody.Interface {
+	public static class RangedItem extends Item implements ItemOnBody.Interface {		
 		public RangedItem() {
 			super();
 			this.setMaxDamage(5000);
@@ -160,6 +160,7 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", 15.0d, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
 						new AttributeModifier(ATTACK_SPEED_MODIFIER, "Ranged item modifier", -2.4, 0));
+				multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 1.0, 0));
 			}
 			return multimap;
 		}
@@ -244,7 +245,7 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-			if (player.world.isRemote && !this.isThrown(stack)) {
+			if (!player.world.isRemote && !this.isThrown(stack)) {
 				if (!stack.hasTagCompound()) {
 					stack.setTagCompound(new NBTTagCompound());
 				}

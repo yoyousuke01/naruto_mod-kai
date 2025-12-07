@@ -101,6 +101,9 @@ public class EntitySweep extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void renderParticles() {
 		}
+
+		protected void renderParticles(Vec3d entityVec, Vec3d relVec, int color, float scale) {
+		}
 	}
 
 	@Override
@@ -159,7 +162,7 @@ public class EntitySweep extends ElementsNarutomodMod.ModElement {
 					ProcedureUtils.RotationMatrix rotmat = new ProcedureUtils.RotationMatrix().rotateYaw(-f1).rotatePitch(-f2).rotateRoll(-entity.rotationRoll).rotateYaw(11.25F * i);
 					Vec3d vec3 = new Vec3d(-0.5d * scale, 0d, 0d);
 					for (int k = 0; k < 5; k++, rotmat.rotateYaw(2.25f)) {
-						this.renderParticles(entity, vec, rotmat.transform(vec3), color, scale);
+						entity.renderParticles(vec, rotmat.transform(vec3), color, scale);
 					}
 				}
 				this.model.render(entity, 0.0F, 0.0F, ageInTicks, 0.0F, 0.0F, 0.0625F);
@@ -171,10 +174,7 @@ public class EntitySweep extends ElementsNarutomodMod.ModElement {
 				GlStateManager.alphaFunc(0x204, 0.1f);
 				GlStateManager.popMatrix();
 			}
-
-			protected void renderParticles(Base entity, Vec3d entityVec, Vec3d relVec, int color, float scale) {
-			}
-	
+	
 			@Override
 			protected ResourceLocation getEntityTexture(Base entity) {
 				return this.texture;

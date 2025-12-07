@@ -41,6 +41,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.Potion;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
@@ -259,19 +260,33 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 				public void onAttacked(LivingHurtEvent event) {
 					EntityLivingBase entity = event.getEntityLiving();
 					Entity attacker = event.getSource().getTrueSource();
-					if (entity instanceof EntityPlayer && !entity.world.isRemote && !entity.isPotionActive(PotionParalysis.potion)
-					 && event.getSource() != DamageSource.OUT_OF_WORLD && attacker instanceof EntityLivingBase && !attacker.equals(entity)) {
-						ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
-						if (stack != null && REPLACEMENT.jutsu.isActivated(stack)) {
-							long l = entity.world.getTotalWorldTime();
-							if (l > stack.getTagCompound().getLong(JUTSULASTUSEKEY) + COOLDOWN 
-							 && Chakra.pathway(entity).consume(REPLACEMENT.chakraUsage)) {
-								event.setCanceled(true);
-								stack.getTagCompound().setLong(JUTSULASTUSEKEY, l);
-								EntityReplacementClone clone = createJutsu(entity, attacker);
-								clone.attackEntityFrom(event.getSource(), event.getAmount());
+					if (entity instanceof EntityLivingBase && !entity.world.isRemote && !entity.isPotionActive(PotionParalysis.potion)
+					 && event.getSource() != DamageSource.OUT_OF_WORLD) {
+					 	EntityReplacementClone clone = null;
+					 	if (entity instanceof EntityReplacementClone) {
+					 		clone = (EntityReplacementClone)entity;
+					 		entity = clone.getSummoner();
+							if (entity != null && event.getSource() instanceof ProcedureUtils.JutsuEffectDamageSource && !event.getSource().isUnblockable()) {
+								Potion potion = ((ProcedureUtils.JutsuEffectDamageSource)event.getSource()).getPotion();
+								PotionEffect effect = entity.getActivePotionEffect(potion);
+								if (effect != null) {
+									clone.addPotionEffect(effect);
+									entity.removePotionEffect(potion);
+								}
 							}
-						}
+					 	} else if (entity instanceof EntityPlayer && attacker instanceof EntityLivingBase && !attacker.equals(entity)) {
+							ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
+							if (stack != null && REPLACEMENT.jutsu.isActivated(stack)) {
+								long l = entity.world.getTotalWorldTime();
+								if (l > stack.getTagCompound().getLong(JUTSULASTUSEKEY) + COOLDOWN 
+								 && Chakra.pathway(entity).consume(REPLACEMENT.chakraUsage)) {
+									event.setCanceled(true);
+									stack.getTagCompound().setLong(JUTSULASTUSEKEY, l);
+									clone = createJutsu(entity, attacker);
+									clone.attackEntityFrom(event.getSource(), event.getAmount());
+								}
+							}
+					 	}
 					}
 				}
 			}

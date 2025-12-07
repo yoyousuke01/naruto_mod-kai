@@ -19,7 +19,7 @@ Jutsus
  - updated dust beam animation to dust cone, shortened beam length
  - almighty push can break out of most trapping jutsus and kill projectile jutsus in range
  - chibakutensei entity can be destroyed with damage
- - using puppets now costs chakra
+ - using puppets now costs chakra, but puppets moves much faster now
  - improved preta shield animation and better chakra absorbing, petrification & death after absorbing 1000 sage chakra
  - added more summons to rinnegan animal path, cycle summons by press and holding jutsukey2
  - shadow/limbo clones will gain ninjaXP from combat and give it to the user after death
@@ -36,7 +36,12 @@ Jutsus
  - added magnet release third eye jutsu: spy on mobs/players from very far away
  - rasenshuriken only sage mode or 6-path variant can be thrown; will hurt user if not thrown; now takes target's chakra
  - sage mode now highlights all entities with chakra in the vicinity
- - adding Sage Transformation kekkei genkai (WIP)
+ - adding Sage Transformation kekkei genkai (WIP-2: Broadaxe, Piston fist, stage 2, multi-cannon, cellular absorption)
+ - jutsus that afflicts amaterasu/corrosion effects will now give the jutsu caster the appropriate ninjaxp
+ - body replacement jutsu will transfer potion effects to the clone (if hit by an effect) 
+ - nerf Unrivaled Strength's steam damage slightly
+ - Rinnegan/Tenseigan Asura path armor has 4 additional arms (cosmetic only)
+ - removing any armor part from biju cloak disables the cloak
  
 Items:
  - giant folding fan is opened by default now (to fix fan not openning when held by random entities)
@@ -52,6 +57,8 @@ Items:
  - fixed blockable swords can attack while blocking
  - buffed anbu sword damage slightly
  - added 3 more anbu masks
+ - some swords are now sheathed when not held
+ - Madara's scythe & Kubikiribōchō can do sweeping damage
  
 Entities:
  - improved giant dog summon model

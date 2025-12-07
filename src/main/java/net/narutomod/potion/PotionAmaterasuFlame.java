@@ -1,8 +1,11 @@
 
 package net.narutomod.potion;
 
-import net.narutomod.procedure.ProcedureAmaterasuFlameOnPotionActiveTick;
+//import net.narutomod.procedure.ProcedureAmaterasuFlameOnPotionActiveTick;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.item.ItemSharingan;
+import net.narutomod.Particles;
+import net.narutomod.procedure.ProcedureUtils;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -13,16 +16,21 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.Potion;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
 
 import java.util.Map;
 import java.util.HashMap;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PotionAmaterasuFlame extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:amaterasuflame")
 	public static final Potion potion = null;
+
 	public PotionAmaterasuFlame(ElementsNarutomodMod instance) {
 		super(instance, 175);
 	}
@@ -31,6 +39,7 @@ public class PotionAmaterasuFlame extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		elements.potions.add(() -> new PotionCustom());
 	}
+
 	public static class PotionCustom extends Potion {
 		private final ResourceLocation potionIcon;
 		public PotionCustom() {
@@ -56,16 +65,21 @@ public class PotionAmaterasuFlame extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void performEffect(EntityLivingBase entity, int amplifier) {
-			World world = entity.world;
-			int x = (int) entity.posX;
-			int y = (int) entity.posY;
-			int z = (int) entity.posZ;
-			{
-				Map<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("entity", entity);
-				$_dependencies.put("amplifier", amplifier);
-				ProcedureAmaterasuFlameOnPotionActiveTick.executeProcedure($_dependencies);
+		public void affectEntity(@Nullable Entity source, @Nullable Entity indirectSource, EntityLivingBase entity, int amplifier, double health) {
+			ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+			if (stack.getItem() instanceof ItemSharingan.Base && (((ItemSharingan.Base)stack.getItem()).getSubType() == ItemSharingan.Type.AMATERASU
+					|| ((ItemSharingan.Base)stack.getItem()).isEternal())) {
+				entity.removePotionEffect(PotionAmaterasuFlame.potion);
+				entity.extinguish();
+			} else {
+				if (source != null) {
+					entity.getEntityData().setBoolean("TempData_disableKnockback", true);
+					entity.attackEntityFrom(new ProcedureUtils.JutsuEffectDamageSource(potion).setCaster(source), (float) (amplifier + 1));
+				} else {
+					entity.attackEntityFrom(ProcedureUtils.AMATERASU, (float) (amplifier + 1));
+				}
+				Particles.spawnParticle(entity.world, Particles.Types.FLAME, entity.posX, entity.posY + entity.height * 0.5f, entity.posZ,
+				 amplifier + 1, entity.width * 0.25, entity.height * 0.2, entity.width * 0.25, 0d, 0d, 0d, 0xA0000000, 20);
 			}
 		}
 

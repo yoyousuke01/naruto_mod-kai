@@ -51,6 +51,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	public static final String FORCE_DOJUTSU_DROP_RULE = "forceDojutsuDropOnDeath";
 	private static final String FORCE_SEND = "forceSendBattleXP2self";
 	private static final String UPDATE_HEALTH = "forceUpdateHealth";
+	private static final String NO_KAMUI_RULE = "noKamuiAndHidingInRock";
 
 	public PlayerTracker(ElementsNarutomodMod instance) {
 		super(instance, 181);
@@ -58,6 +59,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 
 	public static boolean keepNinjaXp(World world) {
 		return world.getGameRules().getBoolean(KEEPXP_RULE);
+	}
+
+	public static boolean noKamuiAndHidingInRock(World world) {
+		return world.getGameRules().getBoolean(NO_KAMUI_RULE);
 	}
 
 	public static boolean isNinja(EntityPlayer player) {
@@ -364,6 +369,9 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			}
 			if (!world.isRemote && !world.getGameRules().hasRule(FORCE_DOJUTSU_DROP_RULE)) {
 				world.getGameRules().addGameRule(FORCE_DOJUTSU_DROP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
+			}
+			if (!world.isRemote && !world.getGameRules().hasRule(NO_KAMUI_RULE)) {
+				world.getGameRules().addGameRule(NO_KAMUI_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
 			}
 		}
 	}

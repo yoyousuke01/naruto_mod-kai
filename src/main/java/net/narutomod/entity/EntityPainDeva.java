@@ -44,6 +44,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
 
@@ -195,6 +196,15 @@ public class EntityPainDeva extends ElementsNarutomodMod.ModElement {
 				 	}
 					this.useAMPush(null, 15 + this.rand.nextInt(11));
 					return false;
+				}
+				if (this.getHealth() - amount < this.getMaxHealth() * 0.5f) {
+					ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+					if (stack.getItem() == ItemAkatsukiRobe.body) {
+						if (!stack.hasTagCompound()) {
+							stack.setTagCompound(new NBTTagCompound());
+						}
+						stack.getTagCompound().setBoolean("halfOff", true);
+					}
 				}
 			}
 			return super.attackEntityFrom(source, amount);

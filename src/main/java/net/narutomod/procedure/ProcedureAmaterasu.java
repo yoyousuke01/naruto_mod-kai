@@ -96,12 +96,9 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 				i = (double) (PlayerTracker.getNinjaLevel((EntityPlayer) entity) / 15);
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (t.entityHit instanceof EntityLivingBase) {
-						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);
+						((EntityLivingBase) t.entityHit).addPotionEffect(
+								new ProcedureUtils.JutsuPotionEffect(PotionAmaterasuFlame.potion, 10000, (int) i, false, false, entity));
 					}
-					entity = t.entityHit;
-					if (entity instanceof EntityLivingBase)
-						((EntityLivingBase) entity)
-								.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, (int) 10000, (int) (i), (false), (false)));
 				} else {
 					x = (int) t.getBlockPos().getX() + t.sideHit.getDirectionVec().getX();
 					y = (int) t.getBlockPos().getY() + t.sideHit.getDirectionVec().getY();

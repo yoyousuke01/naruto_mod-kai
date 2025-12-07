@@ -66,6 +66,16 @@ public class ItemSenninkaBroadaxe extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean isSelected) {
+			super.onUpdate(itemstack, world, entity, par4, isSelected);
+			if (!world.isRemote && entity.ticksExisted % 20 == 3) {
+				if (!isSelected || (entity instanceof EntityPlayer && !ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer)entity, ItemSenninka.block))) {
+					itemstack.shrink(1);
+				}
+			}
+		}
+
+		@Override
 		public float getDestroySpeed(ItemStack par1ItemStack, IBlockState par2Block) {
 			IBlockState require;
 			return 0;

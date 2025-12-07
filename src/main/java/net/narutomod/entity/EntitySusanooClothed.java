@@ -46,8 +46,6 @@ import net.narutomod.item.ItemTotsukaSword;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
 
-import java.util.HashMap;
-
 @ElementsNarutomodMod.ModElement.Tag
 public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 42;
@@ -241,25 +239,12 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				} else if (!thisHeldstack.isEmpty()) {
 					this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ItemStack.EMPTY);
 				}
-				if (ownerheldstack.getItem() == kamuiShuriken.getItem()) {
-					if (this.getHeldItemOffhand().getItem() != kamuiShuriken.getItem()) {
-						this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, kamuiShuriken);
-					}
-				} else {
-					this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, ItemStack.EMPTY);
-				}
-				if (thisHeldstack.getItem() == ItemTotsukaSword.block) {
-					HashMap<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("entity", this);
-					$_dependencies.put("itemstack", this.getHeldItemMainhand());
-					$_dependencies.put("world", this.world);
-					ProcedureTotsukaSwordToolInHandTick.executeProcedure($_dependencies);
-				} else if (thisHeldstack.getItem() == kagutsuchi.getItem()) {
-					HashMap<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("entity", this);
-					$_dependencies.put("itemstack", thisHeldstack);
-					$_dependencies.put("world", this.world);
-					ProcedureKagutsuchiSwordToolInUseTick.executeProcedure($_dependencies);
+			}
+			if (this.getHeldItemMainhand().getItem() == ItemTotsukaSword.block) {
+				if (this.rand.nextFloat() < 0.05f) {
+					this.world.playSound(null, this.posX, this.posY + this.height * 0.5f, this.posZ, 
+					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("block.fire.ambient")),
+					 net.minecraft.util.SoundCategory.NEUTRAL, 2f, this.rand.nextFloat() * 0.7f + 0.3f);
 				}
 			}
 		}

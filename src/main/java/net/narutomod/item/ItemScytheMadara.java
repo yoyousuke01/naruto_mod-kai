@@ -3,6 +3,7 @@ package net.narutomod.item;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.entity.EntityRendererRegister;
+import net.narutomod.entity.EntitySweep;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
@@ -186,17 +187,40 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 			}
 			if (!attacker.world.isRemote && attacker.equals(target)) {
 				if (!itemstack.isEmpty()) {
-					itemstack.damageItem(1, attacker);
-					itemstack.getTagCompound().setBoolean(USE_THROWN_MODEL, true);
-					EntityCustom entityarrow = new EntityCustom(attacker.world, attacker);
-					Vec3d vec = attacker.getLookVec();
-					entityarrow.shoot(vec.x, vec.y, vec.z, 2.0f, 0);
-					entityarrow.setDamage(14d);
-					attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_ARROW_SHOOT,
-							SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + 1f);
-					attacker.world.spawnEntity(entityarrow);
-					this.setEntity(itemstack, entityarrow);
-					entityarrow.setItemStack(itemstack);
+					boolean shouldshoot = true;
+					double d = ProcedureUtils.getReachDistance(attacker);
+					for (EntityLivingBase entity : attacker.world.getEntitiesWithinAABB(EntityLivingBase.class, attacker.getEntityBoundingBox().grow(d, 0.25D, d))) {
+						if (entity != attacker && !attacker.isOnSameTeam(entity) && attacker.getDistanceSq(entity) <= d * d) {
+							Vec3d vec1 = attacker.getLookVec();
+							Vec3d vec2 = attacker.getPositionVector().subtract(entity.getPositionVector()).normalize();
+							if (vec2.dotProduct(vec1) < 0.0d) {
+								attacker.attackTargetEntityWithCurrentItem(entity);
+								shouldshoot = false;
+							}
+						}
+					}
+					if (shouldshoot) {
+						itemstack.damageItem(1, attacker);
+						itemstack.getTagCompound().setBoolean(USE_THROWN_MODEL, true);
+						EntityCustom entityarrow = new EntityCustom(attacker.world, attacker);
+						Vec3d vec = attacker.getLookVec();
+						entityarrow.shoot(vec.x, vec.y, vec.z, 2.0f, 0);
+						entityarrow.setDamage(14d);
+						attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_ARROW_SHOOT,
+								SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + 1f);
+						attacker.world.spawnEntity(entityarrow);
+						this.setEntity(itemstack, entityarrow);
+						entityarrow.setItemStack(itemstack);
+					} else {
+						attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP,
+						 SoundCategory.NEUTRAL, 1.0F, 1.0F);
+						Vec3d vec = attacker.getPositionVector();
+						for (int i = 2; i < 5; i++) {
+							EntitySweep.Base sweepParticle = new EntitySweep.Base(attacker, 0xB0101010, (float)d * 2 - 1.2f * i);
+							sweepParticle.setLocationAndAngles(vec.x, vec.y + 1.4d - 0.02d * i, vec.z, attacker.rotationYaw, 0.0f);
+							attacker.world.spawnEntity(sweepParticle);
+						}
+					}
 				}
 				return true;
 			}

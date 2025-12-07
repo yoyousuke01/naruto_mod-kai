@@ -341,10 +341,10 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer hoof_r10;
 			private final ModelRenderer hoof_r11;
 			private final ModelRenderer hoof_r12;
-			private final ModelRenderer[][] tail = new ModelRenderer[5][8];
-			private final float tailSwayX[][] = new float[5][8];
-			private final float tailSwayY[][] = new float[5][8];
-			private final float tailSwayZ[][] = new float[5][8];
+			private final ModelRenderer[][] tail = new ModelRenderer[5][9];
+			private final float tailSwayX[][] = new float[5][9];
+			private final float tailSwayY[][] = new float[5][9];
+			private final float tailSwayZ[][] = new float[5][9];
 			private final Random rand = new Random();
 
 			private final float[][] swingingBodyPreset = { { 0.0F, 12.75F, 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 15.75F, 0.0F, 0.2618F, 0.0F, 0.0F }, { 0.0F, 13.75F, 0.0F, 0.0F, 0.0F, 0.0F } };
@@ -721,7 +721,7 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				leg3_1.setRotationPoint(0.0F, 0.0F, 0.0F);
 				leg3.addChild(leg3_1);
 				setRotationAngle(leg3_1, 0.0F, 0.0F, 0.0873F);
-				leg3_1.cubeList.add(new ModelBox(leg3_1, 28, 28, -1.5989F, -2.3433F, -0.6F, 3, 5, 3, 0.3F, false));
+				leg3_1.cubeList.add(new ModelBox(leg3_1, 28, 28, -1.5989F, -2.3433F, -0.6F, 2, 5, 3, 0.3F, false));
 		
 				leg3_2 = new ModelRenderer(this);
 				leg3_2.setRotationPoint(-0.5989F, 2.9567F, -0.75F);
@@ -768,7 +768,7 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				leg4_1.setRotationPoint(0.0F, 0.0F, 0.0F);
 				leg4.addChild(leg4_1);
 				setRotationAngle(leg4_1, 0.0F, 0.0F, -0.0873F);
-				leg4_1.cubeList.add(new ModelBox(leg4_1, 28, 28, -1.4011F, -2.3433F, -0.6F, 3, 5, 3, 0.3F, true));
+				leg4_1.cubeList.add(new ModelBox(leg4_1, 28, 28, -0.4011F, -2.3433F, -0.6F, 2, 5, 3, 0.3F, true));
 		
 				leg4_2 = new ModelRenderer(this);
 				leg4_2.setRotationPoint(0.5989F, 2.9567F, -0.75F);
@@ -833,26 +833,32 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				tail[0][4] = new ModelRenderer(this);
 				tail[0][4].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[0][3].addChild(tail[0][4]);
-				setRotationAngle(tail[0][4], 0.2618F, 0.0F, 0.0F);
-				tail[0][4].cubeList.add(new ModelBox(tail[0][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				setRotationAngle(tail[0][4], -0.2618F, 0.0F, 0.0F);
+				tail[0][4].cubeList.add(new ModelBox(tail[0][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
 
 				tail[0][5] = new ModelRenderer(this);
 				tail[0][5].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[0][4].addChild(tail[0][5]);
 				setRotationAngle(tail[0][5], 0.2618F, 0.0F, 0.0F);
-				tail[0][5].cubeList.add(new ModelBox(tail[0][5], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
+				tail[0][5].cubeList.add(new ModelBox(tail[0][5], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
 
 				tail[0][6] = new ModelRenderer(this);
 				tail[0][6].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[0][5].addChild(tail[0][6]);
 				setRotationAngle(tail[0][6], 0.2618F, 0.0F, 0.0F);
-				tail[0][6].cubeList.add(new ModelBox(tail[0][6], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+				tail[0][6].cubeList.add(new ModelBox(tail[0][6], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
 
 				tail[0][7] = new ModelRenderer(this);
 				tail[0][7].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[0][6].addChild(tail[0][7]);
 				setRotationAngle(tail[0][7], 0.2618F, 0.0F, 0.0F);
-				tail[0][7].cubeList.add(new ModelBox(tail[0][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
+				tail[0][7].cubeList.add(new ModelBox(tail[0][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+
+				tail[0][8] = new ModelRenderer(this);
+				tail[0][8].setRotationPoint(0.0F, -2.0F, 0.0F);
+				tail[0][7].addChild(tail[0][8]);
+				setRotationAngle(tail[0][8], 0.2618F, 0.0F, 0.0F);
+				tail[0][8].cubeList.add(new ModelBox(tail[0][8], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
 
 				tail[1][0] = new ModelRenderer(this);
 				tail[1][0].setRotationPoint(-1.0F, 0.5F, 10.5F);
@@ -881,26 +887,32 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				tail[1][4] = new ModelRenderer(this);
 				tail[1][4].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[1][3].addChild(tail[1][4]);
-				setRotationAngle(tail[1][4], 0.2618F, 0.0F, 0.0F);
-				tail[1][4].cubeList.add(new ModelBox(tail[1][4], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				setRotationAngle(tail[1][4], -0.2618F, 0.0F, 0.0F);
+				tail[1][4].cubeList.add(new ModelBox(tail[1][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
 
 				tail[1][5] = new ModelRenderer(this);
 				tail[1][5].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[1][4].addChild(tail[1][5]);
 				setRotationAngle(tail[1][5], 0.2618F, 0.0F, 0.0F);
-				tail[1][5].cubeList.add(new ModelBox(tail[1][5], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
+				tail[1][5].cubeList.add(new ModelBox(tail[1][5], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
 
 				tail[1][6] = new ModelRenderer(this);
 				tail[1][6].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[1][5].addChild(tail[1][6]);
 				setRotationAngle(tail[1][6], 0.2618F, 0.0F, 0.0F);
-				tail[1][6].cubeList.add(new ModelBox(tail[1][6], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+				tail[1][6].cubeList.add(new ModelBox(tail[1][6], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
 
 				tail[1][7] = new ModelRenderer(this);
 				tail[1][7].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[1][6].addChild(tail[1][7]);
 				setRotationAngle(tail[1][7], 0.2618F, 0.0F, 0.0F);
-				tail[1][7].cubeList.add(new ModelBox(tail[1][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
+				tail[1][7].cubeList.add(new ModelBox(tail[1][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+
+				tail[1][8] = new ModelRenderer(this);
+				tail[1][8].setRotationPoint(0.0F, -2.0F, 0.0F);
+				tail[1][7].addChild(tail[1][8]);
+				setRotationAngle(tail[1][8], 0.2618F, 0.0F, 0.0F);
+				tail[1][8].cubeList.add(new ModelBox(tail[1][8], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
 
 				tail[2][0] = new ModelRenderer(this);
 				tail[2][0].setRotationPoint(1.0F, 0.5F, 10.5F);
@@ -929,26 +941,32 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				tail[2][4] = new ModelRenderer(this);
 				tail[2][4].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[2][3].addChild(tail[2][4]);
-				setRotationAngle(tail[2][4], 0.2618F, 0.0F, 0.0F);
-				tail[2][4].cubeList.add(new ModelBox(tail[2][4], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				setRotationAngle(tail[2][4], -0.2618F, 0.0F, 0.0F);
+				tail[2][4].cubeList.add(new ModelBox(tail[2][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
 
 				tail[2][5] = new ModelRenderer(this);
 				tail[2][5].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[2][4].addChild(tail[2][5]);
 				setRotationAngle(tail[2][5], 0.2618F, 0.0F, 0.0F);
-				tail[2][5].cubeList.add(new ModelBox(tail[2][5], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
+				tail[2][5].cubeList.add(new ModelBox(tail[2][5], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
 
 				tail[2][6] = new ModelRenderer(this);
 				tail[2][6].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[2][5].addChild(tail[2][6]);
 				setRotationAngle(tail[2][6], 0.2618F, 0.0F, 0.0F);
-				tail[2][6].cubeList.add(new ModelBox(tail[2][6], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+				tail[2][6].cubeList.add(new ModelBox(tail[2][6], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
 
 				tail[2][7] = new ModelRenderer(this);
 				tail[2][7].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[2][6].addChild(tail[2][7]);
 				setRotationAngle(tail[2][7], 0.2618F, 0.0F, 0.0F);
-				tail[2][7].cubeList.add(new ModelBox(tail[2][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
+				tail[2][7].cubeList.add(new ModelBox(tail[2][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+
+				tail[2][8] = new ModelRenderer(this);
+				tail[2][8].setRotationPoint(0.0F, -2.0F, 0.0F);
+				tail[2][7].addChild(tail[2][8]);
+				setRotationAngle(tail[2][8], 0.2618F, 0.0F, 0.0F);
+				tail[2][8].cubeList.add(new ModelBox(tail[2][8], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
 
 				tail[3][0] = new ModelRenderer(this);
 				tail[3][0].setRotationPoint(-2.0F, 0.5F, 10.5F);
@@ -977,26 +995,32 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				tail[3][4] = new ModelRenderer(this);
 				tail[3][4].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[3][3].addChild(tail[3][4]);
-				setRotationAngle(tail[3][4], 0.2618F, 0.0F, 0.0F);
-				tail[3][4].cubeList.add(new ModelBox(tail[3][4], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				setRotationAngle(tail[3][4], -0.2618F, 0.0F, 0.0F);
+				tail[3][4].cubeList.add(new ModelBox(tail[3][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
 
 				tail[3][5] = new ModelRenderer(this);
 				tail[3][5].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[3][4].addChild(tail[3][5]);
 				setRotationAngle(tail[3][5], 0.2618F, 0.0F, 0.0F);
-				tail[3][5].cubeList.add(new ModelBox(tail[3][5], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
+				tail[3][5].cubeList.add(new ModelBox(tail[3][5], 24, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
 
 				tail[3][6] = new ModelRenderer(this);
 				tail[3][6].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[3][5].addChild(tail[3][6]);
 				setRotationAngle(tail[3][6], 0.2618F, 0.0F, 0.0F);
-				tail[3][6].cubeList.add(new ModelBox(tail[3][6], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+				tail[3][6].cubeList.add(new ModelBox(tail[3][6], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
 
 				tail[3][7] = new ModelRenderer(this);
 				tail[3][7].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[3][6].addChild(tail[3][7]);
 				setRotationAngle(tail[3][7], 0.2618F, 0.0F, 0.0F);
-				tail[3][7].cubeList.add(new ModelBox(tail[3][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
+				tail[3][7].cubeList.add(new ModelBox(tail[3][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+
+				tail[3][8] = new ModelRenderer(this);
+				tail[3][8].setRotationPoint(0.0F, -2.0F, 0.0F);
+				tail[3][7].addChild(tail[3][8]);
+				setRotationAngle(tail[3][8], 0.2618F, 0.0F, 0.0F);
+				tail[3][8].cubeList.add(new ModelBox(tail[3][8], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
 
 				tail[4][0] = new ModelRenderer(this);
 				tail[4][0].setRotationPoint(2.0F, 0.5F, 10.5F);
@@ -1025,29 +1049,35 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				tail[4][4] = new ModelRenderer(this);
 				tail[4][4].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[4][3].addChild(tail[4][4]);
-				setRotationAngle(tail[4][4], 0.2618F, 0.0F, 0.0F);
-				tail[4][4].cubeList.add(new ModelBox(tail[4][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				setRotationAngle(tail[4][4], -0.2618F, 0.0F, 0.0F);
+				tail[4][4].cubeList.add(new ModelBox(tail[4][4], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
 
 				tail[4][5] = new ModelRenderer(this);
 				tail[4][5].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[4][4].addChild(tail[4][5]);
 				setRotationAngle(tail[4][5], 0.2618F, 0.0F, 0.0F);
-				tail[4][5].cubeList.add(new ModelBox(tail[4][5], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
+				tail[4][5].cubeList.add(new ModelBox(tail[4][5], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.1F, false));
 
 				tail[4][6] = new ModelRenderer(this);
 				tail[4][6].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[4][5].addChild(tail[4][6]);
 				setRotationAngle(tail[4][6], 0.2618F, 0.0F, 0.0F);
-				tail[4][6].cubeList.add(new ModelBox(tail[4][6], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+				tail[4][6].cubeList.add(new ModelBox(tail[4][6], 33, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.2F, false));
 
 				tail[4][7] = new ModelRenderer(this);
 				tail[4][7].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[4][6].addChild(tail[4][7]);
 				setRotationAngle(tail[4][7], 0.2618F, 0.0F, 0.0F);
-				tail[4][7].cubeList.add(new ModelBox(tail[4][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
+				tail[4][7].cubeList.add(new ModelBox(tail[4][7], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.4F, false));
+
+				tail[4][8] = new ModelRenderer(this);
+				tail[4][8].setRotationPoint(0.0F, -2.0F, 0.0F);
+				tail[4][7].addChild(tail[4][8]);
+				setRotationAngle(tail[4][8], 0.2618F, 0.0F, 0.0F);
+				tail[4][8].cubeList.add(new ModelBox(tail[4][8], 42, 42, -1.0F, -2.5F, -1.0F, 2, 3, 2, -0.6F, false));
 
 				for (int i = 0; i < 5; i++) {
-					for (int j = 1; j < 8; j++) {
+					for (int j = 1; j < 9; j++) {
 						tailSwayX[i][j] = (rand.nextFloat() * 0.2618F + 0.2618F) * (rand.nextBoolean() ? -1F : 1F);
 						tailSwayZ[i][j] = (rand.nextFloat() * 0.1745F + 0.1745F) * (rand.nextBoolean() ? -1F : 1F);
 						tailSwayY[i][j] = (rand.nextFloat() * 0.1745F + 0.1745F);
@@ -1082,7 +1112,7 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				super.setRotationAngles(f0 * 2.0F / e.height, f1, f2, f3, f4, f5, e);
 				body.rotateAngleX = 0.0F;
 				for (int i = 0; i < 5; i++) {
-					for (int j = 1; j < 8; j++) {
+					for (int j = 1; j < 9; j++) {
 						tail[i][j].rotateAngleX = MathHelper.sin((f2 - j) * 0.2F) * tailSwayX[i][j];
 						tail[i][j].rotateAngleZ = MathHelper.cos((f2 - j) * 0.2F) * tailSwayZ[i][j];
 						//tail[i][j].rotateAngleY = MathHelper.sin((f2 - j) * 0.1F) * tailSwayY[i][j];

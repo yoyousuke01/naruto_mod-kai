@@ -77,6 +77,9 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 			}
 			return;
 		}
+		if (PlayerTracker.noKamuiAndHidingInRock(world)) {
+			return;
+		}
 		timer = (double) ((entity.getEntityData().getDouble("kamui_timer")) + 1);
 		chakraAmount = (double) Chakra.pathway((EntityPlayer) entity).getAmount();
 		if ((!(entity.isSneaking()))) {

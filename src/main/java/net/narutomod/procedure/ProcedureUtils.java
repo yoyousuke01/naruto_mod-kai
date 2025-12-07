@@ -98,10 +98,21 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 
 	public static class JutsuEffectDamageSource extends DamageSource {
 		public final Potion potion;
+		protected Entity caster;
 		
 		public JutsuEffectDamageSource(Potion potionIn) {
 			super(ItemJutsu.NINJUTSU_TYPE);
 			this.potion = potionIn;
+		}
+
+		public JutsuEffectDamageSource setCaster(Entity entity) {
+			this.caster = entity;
+			return this;
+		}
+
+		@Override @Nullable
+		public Entity getTrueSource() {
+			return this.caster;
 		}
 
 		public Potion getPotion() {
@@ -1936,5 +1947,30 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	        double z = vec.x * this.matrix[2][0] + vec.y * this.matrix[2][1] + vec.z * this.matrix[2][2];
 	        return new Vec3d(x, y, z);
 	    }
+	}
+
+	public static class JutsuPotionEffect extends PotionEffect {
+		private Entity caster;
+
+		public JutsuPotionEffect(Potion potionIn, int durationIn, int amplifierIn, Entity entity) {
+			this(potionIn, durationIn, amplifierIn, false, true, entity);
+		}
+
+		public JutsuPotionEffect(Potion potionIn, int durationIn, int amplifierIn, boolean ambientIn, boolean showParticlesIn, Entity entity) {
+			super(potionIn, durationIn, amplifierIn, ambientIn, showParticlesIn);
+			this.caster = entity;
+		}
+
+		@Nullable
+		public Entity getCaster() {
+			return this.caster;
+		}
+
+		@Override
+		public void performEffect(EntityLivingBase entityIn) {
+			if (this.getDuration() > 0) {
+				this.getPotion().affectEntity(this.caster, this.caster, entityIn, this.getAmplifier(), 1);
+			}
+		}
 	}
 }

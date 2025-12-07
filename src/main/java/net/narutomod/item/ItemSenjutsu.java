@@ -79,6 +79,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 355;
 	//private static final String SAGEMODEACTIVATEDKEY = "SageModeActivated";
+	protected static final UUID REACH_BOOST = UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6");
+	protected static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868");
+	protected static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("33b7fa14-828a-4964-b014-b61863526589");
+	protected static final UUID MOVEMENT_SPEED_MODIFIER = UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414");
+	protected static final UUID MAX_HEALTH_MODIFIER = UUID.fromString("70e0acc2-cf75-4bbd-a21a-753088324a59");
 	private static final String SAGECHAKRADEPLETIONAMOUNT = "SageChakraDepletionAmount";
 	public static final ItemJutsu.JutsuEnum SAGEMODE = new ItemJutsu.JutsuEnum(0, "tooltip.senjutsu.sagemode", 'S', 10d, new SageMode());
 	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.SageModeVariant());
@@ -113,18 +118,6 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 	public static class RangedItem extends ItemJutsu.Base implements ItemOnBody.Interface {
 		private static final String TYPEKEY = "SageType";
-		protected static final UUID REACH_BOOST = UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6");
-		protected static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868");
-		protected static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("33b7fa14-828a-4964-b014-b61863526589");
-		protected static final UUID MOVEMENT_SPEED_MODIFIER = UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414");
-		protected static final UUID MAX_HEALTH_MODIFIER = UUID.fromString("70e0acc2-cf75-4bbd-a21a-753088324a59");
-		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
-			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(REACH_BOOST, "sagemode.reach", 2.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "sagemode.damage", 60.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "sagemode.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(MOVEMENT_SPEED_MODIFIER, "sagemode.movement", 1.5d, 1))
-			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(MAX_HEALTH_MODIFIER, "sagemode.health", 80.0d, 0))
-			.build();
 
 		@SideOnly(Side.CLIENT)
 		private ModelBiped armorModel;
@@ -177,36 +170,10 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				EntityLivingBase living = (EntityLivingBase)entity;
-				boolean flag = isSageModeActivated(itemstack);
-				boolean flag1 = living.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH));
-				if (flag && !flag1) {
-					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
-						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
-						if (attr != null) {
-							attr.applyModifier(entry.getValue());
-						}
-					}
-					if (entity instanceof EntityPlayer) {
-						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
-						if (itemstack.getTagCompound().getInteger("prevFoodStat") != foodlevel) {
-							itemstack.getTagCompound().setInteger("prevFoodStat", foodlevel);
-						}
-					}
-				} else if (!flag && flag1) {
-					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
-						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
-						if (attr != null) {
-							attr.removeModifier(entry.getValue().getID());
-						}
-					}
-					if (entity instanceof EntityPlayer) {
-						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat") - 5);
-					}
-				}
-				if (flag) {
+				if (isSageModeActivated(itemstack)) {
 					Chakra.Pathway cp = Chakra.pathway(living);
 					if (cp.getAmount() < itemstack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT)) {
-						deactivateSageMode(itemstack, living);
+						deactivateSageMode(living);
 					} else if (living.ticksExisted % 20 == 10) {
 						living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
 						cp.consume(50d);
@@ -337,51 +304,22 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static Type getSageType(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer) {
-			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
-			if (stack != null) {
-				return ((RangedItem)stack.getItem()).getSageType(stack);
-			}
-		}
-		return Type.NONE;
+		ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+		return stack != null ? ((RangedItem)stack.getItem()).getSageType(stack) : Type.NONE;
 	}
 
 	public static boolean isSageModeActivated(ItemStack stack) {
-		return stack.hasTagCompound() && stack.getTagCompound().hasKey(SAGECHAKRADEPLETIONAMOUNT, 6);
+		return SAGEMODE.jutsu.isActivated(stack);
 	}
 
 	public static boolean isSageModeActivated(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer) {
-			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
-			return stack != null && isSageModeActivated(stack);
-		}
-		return false;
+		return SAGEMODE.jutsu.isActivated(entity);
 	}
 
 	public static void deactivateSageMode(EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer) {
-			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
-			if (stack != null && isSageModeActivated(stack)) {
-				deactivateSageMode(stack, entity);
-			}
-		}
+		SAGEMODE.jutsu.deactivate(entity);
 	}
-
-	private static void deactivateSageMode(ItemStack stack, EntityLivingBase entity) {
-		if (stack.hasTagCompound()) {
-			Chakra.Pathway cp = Chakra.pathway(entity);
-			double d = stack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT);
-			if (d > 0.0d && cp.getAmount() > d) {
-				cp.consume(cp.getAmount() - d);
-			}
-			//stack.getTagCompound().removeTag(SAGEMODEACTIVATEDKEY);
-			stack.getTagCompound().removeTag(SAGECHAKRADEPLETIONAMOUNT);
-		}
-		if (entity instanceof EntityPlayerMP) {
-			OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, false);
-		}
-	}
-
+
 	public static class EventHook {
 		@SubscribeEvent
 		public void onDeath(LivingDeathEvent event) {
@@ -408,15 +346,37 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class SageMode implements ItemJutsu.IJutsuCallback {
+		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
+			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(REACH_BOOST, "sagemode.reach", 2.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "sagemode.damage", 60.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "sagemode.damagespeed", 2.0d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(MOVEMENT_SPEED_MODIFIER, "sagemode.movement", 1.5d, 1))
+			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(MAX_HEALTH_MODIFIER, "sagemode.health", 80.0d, 0))
+			.build();
+
 		@Override
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (power >= 100.0f) {
+				ItemSenninka.SenninkaJutsu.deactivateAll(entity);
 				Chakra.Pathway cp = Chakra.pathway(entity);
 				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
 				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
 				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
 				cp.consume(-0.6f / f, true);
-				//stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
+				if (!entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH))) {
+					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
+						IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
+						if (attr != null) {
+							attr.applyModifier(entry.getValue());
+						}
+					}
+					if (entity instanceof EntityPlayer) {
+						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
+						if (stack.getTagCompound().getInteger("prevFoodStat") != foodlevel) {
+							stack.getTagCompound().setInteger("prevFoodStat", foodlevel);
+						}
+					}
+				}
 				if (entity instanceof EntityPlayerMP) {
 					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
 				}
@@ -427,7 +387,38 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean isActivated(ItemStack stack) {
-			return isSageModeActivated(stack);
+			return stack.hasTagCompound() && stack.getTagCompound().hasKey(SAGECHAKRADEPLETIONAMOUNT, 6);
+		}
+
+		@Override
+		public boolean isActivated(EntityLivingBase entity) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			return stack != null && this.isActivated(stack);
+		}
+
+		@Override
+		public void deactivate(EntityLivingBase entity) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			if (stack != null && this.isActivated(stack)) {
+				for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
+					IAttributeInstance attr = entity.getEntityAttribute(entry.getKey());
+					if (attr != null) {
+						attr.removeModifier(entry.getValue().getID());
+					}
+				}
+				if (stack.hasTagCompound()) {
+					Chakra.Pathway cp = Chakra.pathway(entity);
+					double d = stack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT);
+					if (d > 0.0d && cp.getAmount() > d) {
+						cp.consume(cp.getAmount() - d);
+					}
+					stack.getTagCompound().removeTag(SAGECHAKRADEPLETIONAMOUNT);
+				}
+				if (entity instanceof EntityPlayerMP) {
+					((EntityPlayer)entity).getFoodStats().setFoodLevel(stack.getTagCompound().getInteger("prevFoodStat") - 5);
+					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, false);
+				}
+			}
 		}
 
 		@Override
@@ -436,8 +427,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		}
 	
 		@Override
-		public float getPowerupDelay() {
-			return 20.0f;
+		public float getPowerupDelay(ItemStack stack, EntityLivingBase player) {
+			return player instanceof EntityPlayer && ItemJutsu.hasOwnerMatchingItemstack((EntityPlayer)player, ItemSenninka.block) ? 2.0f : 20.0f;
 		}
 	
 		@Override

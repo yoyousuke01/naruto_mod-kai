@@ -203,10 +203,14 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void renderModel(AbstractClientPlayer entityIn, float f0, float f1, float f2, float f3, float f4, float f5) {
+			ModelPlayer model = this.getMainModel();
 			if (isTransparent(entityIn)) {
 				if (this.bindEntityTexture(entityIn)) {
 					GlStateManager.enableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
-					this.mainModel.render(entityIn, f0, f1, f2, f3, f4, f5);
+					if (headwearHiddenTicks(entityIn) > 0) {
+						model.bipedHeadwear.showModel = false;
+					}
+					model.render(entityIn, f0, f1, f2, f3, f4, f5);
 					GlStateManager.disableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
 				}
 			} else {
@@ -217,7 +221,6 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 						GlStateManager.enableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
 					}
 					this.bindEntityTexture(entityIn);
-					ModelPlayer model = this.getMainModel();
 					if (headwearHiddenTicks(entityIn) > 0) {
 						model.bipedHeadwear.showModel = false;
 					}

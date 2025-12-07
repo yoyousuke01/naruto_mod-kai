@@ -1429,6 +1429,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer browLeft;
 			private final ModelRenderer browRight;
 			private final ModelRenderer jaw;
+			private final ModelRenderer bone;
 			private final ModelRenderer leftear;
 			private final ModelRenderer rightear;
 			private final ModelRenderer eyes;
@@ -1478,7 +1479,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				bone3.setRotationPoint(1.25F, 0.25F, -4.0F);
 				nose.addChild(bone3);
 				setRotationAngle(bone3, 0.1452F, 0.2555F, 0.2256F);
-				bone3.cubeList.add(new ModelBox(bone3, 3, 24, -1.5F, -1.5F, 0.0F, 3, 3, 4, 0.0F, false));
+				bone3.cubeList.add(new ModelBox(bone3, 3, 24, -1.5F, -1.5F, 0.0F, 3, 4, 4, 0.0F, false));
 		
 				bone12 = new ModelRenderer(this);
 				bone12.setRotationPoint(0.0F, -0.25F, 4.75F);
@@ -1490,7 +1491,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				bone4.setRotationPoint(-1.25F, 0.25F, -4.0F);
 				nose.addChild(bone4);
 				setRotationAngle(bone4, 0.1452F, -0.2555F, -0.2256F);
-				bone4.cubeList.add(new ModelBox(bone4, 3, 24, -1.5F, -1.5F, 0.0F, 3, 3, 4, 0.0F, true));
+				bone4.cubeList.add(new ModelBox(bone4, 3, 24, -1.5F, -1.5F, 0.0F, 3, 4, 4, 0.0F, true));
 		
 				bone13 = new ModelRenderer(this);
 				bone13.setRotationPoint(0.0F, -0.25F, 4.75F);
@@ -1555,6 +1556,12 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				jaw.cubeList.add(new ModelBox(jaw, 20, 24, -3.0F, 0.0F, -4.0F, 6, 2, 4, -0.2F, false));
 				jaw.cubeList.add(new ModelBox(jaw, 36, 0, -3.0F, 1.25F, -3.75F, 6, 0, 3, -0.2F, false));
 		
+				bone = new ModelRenderer(this);
+				bone.setRotationPoint(0.0F, 1.75F, -3.75F);
+				jaw.addChild(bone);
+				setRotationAngle(bone, 0.4363F, 0.0F, 0.0F);
+				bone.cubeList.add(new ModelBox(bone, 7, 0, -1.5F, 0.0F, 0.0F, 3, 1, 2, 0.0F, false));
+
 				leftear = new ModelRenderer(this);
 				leftear.setRotationPoint(3.25F, 9.75F, -6.75F);
 				head.addChild(leftear);

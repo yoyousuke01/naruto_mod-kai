@@ -8,6 +8,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.Item;
@@ -107,6 +108,11 @@ public class ItemAsuraPathArmor extends ElementsNarutomodMod.ModElement {
 		private final ModelRenderer tail6;
 		//private final ModelRenderer rightArmwear;
 		//private final ModelRenderer leftArmwear;
+		private final ModelRenderer bipedRightArm1;
+		private final ModelRenderer bipedRightArm2;
+		private final ModelRenderer bipedLeftArm1;
+		private final ModelRenderer bipedLeftArm2;
+
 		public ModelArmorCustom() {
 			this.textureWidth = 64;
 			this.textureHeight = 64;
@@ -152,6 +158,34 @@ public class ItemAsuraPathArmor extends ElementsNarutomodMod.ModElement {
 			setRotationAngle(tail6, 0.5236F, 0.0F, 0.0F);
 			tail6.cubeList.add(new ModelBox(tail6, 26, 56, -3.0F, -8.0F, 0.0F, 6, 8, 0, 0.0F, false));
 	
+			bipedRightArm1 = new ModelRenderer(this);
+			bipedRightArm1.setRotationPoint(-5.0F, 2.0F, 1.0F);
+			bipedBody.addChild(bipedRightArm1);
+			setRotationAngle(bipedRightArm1, 0.0F, 0.5236F, 0.7854F);
+			bipedRightArm1.cubeList.add(new ModelBox(bipedRightArm1, 40, 18, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
+			bipedRightArm1.cubeList.add(new ModelBox(bipedRightArm1, 40, 34, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, false));
+		
+			bipedRightArm2 = new ModelRenderer(this);
+			bipedRightArm2.setRotationPoint(-5.0F, 2.0F, 2.0F);
+			bipedBody.addChild(bipedRightArm2);
+			setRotationAngle(bipedRightArm2, 1.0472F, 0.5236F, 1.5708F);
+			bipedRightArm2.cubeList.add(new ModelBox(bipedRightArm2, 40, 18, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, false));
+			bipedRightArm2.cubeList.add(new ModelBox(bipedRightArm2, 40, 34, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, false));
+		
+			bipedLeftArm1 = new ModelRenderer(this);
+			bipedLeftArm1.setRotationPoint(5.0F, 2.0F, 1.0F);
+			bipedBody.addChild(bipedLeftArm1);
+			setRotationAngle(bipedLeftArm1, 0.3927F, -0.5236F, -0.7854F);
+			bipedLeftArm1.cubeList.add(new ModelBox(bipedLeftArm1, 40, 18, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, true));
+			bipedLeftArm1.cubeList.add(new ModelBox(bipedLeftArm1, 40, 34, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, true));
+		
+			bipedLeftArm2 = new ModelRenderer(this);
+			bipedLeftArm2.setRotationPoint(5.0F, 2.0F, 2.0F);
+			bipedBody.addChild(bipedLeftArm2);
+			setRotationAngle(bipedLeftArm2, 1.0472F, -0.5236F, -1.5708F);
+			bipedLeftArm2.cubeList.add(new ModelBox(bipedLeftArm2, 40, 18, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.0F, true));
+			bipedLeftArm2.cubeList.add(new ModelBox(bipedLeftArm2, 40, 34, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.2F, true));
+
 			bipedRightArm = new ModelRenderer(this);
 			bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
 			setRotationAngle(bipedRightArm, -0.3927F, 0.0F, 0.0F);
@@ -169,6 +203,42 @@ public class ItemAsuraPathArmor extends ElementsNarutomodMod.ModElement {
 			modelRenderer.rotateAngleX = x;
 			modelRenderer.rotateAngleY = y;
 			modelRenderer.rotateAngleZ = z;
+		}
+
+		@Override
+		public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
+			super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
+		    this.bipedRightArm1.rotateAngleX = 0.3927F + MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 2.0F * limbSwingAmount * 0.5F;
+		    this.bipedLeftArm1.rotateAngleX = 0.3927F + MathHelper.cos(limbSwing * 0.6662F) * 2.0F * limbSwingAmount * 0.5F;
+		    this.bipedRightArm1.rotateAngleZ = 0.7854F;
+		    this.bipedLeftArm1.rotateAngleZ = -0.7854F;
+		    this.bipedRightArm1.rotateAngleY = 0.5236F;
+		    this.bipedLeftArm1.rotateAngleY = -0.5236F;
+		    this.bipedRightArm2.rotateAngleX = 1.0472F + MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 2.0F * limbSwingAmount * 0.5F;
+		    this.bipedLeftArm2.rotateAngleX = 1.0472F + MathHelper.cos(limbSwing * 0.6662F) * 2.0F * limbSwingAmount * 0.5F;
+		    this.bipedRightArm2.rotateAngleZ = 1.5708F;
+		    this.bipedLeftArm2.rotateAngleZ = -1.5708F;
+		    this.bipedRightArm2.rotateAngleY = 0.5236F;
+		    this.bipedLeftArm2.rotateAngleY = -0.5236F;
+		    if (this.isSneak) {
+				this.bipedRightArm1.rotateAngleX = 0.3927F + 1.8835F;
+				this.bipedRightArm1.rotateAngleY += -0.3927F;
+				this.bipedLeftArm1.rotateAngleX = 0.3927F + 1.8835F;
+				this.bipedLeftArm1.rotateAngleY += 0.3927F;
+				this.bipedRightArm2.rotateAngleX = 1.0472F + 1.8835F;
+				this.bipedRightArm2.rotateAngleY += -0.3927F;
+				this.bipedLeftArm2.rotateAngleX = 1.0472F + 1.8835F;
+				this.bipedLeftArm2.rotateAngleY += 0.3927F;
+		    } else {
+			    this.bipedRightArm1.rotateAngleZ += MathHelper.cos((ageInTicks + 20) * 0.09F) * 0.05F + 0.05F;
+			    this.bipedLeftArm1.rotateAngleZ -= MathHelper.cos((ageInTicks + 20) * 0.09F) * 0.05F + 0.05F;
+			    this.bipedRightArm1.rotateAngleX += MathHelper.sin((ageInTicks + 20) * 0.067F) * 0.05F;
+			    this.bipedLeftArm1.rotateAngleX -= MathHelper.sin((ageInTicks + 20) * 0.067F) * 0.05F;
+			    this.bipedRightArm2.rotateAngleZ += MathHelper.cos((ageInTicks + 40) * 0.09F) * 0.05F + 0.05F;
+			    this.bipedLeftArm2.rotateAngleZ -= MathHelper.cos((ageInTicks + 40) * 0.09F) * 0.05F + 0.05F;
+			    this.bipedRightArm2.rotateAngleX += MathHelper.sin((ageInTicks + 40) * 0.067F) * 0.05F;
+			    this.bipedLeftArm2.rotateAngleX -= MathHelper.sin((ageInTicks + 40) * 0.067F) * 0.05F;
+		    }
 		}
 	}
 }

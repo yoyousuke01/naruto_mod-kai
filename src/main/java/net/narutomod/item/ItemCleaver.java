@@ -24,6 +24,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.EnumAction;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
@@ -38,6 +39,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
@@ -61,6 +64,7 @@ public class ItemCleaver extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:cleaver")
 	public static final Item block = null;
 	public static final int ENTITYID = 33;
+	private static final String CUSTOM_MODEL_KEY = "CustomRenderedModel";
 
 	public ItemCleaver(ElementsNarutomodMod instance) {
 		super(instance, 780);
@@ -128,8 +132,22 @@ public class ItemCleaver extends ElementsNarutomodMod.ModElement {
 		}
 	
 		@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean isSelected) {
+			super.onUpdate(itemstack, world, entity, par4, isSelected);
+			if (itemstack.getTagCompound() == null) {
+				itemstack.setTagCompound(new NBTTagCompound());
+			}
+			if (isSelected) {
+				if (!itemstack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+					itemstack.getTagCompound().setBoolean(CUSTOM_MODEL_KEY, true);
+					world.playSound(null, entity.posX, entity.posY, entity.posZ,
+					 SoundEvents.ITEM_ARMOR_EQUIP_IRON, net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 1.6f);
+				}
+			} else if (itemstack.getTagCompound().hasKey(CUSTOM_MODEL_KEY)) {
+				itemstack.getTagCompound().removeTag(CUSTOM_MODEL_KEY);
+				world.playSound(null, entity.posX, entity.posY, entity.posZ,
+				 SoundEvents.ITEM_ARMOR_EQUIP_IRON, net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, 0.8f);
+			}
 			if (!world.isRemote && entity instanceof EntityLivingBase) {
 				if (((EntityLivingBase)entity).getHeldItemMainhand().equals(itemstack)) {
 					boolean flag = this.canUseRaiton((EntityLivingBase)entity);
@@ -188,10 +206,25 @@ public class ItemCleaver extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:cleaver", "inventory"));
+		class MeshDef implements ItemMeshDefinition {
+			final ModelResourceLocation[] resources = {
+		   	    new ModelResourceLocation("narutomod:cleaver", "inventory"),
+		   	    new ModelResourceLocation("narutomod:cleaver_sheathed", "inventory")
+			};
+	        @Override
+	        public ModelResourceLocation getModelLocation(ItemStack stack) {
+	            if (stack.hasTagCompound() && stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+	                return this.resources[0];
+	            }
+	            return this.resources[1];
+	        }
+	    }
+	    MeshDef meshDef = new MeshDef();
+   	    ModelBakery.registerItemVariants(block, meshDef.resources);
+	    ModelLoader.setCustomMeshDefinition(block, meshDef);
 	}
 
 	public static class EntityCustom extends Entity {

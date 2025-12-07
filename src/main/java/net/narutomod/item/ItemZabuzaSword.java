@@ -4,11 +4,13 @@ package net.narutomod.item;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -24,10 +26,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.SoundEvents;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
+import net.narutomod.entity.EntitySweep;
 
 import java.util.List;
 import com.google.common.collect.Multimap;
@@ -51,6 +56,11 @@ public class ItemZabuzaSword extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:zabuza_sword", "inventory"));
+	}
+
+	@Override
+	public void init(FMLInitializationEvent event) {
+		ProcedureOnLeftClickEmpty.addQualifiedItem(block, EnumHand.MAIN_HAND);
 	}
 
 	private static class ItemToolCustom extends Item implements ItemOnBody.Interface {
@@ -122,6 +132,33 @@ public class ItemZabuzaSword extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.isHandActive()) {
+				return true;
+			}
+			if (!attacker.world.isRemote && attacker.equals(target)) {
+				if (!itemstack.isEmpty()) {
+					boolean sweep = false;
+					double d = ProcedureUtils.getReachDistance(attacker);
+					for (EntityLivingBase entity : attacker.world.getEntitiesWithinAABB(EntityLivingBase.class, attacker.getEntityBoundingBox().grow(d, 0.25D, d))) {
+						if (entity != attacker && !attacker.isOnSameTeam(entity) && attacker.getDistanceSq(entity) <= d * d) {
+							Vec3d vec1 = attacker.getLookVec();
+							Vec3d vec2 = attacker.getPositionVector().subtract(entity.getPositionVector()).normalize();
+							if (vec2.dotProduct(vec1) < 0.0d) {
+								attacker.attackTargetEntityWithCurrentItem(entity);
+								sweep = true;
+							}
+						}
+					}
+					if (sweep) {
+						attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP,
+						 net.minecraft.util.SoundCategory.NEUTRAL, 1.0F, 1.0F);
+						Vec3d vec = attacker.getPositionVector();
+						for (int i = 2; i < 10; i++) {
+							EntitySweep.Base sweepParticle = new EntitySweep.Base(attacker, 0xB0AAAAAA, (float)d * 2 - 1.2f * i);
+							sweepParticle.setLocationAndAngles(vec.x, vec.y + 1.4d - 0.02d * i, vec.z, attacker.rotationYaw, 0.0f);
+							attacker.world.spawnEntity(sweepParticle);
+						}
+					}
+				}
 				return true;
 			}
 			return super.onLeftClickEntity(itemstack, attacker, target);

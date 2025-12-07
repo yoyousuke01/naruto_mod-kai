@@ -1550,7 +1550,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			float f2 = f1 / (float)this.particleMaxAge;
 			float f3 = this.particleScale * (f2 * 0.8f + 0.5f);
 			float f4 = this.particleAlpha * (1.0F - f2);
-			this.renderBuffer(buffer, entityIn, partialTicks, this.rotateX, this.rotateY, this.rotateZ - 30.0F * f1, f3, f4);
+			this.renderBuffer(buffer, entityIn, partialTicks, this.rotateX, this.rotateY, this.rotateZ - 60.0F * f1, f3, f4);
 		}
 
 		@Override

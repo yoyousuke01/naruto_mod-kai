@@ -680,23 +680,43 @@ public class ProcedureSync extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static void sendToSelf(EntityPlayerMP entity, String tagName) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(entity, tagName), entity);
+			EntityNBTTag.sendTo(entity, entity, tagName);
 		}
 
 		public static void sendToSelf(EntityPlayerMP entity, String tagName, int i) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(entity, tagName, i), entity);
+			EntityNBTTag.sendTo(entity, entity, tagName, i);
 		}
 
 		public static void sendToSelf(EntityPlayerMP entity, String tagName, double d) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(entity, tagName, d), entity);
+			EntityNBTTag.sendTo(entity, entity, tagName, d);
 		}
 
 		public static void sendToSelf(EntityPlayerMP entity, String tagName, boolean b) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(entity, tagName, b), entity);
+			EntityNBTTag.sendTo(entity, entity, tagName, b);
 		}
 
 		public static void sendToSelf(EntityPlayerMP entity, String tagName, byte b) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(entity, tagName, b), entity);
+			EntityNBTTag.sendTo(entity, entity, tagName, b);
+		}
+
+		public static void sendTo(EntityPlayerMP entity, Entity tagOwner, String tagName) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(tagOwner, tagName), entity);
+		}
+
+		public static void sendTo(EntityPlayerMP entity, Entity tagOwner, String tagName, int i) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(tagOwner, tagName, i), entity);
+		}
+
+		public static void sendTo(EntityPlayerMP entity, Entity tagOwner, String tagName, double d) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(tagOwner, tagName, d), entity);
+		}
+
+		public static void sendTo(EntityPlayerMP entity, Entity tagOwner, String tagName, boolean b) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(tagOwner, tagName, b), entity);
+		}
+
+		public static void sendTo(EntityPlayerMP entity, Entity tagOwner, String tagName, byte b) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new EntityNBTTag(tagOwner, tagName, b), entity);
 		}
 
 		public static void sendToTracking(Entity entity, String tagName) {
