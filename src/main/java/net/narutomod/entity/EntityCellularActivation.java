@@ -129,7 +129,7 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 				 : 1;
 				if (i >= 10) {
 					Chakra.Pathway cp = Chakra.pathway(user);
-					float reduction = event.getAmount() * (1f - 1f/(float)(i - 8));
+					float reduction = (event.getAmount() * (1f - 1f/(float)(i - 8)) * 0.05f);
 					this.setReductionAmount(this.getReductionAmount() + (int)reduction);
 					double chakrausage = this.chakraBurn * reduction;
 					if (chakrausage > cp.getAmount()) {
